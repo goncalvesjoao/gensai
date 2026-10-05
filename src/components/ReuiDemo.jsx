@@ -1,44 +1,11 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
 let ReuiInstance;
 
 async function getReui() {
   if (!ReuiInstance) {
-    const reactModule = await import('react');
-    const React = reactModule.default ?? reactModule;
-
-    if (!React.PropTypes) {
-      Object.defineProperty(React, 'PropTypes', {
-        value: PropTypes,
-        configurable: true,
-      });
-    }
-
     const mod = await import('reui/lib/Reui.js');
     ReuiInstance = mod.default ?? mod;
-
-    ReuiInstance.setGlobalTheme({
-      Panel: {
-        panel: 'reui-panel',
-        panelHeading: 'reui-panel__heading',
-        panelBody: 'reui-panel__body',
-      },
-      Button: {
-        button: 'reui-button',
-        buttonXs: 'reui-button--xs',
-        buttonSm: 'reui-button--sm',
-        buttonMd: 'reui-button--md',
-        buttonLg: 'reui-button--lg',
-        buttonDisabled: 'reui-button--disabled',
-        buttonActive: 'reui-button--active',
-        buttonDefault: 'reui-button--default',
-        buttonPrimary: 'reui-button--primary',
-        buttonSuccess: 'reui-button--success',
-        buttonWarning: 'reui-button--warning',
-        buttonDanger: 'reui-button--danger',
-      },
-    });
   }
 
   return ReuiInstance;
