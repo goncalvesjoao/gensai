@@ -28,6 +28,10 @@ export default function MapView() {
           lat: position.coords.latitude,
         };
 
+        if (typeof window !== 'undefined') {
+          window.__gensaiCurrentLocation = nextLocation;
+        }
+
         setLocation(nextLocation);
         setIsReady(true);
 
@@ -57,6 +61,10 @@ export default function MapView() {
       attributionControl: false,
     });
 
+    if (typeof window !== 'undefined') {
+      window.__gensaiMapInstance = map;
+    }
+
     map.addControl(new maplibregl.NavigationControl(), 'top-right');
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     mapRef.current = map;
@@ -66,6 +74,9 @@ export default function MapView() {
     return () => {
       map.remove();
       mapRef.current = null;
+      if (typeof window !== 'undefined' && window.__gensaiMapInstance === map) {
+        delete window.__gensaiMapInstance;
+      }
     };
   }, [location]);
 

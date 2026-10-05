@@ -61,6 +61,17 @@ export default function ReuiDemo() {
     };
   }, []);
 
+  const handleCenter = () => {
+    if (typeof window === 'undefined') return;
+
+    const nextLocation = window.__gensaiCurrentLocation || { lng: 139.6917, lat: 35.6895 };
+    const map = window.__gensaiMapInstance;
+
+    if (map) {
+      map.flyTo({ center: [nextLocation.lng, nextLocation.lat], zoom: 12 });
+    }
+  };
+
   if (!Reui) {
     return <div className="reui-loading">Loading panel…</div>;
   }
@@ -68,7 +79,9 @@ export default function ReuiDemo() {
   return (
     <Reui.Panel title="Preparedness map">
       <p className="panel-copy">Use the map to check conditions near your current location.</p>
-      <Reui.Button title="Center on me" color="primary" size="md" className="reui-demo-button" />
+      <button type="button" className="reui-button reui-button--md reui-button--primary" onClick={handleCenter}>
+        Center on me
+      </button>
     </Reui.Panel>
   );
 }
