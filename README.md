@@ -36,7 +36,14 @@ Coverage varies by layer and region. The map will need to distinguish unavailabl
 
 ## Local development
 
-The app uses Astro 7, React 19, MapLibre GL JS 6, and the official [ReUI](https://reui.io/docs/get-started)/shadcn registry workflow with Tailwind CSS 4. React components are written in JavaScript/JSX. You need Node.js 22.12.0 or later and npm 9.6.5 or later.
+The app uses Astro 7, React 19, MapLibre GL JS 6, and the official [ReUI](https://reui.io/docs/get-started)/shadcn registry workflow with Tailwind CSS 4. React components are written in JavaScript/JSX. Use Node.js 26.10.0, pinned in `.nvmrc`, and npm 9.6.5 or later. Other supported Node.js versions are `^22.22.3`, `^24.16.0`, or `>=26.3.0`.
+
+If you use nvm, select the project's Node.js version first:
+
+```bash
+nvm install
+nvm use
+```
 
 Install dependencies and start the development server:
 
