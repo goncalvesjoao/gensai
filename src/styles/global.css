@@ -1,3 +1,40 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--ink);
+  --color-card: var(--panel);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--panel);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--brand);
+  --color-primary-strong: #0b5f5b;
+  --color-primary-foreground: #fff;
+  --color-secondary: #e8edf6;
+  --color-secondary-foreground: var(--ink);
+  --color-muted: #e8edf6;
+  --color-muted-foreground: var(--muted);
+  --color-accent: #e8edf6;
+  --color-accent-foreground: var(--ink);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--brand);
+  --color-destructive: var(--color-red-600);
+  --color-destructive-foreground: var(--color-red-800);
+  --color-info: var(--color-violet-500);
+  --color-info-foreground: var(--color-violet-900);
+  --color-success: var(--color-emerald-500);
+  --color-success-foreground: var(--color-emerald-900);
+  --color-warning: var(--color-yellow-500);
+  --color-warning-foreground: var(--color-yellow-900);
+  --color-invert: var(--color-zinc-900);
+  --color-invert-foreground: var(--color-zinc-50);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+}
+
 :root {
   color-scheme: light;
   --bg: #f3f5f7;
@@ -5,7 +42,6 @@
   --ink: #13233a;
   --muted: #53657b;
   --brand: #0f766e;
-  --brand-strong: #0b5f5b;
   --border: rgba(18, 24, 38, 0.1);
   --shadow: rgba(15, 23, 42, 0.08);
 }
@@ -85,60 +121,6 @@ body {
   margin: 0 0 16px;
   line-height: 1.5;
   color: var(--muted);
-}
-
-.reui-panel {
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  overflow: hidden;
-}
-
-.reui-panel__heading {
-  background: linear-gradient(
-    135deg,
-    rgba(15, 118, 110, 0.08),
-    rgba(15, 118, 110, 0.02)
-  );
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 700;
-  color: var(--brand-strong);
-}
-
-.reui-panel__body {
-  padding: 18px;
-}
-
-.reui-button {
-  appearance: none;
-  border: 0;
-  border-radius: 10px;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.reui-button:hover {
-  transform: translateY(-1px);
-}
-
-.reui-button--md {
-  padding: 0.7rem 1rem;
-  min-height: 40px;
-}
-
-.reui-button--primary {
-  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-  color: white;
-  box-shadow: 0 10px 18px rgba(15, 118, 110, 0.18);
-}
-
-.reui-button--default {
-  background: #e8edf6;
-  color: var(--ink);
 }
 
 @media (max-width: 860px) {

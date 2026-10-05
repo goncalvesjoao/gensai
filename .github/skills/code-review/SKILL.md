@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Review changes along two axes: Standards (repository coding standards) and Spec (originating requirements). Use for automatic pull request reviews, requested PR or branch reviews, and local reviews since a commit, branch, tag, or merge-base."
+description: 'Review changes along two axes: Standards (repository coding standards) and Spec (originating requirements). Use for automatic pull request reviews, requested PR or branch reviews, and local reviews since a commit, branch, tag, or merge-base.'
 ---
 
 Two-axis review of a pull request or local Git comparison:
@@ -42,7 +42,7 @@ On top of whatever the repo documents, the Standards axis always carries the **s
 - **The repo overrides.** A documented repo standard always wins; where it endorses something the baseline would flag, suppress the smell.
 - **Always a judgement call.** Each smell is a labelled heuristic ("possible Feature Envy"), never a hard violation. Like any standard here, skip anything tooling already enforces.
 
-Each smell reads *what it is* → *how to fix*; match it against the diff:
+Each smell reads _what it is_ → _how to fix_; match it against the diff:
 
 - **Mysterious Name**: a function, variable, or type whose name doesn't reveal what it does or holds. → rename it; if no honest name comes, the design's murky.
 - **Duplicated Code**: the same logic shape appears in more than one hunk or file in the change. → extract the shared shape, call it from both.

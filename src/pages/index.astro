@@ -1,8 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MapView from '../components/MapView.jsx';
-import ReuiDemo from '../components/ReuiDemo.jsx';
-import '../styles/global.css';
+import PreparednessPanel from '../components/PreparednessPanel.astro';
 ---
 
 <BaseLayout>
@@ -14,7 +13,7 @@ import '../styles/global.css';
 
     <div class="content-grid">
       <aside class="sidebar">
-        <ReuiDemo client:only="react" />
+        <PreparednessPanel />
       </aside>
 
       <section class="map-panel" aria-label="Map of your location">
