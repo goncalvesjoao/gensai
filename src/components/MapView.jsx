@@ -88,7 +88,7 @@ export default function MapView({ locale = 'en' }) {
   return (
     <>
       {!isReady && (
-        <div className="map-loading">
+        <div className="absolute top-4 left-4 z-1 rounded-md bg-card px-3 py-2">
           {locale === 'ja' ? '地図を読み込み中…' : 'Loading map…'}
         </div>
       )}

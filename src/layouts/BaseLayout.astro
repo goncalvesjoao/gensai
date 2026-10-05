@@ -9,6 +9,9 @@ const locale = localeFromPath(Astro.url.pathname);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title><slot name="title">Gensai Map</slot></title>
+
     <!-- Apply preferences synchronously before the body can paint. -->
     <script is:inline>
       (() => {
@@ -25,8 +28,8 @@ const locale = localeFromPath(Astro.url.pathname);
         document.documentElement.dataset.theme = theme;
       })();
     </script>
-    <title><slot name="title">Gensai Map</slot></title>
   </head>
+
   <body>
     <NavigationRail
       client:load
