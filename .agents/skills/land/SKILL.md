@@ -1,19 +1,18 @@
 ---
 name: land
 description: >-
-  Land changes in goncalvesjoao/gensai through verified, squash-merged GitHub
-  pull requests. Invoke only when the user explicitly requests landing,
-  including /land, not for review, preparation, passing checks, or installation.
+  Prepare and verify a GitHub pull request in goncalvesjoao/gensai for the user
+  to merge manually.
 disable-model-invocation: true
-metadata:
-  delta-action: land
 ---
 
 # Land
 
-An explicit landing request authorizes this workflow, including publication and
-merging. Proceed without asking for the same permission again. Stop for genuine
-blockers or unresolved scope.
+An explicit `/land` request authorizes preparation, verification, and publication
+of a pull request. The user owns the final merge. Stop at the manual handoff;
+do not merge the PR, enable auto-merge, or enqueue it for merging.
+Proceed without asking again for publication permission. Stop for genuine blockers
+or unresolved scope.
 
 ## Prepare the change
 
@@ -78,9 +77,9 @@ Inspect the final diff for accidental changes and consistency with the request.
 Investigate failures, commit corrections, and repeat applicable verification after
 each change. Disclose dependency audit findings; address any that current policy
 or review identifies as blockers rather than treating a build as security evidence.
-Every required local check must pass on the exact final tree being landed.
+Every required local check must pass on the exact final tree being published.
 
-## Publish and land
+## Publish and verify
 
 1. Push the feature branch to `origin` without force. Open or update its pull request
    targeting `main`. Use an explicit title and body file, with the change scope,
@@ -95,26 +94,22 @@ Every required local check must pass on the exact final tree being landed.
    (source: `gh pr checks --help`); bounded `--watch` may wait for completion.
    Ensure results apply to the final head and any merge candidate required by
    repository rules.
-3. Require all applicable checks and reviews to have passed before landing. Pending,
+3. Require all applicable checks and reviews to have passed before reporting the PR
+   ready for manual merge. Pending,
    failing, missing, cancelled, or unverifiable required results are blockers.
    No remote checks is acceptable only when current repository requirements require
    none. Address actionable review findings and repeat verification after edits.
 4. If the target advances and synchronization is needed, merge its latest revision
    into the feature branch, handle conflicts as above, and repeat verification,
    publication, and required reviews/checks on the updated head.
-5. Confirm squash merging remains permitted, then use
-   `gh pr merge <number> --squash --match-head-commit <verified-head-sha>`
-   (source: `gh pr merge --help`). Do not use an administrative bypass.
-   If a required merge queue controls landing, use its supported mechanism without
-   bypassing requirements and wait for actual completion. Queued or auto-merge-enabled
-   is not landed. Stop if a changed merge policy prevents this workflow.
 
-## Confirm completion
+## Hand off for manual merge
 
-Read the PR's merged state and merge commit, fetch `origin/main`, and verify that
-commit is present in the destination history. Only then report successful landing,
-with the PR URL, merge commit, and verification results.
+Report the PR URL, verified head SHA, local verification results, remote check and
+review status, and known limitations. State that the PR is ready for the user to
+merge manually only when all applicable requirements have passed. Preparation is
+complete at this handoff; do not report the change as landed.
 
 Leave branches and unrelated local work intact. If a blocker prevents completion,
-state that the changes have not landed, identify the blocker, and report any branch
-or PR already published.
+identify the blocker and report any branch or PR already published. Leave the PR
+open for the user to review and merge.
