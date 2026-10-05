@@ -94,6 +94,7 @@ shim is needed.
 | `npm run dev`          | Start the development server.                                       |
 | `npm run build`        | Create a production build.                                          |
 | `npm run preview`      | Preview the production build locally after running `npm run build`. |
+| `npm test`             | Build and check production map worker requests through preview.     |
 | `npm run lint`         | Check JavaScript, JSX, and Astro files with ESLint.                 |
 | `npm run lint:fix`     | Apply automatic ESLint fixes.                                       |
 | `npm run format`       | Format the project with Prettier, including Astro files.            |
@@ -101,7 +102,11 @@ shim is needed.
 
 ESLint checks code correctness and React Hooks; Prettier handles formatting.
 Generated files and the dependency lockfile are excluded from formatting.
-No automated test suite is configured. The current `npm test` script is a placeholder that exits with an error.
+The Node.js test suite checks that the emitted MapLibre worker and its relative
+static imports are served successfully with JavaScript MIME types by Astro preview.
+MapLibre 6's worker imports a shared module, so its Vite import must use
+`.mjs?worker&url` to bundle that dependency; plain `?url` can work in development
+but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibre-gl-js/docs/).
 
 ### Project structure
 
@@ -115,6 +120,7 @@ No automated test suite is configured. The current `npm test` script is a placeh
 - `components.json`: shadcn/ReUI registry setup.
 - `tsconfig.json`: Astro configuration and `@/*` source alias for registry installs.
 - `astro.config.mjs`: Astro, React, Tailwind Vite plugin, and server configuration.
+- `tests/map-worker.test.mjs`: production worker request regression test.
 
 ## License
 
