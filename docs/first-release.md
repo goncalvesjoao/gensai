@@ -35,11 +35,11 @@ not be presented as the user's current location.
 
 Use these five official hazard layers, presented as three categories:
 
-| Category | Layers |
-| --- | --- |
-| River flooding | Assumed maximum-scale inundation depth, combining national and prefectural river data |
-| Tsunami | Estimated inundation depth |
-| Landslide hazards | Debris flow, steep-slope collapse, and landslide warning zones |
+| Category          | Layers                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| River flooding    | Assumed maximum-scale inundation depth, combining national and prefectural river data |
+| Tsunami           | Estimated inundation depth                                                            |
+| Landslide hazards | Debris flow, steep-slope collapse, and landslide warning zones                        |
 
 Select tsunami initially. Show one category at a time. Within landslide hazards,
 show the three types together with legend entries that distinguish them.

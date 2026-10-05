@@ -36,7 +36,10 @@ export default function MapView() {
         setIsReady(true);
 
         if (mapRef.current) {
-          mapRef.current.flyTo({ center: [nextLocation.lng, nextLocation.lat], zoom: 12 });
+          mapRef.current.flyTo({
+            center: [nextLocation.lng, nextLocation.lat],
+            zoom: 12,
+          });
           const marker = new maplibregl.Marker({ color: '#ef4444' })
             .setLngLat([nextLocation.lng, nextLocation.lat])
             .addTo(mapRef.current);
@@ -46,7 +49,7 @@ export default function MapView() {
       () => {
         setIsReady(true);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     );
   }, []);
 
@@ -83,7 +86,11 @@ export default function MapView() {
   return (
     <>
       {!isReady && <div className="map-loading">Loading map…</div>}
-      <div className="map-shell" ref={containerRef} aria-label="Map centered on your location" />
+      <div
+        className="map-shell"
+        ref={containerRef}
+        aria-label="Map centered on your location"
+      />
     </>
   );
 }
