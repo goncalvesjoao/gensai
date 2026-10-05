@@ -1,14 +1,38 @@
 ---
 import '../styles/global.css';
+import NavigationRail from '../components/NavigationRail.jsx';
+import { localeFromPath, unlocalizedPath } from '../lib/locale.mjs';
+const locale = localeFromPath(Astro.url.pathname);
 ---
 
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Apply preferences synchronously before the body can paint. -->
+    <script is:inline>
+      (() => {
+        let theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+        try {
+          const savedTheme = localStorage.getItem('gensai-theme');
+          if (savedTheme === 'light' || savedTheme === 'dark')
+            theme = savedTheme;
+        } catch {
+          // Storage is optional; retain the system theme.
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <title><slot name="title">Gensai Map</slot></title>
   </head>
   <body>
+    <NavigationRail
+      client:load
+      locale={locale}
+      path={unlocalizedPath(Astro.url.pathname).replace(/\/$/, '') || '/'}
+    />
     <slot />
   </body>
 </html>

@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MapView from '../../components/MapView.jsx';
+import PreparednessPanel from '../../components/PreparednessPanel.astro';
+---
+
+<BaseLayout>
+  <main class="page-shell">
+    <div class="content-grid">
+      <aside class="sidebar">
+        <PreparednessPanel locale="ja" />
+      </aside>
+      <section class="map-panel" aria-label="現在地の地図">
+        <MapView client:only="react" locale="ja" />
+      </section>
+    </div>
+  </main>
+</BaseLayout>
