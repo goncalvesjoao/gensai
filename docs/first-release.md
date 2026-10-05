@@ -1,6 +1,7 @@
 # First release
 
-Status: scope confirmed by the product owner on 2026-10-05.
+Status: scope confirmed by the product owner on 2026-10-05; URL and redirect
+requirements updated on 2026-10-06.
 This document describes planned behaviour, not implemented functionality.
 Domain terms are defined in [GLOSSARY.md](../GLOSSARY.md).
 
@@ -9,6 +10,24 @@ Domain terms are defined in [GLOSSARY.md](../GLOSSARY.md).
 The first release prioritizes current residents preparing before a disaster.
 They can find a selected location and explore the mapped hazards around it.
 Home is the primary use case; workplaces and other locations work the same way.
+
+## URLs and entry point
+
+The Gensai map lives at the root of a dedicated map subdomain. The Gensai entry
+point redirects visitors to the map for this release instead of showing a welcome
+page.
+
+| Environment | Gensai entry point       | Gensai map                   |
+| ----------- | ------------------------ | ---------------------------- |
+| Production  | `https://gensai.help/`   | `https://map.gensai.help/`   |
+| Development | `http://localhost:4321/` | `http://map.localhost:4321/` |
+
+Development uses the same port on both hosts. If the development server uses a
+port other than 4321, use that port for both URLs.
+
+English is unprefixed and Japanese uses `/ja` on the map subdomain. Redirect the
+Japanese entry point at `/ja` to the map subdomain's `/ja` route. Language switching
+keeps visitors on the map subdomain. The map URL does not require a `/map` path.
 
 ## Geographic scope and location selection
 
@@ -95,6 +114,9 @@ explains that absent hazard display may reflect missing data, that publication
 can lag source updates, and that zooming in does not establish greater accuracy.
 
 Before implementation is considered ready for release:
+
+- Verify that the map loads directly on its production and development hosts and
+  that the entry point redirects to the corresponding map host, including `/ja`.
 
 - Select an address-search provider and verify Japanese-script and Latin-character
   queries, result ambiguity, and restriction to Japan.

@@ -1,8 +1,9 @@
 ---
 import '../styles/global.css';
-import NavigationRail from '../components/NavigationRail.jsx';
-import { localeFromPath, unlocalizedPath } from '../lib/locale.mjs';
+import PreferenceControls from '../components/PreferenceControls.jsx';
+import { localeFromPath } from '../lib/locale.mjs';
 const locale = localeFromPath(Astro.url.pathname);
+const { title = 'Gensai Map' } = Astro.props;
 ---
 
 <html lang={locale}>
@@ -10,8 +11,25 @@ const locale = localeFromPath(Astro.url.pathname);
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title><slot name="title">Gensai Map</slot></title>
+    <title>{title}</title>
 
+    <!-- Resolve the entry-point host before the map can hydrate. -->
+    <script is:inline>
+      (() => {
+        const url = new URL(window.location.href);
+        if (url.hostname === 'gensai.help') {
+          url.hostname = 'map.gensai.help';
+          url.protocol = 'https:';
+          url.port = '';
+        } else if (url.hostname === 'localhost') {
+          url.hostname = 'map.localhost';
+        } else {
+          return;
+        }
+        // ponytail: static build uses a browser redirect; use a host HTTP redirect when hosting is chosen.
+        window.location.replace(url.href);
+      })();
+    </script>
     <!-- Apply preferences synchronously before the body can paint. -->
     <script is:inline>
       (() => {
@@ -31,11 +49,9 @@ const locale = localeFromPath(Astro.url.pathname);
   </head>
 
   <body>
-    <NavigationRail
-      client:load
-      locale={locale}
-      path={unlocalizedPath(Astro.url.pathname).replace(/\/$/, '') || '/'}
-    />
+    <div class="fixed top-4 right-4 z-10">
+      <PreferenceControls client:load locale={locale} />
+    </div>
     <slot />
   </body>
 </html>

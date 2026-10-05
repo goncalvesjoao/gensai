@@ -70,7 +70,7 @@ export default function MapView({ locale = 'en' }) {
       window.__gensaiMapInstance = map;
     }
 
-    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     mapRef.current = map;
 

@@ -4,6 +4,14 @@ Domain vocabulary for disaster preparedness in Japan.
 
 ## Language
 
+**Gensai map**:
+The map experience for examining mapped hazards around a selected location in Japan.
+_Avoid_: Gensai entry point, when referring to the map itself.
+
+**Gensai entry point**:
+Gensai's main site address, distinct from the address of the Gensai map.
+_Avoid_: Gensai map, when referring to the main site address.
+
 **Current resident**:
 A person who already lives in Japan.
 _Avoid_: User, when referring specifically to residency status.

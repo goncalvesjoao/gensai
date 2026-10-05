@@ -28,11 +28,29 @@ Gensai will initially support English and Japanese speakers, with additional lan
 
 ## Current status
 
-Gensai is in early development. The current prototype has a MapLibre GL JS map using demo tiles, browser geolocation with a Tokyo fallback, and a "Center on me" button in a ReUI panel. The interface is currently in English.
+Gensai is in early development. The current prototype has a MapLibre GL JS map using demo tiles, browser geolocation with a Tokyo fallback, and a "Center on me" button in a ReUI panel. The map lives at the root of the map subdomain; the main site address redirects to it. The prototype has English and Japanese routes.
 
-Official hazard layers, preparedness guidance, and Japanese language support are not implemented yet. The planned hazard map will use official tiles and legends from Japan's [Hazard Map Portal](https://disaportal.gsi.go.jp/). The portal's [open-data catalogue](https://disaportal.gsi.go.jp/hazardmap/copyright/opendata.html) lists tile URLs, zoom levels, data providers, attribution requirements, and coverage notes.
+Official hazard layers and preparedness guidance are not implemented yet. The planned hazard map will use official tiles and legends from Japan's [Hazard Map Portal](https://disaportal.gsi.go.jp/). The portal's [open-data catalogue](https://disaportal.gsi.go.jp/hazardmap/copyright/opendata.html) lists tile URLs, zoom levels, data providers, attribution requirements, and coverage notes.
 
 Coverage varies by layer and region. The map will need to distinguish unavailable data from areas with no mapped hazard. Tile URLs and coverage will be checked against the official catalogue during implementation.
+
+## First release URLs
+
+The [first-release spec](docs/first-release.md) places the Gensai map at
+`https://map.gensai.help/`, with `https://gensai.help/` redirecting to it.
+In development, `http://localhost:4321/` redirects to
+`http://map.localhost:4321/`. Both development hosts use the same server port,
+including when it differs from 4321.
+
+English uses the map host's root and Japanese uses `/ja`. The entry point's
+`/ja` route redirects to `/ja` on the map host. Language switching stays on the
+map host.
+
+The static build uses a browser redirect in the page head for the entry-point
+host, preserving the path, query string, and fragment. Serve the same `dist/`
+build on both production hosts with HTTPS. DNS and hosting setup are required
+before the production URLs are live. When a hosting provider is chosen, configure
+an HTTP redirect there so the entry point also redirects without JavaScript.
 
 ## Local development
 
@@ -52,7 +70,7 @@ npm ci
 npm run dev
 ```
 
-Open [localhost:4321](http://localhost:4321) to view the app. If that port is occupied, use the URL printed by the development server. The demo map needs an internet connection to load its tiles. Allow location access to center it on your position; otherwise, it defaults to Tokyo.
+Open [map.localhost:4321](http://map.localhost:4321) to view the map directly, or [localhost:4321](http://localhost:4321) to follow the redirect. If that port is occupied, use the port printed by the development server on both hosts. The demo map needs an internet connection to load its tiles. Allow location access to center it on your position; otherwise, it defaults to Tokyo.
 
 ### UI components and styling
 
@@ -78,7 +96,7 @@ namespace; consult that component's current docs for its name and dependencies.
 Install only dependencies required by the chosen component, not the entire
 catalog's animation or primitive libraries.
 
-The navigation rail reuses stock `base-nova` Button (ghost/icon size), Tooltip,
+The theme and language controls reuse stock `base-nova` Button (ghost/icon size), Tooltip,
 and DropdownMenu radio items. Their JSX adaptations live in `src/components/ui/`,
 use the existing Base UI primitives, and omit optional animation utilities.
 Before adding custom component CSS, check the configured shadcn/ReUI registries
@@ -92,12 +110,12 @@ shadcn/ReUI semantic color tokens to the existing light palette. The existing
 page grid, sidebar, and map sizing remain plain CSS. The layout applies the saved
 or system theme before first paint; dark-mode tokens also style the menu and
 tooltips. English routes are unprefixed and Japanese routes use `/ja`; each page
-renders only its selected language. The rail's language menu navigates between
+renders only its selected language. The language menu navigates between
 equivalent routes. Component-specific animation styles are not configured.
 
 Following [Astro's framework component conventions](https://docs.astro.build/en/guides/framework-components/),
 the layout and panel content stay in Astro. Card sections render as static HTML
-without hydration. The React rail and centering button use `client:load` so their
+without hydration. The React preference controls and centering button use `client:load` so their
 actions are available immediately; the centering handler accesses the existing
 browser map instance and uses Tokyo when geolocation is unavailable.
 MapLibre stays in a `client:only="react"` island so its browser-only code is not
@@ -127,8 +145,9 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 
 ### Project structure
 
-- `src/pages/index.astro`: home page.
-- `src/layouts/BaseLayout.astro`: shared HTML layout and global stylesheet import.
+- `src/pages/index.astro`: English map page.
+- `src/pages/ja/index.astro`: Japanese map page.
+- `src/layouts/BaseLayout.astro`: shared HTML layout, entry-point redirect, and theme initialization.
 - `src/components/MapView.jsx`: map and browser geolocation.
 - `src/components/PreparednessPanel.astro`: static sidebar panel.
 - `src/components/CenterOnMe.jsx`: interactive map centering button with a Lucide icon.
@@ -138,6 +157,7 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `tsconfig.json`: Astro configuration and `@/*` source alias for registry installs.
 - `astro.config.mjs`: Astro, React, Tailwind Vite plugin, and server configuration.
 - `tests/map-worker.test.mjs`: production worker request regression test.
+- `tests/map-routing.test.mjs`: entry-point redirect checks.
 
 ## License
 
