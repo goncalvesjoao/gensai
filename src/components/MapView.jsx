@@ -9,7 +9,8 @@ if (typeof window !== 'undefined') {
   maplibregl.setWorkerUrl(maplibreWorkerUrl);
 }
 
-export default function MapView() {
+// eslint-disable-next-line react/prop-types
+export default function MapView({ locale = 'en' }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const [location, setLocation] = useState(TOKYO);
@@ -43,7 +44,8 @@ export default function MapView() {
           const marker = new maplibregl.Marker({ color: '#ef4444' })
             .setLngLat([nextLocation.lng, nextLocation.lat])
             .addTo(mapRef.current);
-          marker.getElement().title = 'Your location';
+          marker.getElement().title =
+            locale === 'ja' ? '現在地' : 'Your location';
         }
       },
       () => {
@@ -51,7 +53,7 @@ export default function MapView() {
       },
       { enableHighAccuracy: true, timeout: 10000 },
     );
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -85,11 +87,19 @@ export default function MapView() {
 
   return (
     <>
-      {!isReady && <div className="map-loading">Loading map…</div>}
+      {!isReady && (
+        <div className="absolute top-4 left-4 z-1 rounded-md bg-card px-3 py-2">
+          {locale === 'ja' ? '地図を読み込み中…' : 'Loading map…'}
+        </div>
+      )}
       <div
         className="map-shell"
         ref={containerRef}
-        aria-label="Map centered on your location"
+        aria-label={
+          locale === 'ja'
+            ? '現在地を中心とした地図'
+            : 'Map centered on your location'
+        }
       />
     </>
   );

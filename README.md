@@ -64,24 +64,34 @@ install by bare name, not `@reui/card` or `@reui/button`:
 npx shadcn@latest add card button
 ```
 
-The local components retain only the sections/default button variant needed here.
+The local components retain only the sections, variants, and sizes needed here.
 Reinstalling them can replace these adaptations; review the diff before accepting
 overwrites. Free ReUI `c-*` components can be added using the `@reui/<name>`
 namespace; consult that component's current docs for its name and dependencies.
 Install only dependencies required by the chosen component, not the entire
 catalog's animation or primitive libraries.
 
+The navigation rail reuses stock `base-nova` Button (ghost/icon size), Tooltip,
+and DropdownMenu radio items. Their JSX adaptations live in `src/components/ui/`,
+use the existing Base UI primitives, and omit optional animation utilities.
+Before adding custom component CSS, check the configured shadcn/ReUI registries
+and reuse or extend these local components. App-specific map sizing and responsive
+page layout remain CSS; reusable controls use component styles and semantic tokens.
+
 [Astro's Tailwind 4 integration](https://docs.astro.build/en/guides/styling/#tailwind)
 uses `@tailwindcss/vite`, not the legacy `@astrojs/tailwind` integration.
 `BaseLayout.astro` imports the global stylesheet, which imports Tailwind and maps
 shadcn/ReUI semantic color tokens to the existing light palette. The existing
-page grid, sidebar, and map sizing remain plain CSS. Dark mode and component-specific
-animation styles are not configured; add them only when needed.
+page grid, sidebar, and map sizing remain plain CSS. The layout applies the saved
+or system theme before first paint; dark-mode tokens also style the menu and
+tooltips. English routes are unprefixed and Japanese routes use `/ja`; each page
+renders only its selected language. The rail's language menu navigates between
+equivalent routes. Component-specific animation styles are not configured.
 
 Following [Astro's framework component conventions](https://docs.astro.build/en/guides/framework-components/),
 the layout and panel content stay in Astro. Card sections render as static HTML
-without hydration. Only the React centering button uses `client:load`, since its
-action should be available immediately; its click handler accesses the existing
+without hydration. The React rail and centering button use `client:load` so their
+actions are available immediately; the centering handler accesses the existing
 browser map instance and uses Tokyo when geolocation is unavailable.
 MapLibre stays in a `client:only="react"` island so its browser-only code is not
 rendered on the server. No React root, theme provider, or PropTypes compatibility

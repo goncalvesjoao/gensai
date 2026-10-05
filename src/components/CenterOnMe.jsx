@@ -1,7 +1,9 @@
 import { LocateFixed } from 'lucide-react';
 import { Button } from './ui/button';
 
-export default function CenterOnMe() {
+// Locale is supplied by the route so only one language is rendered.
+// eslint-disable-next-line react/prop-types
+export default function CenterOnMe({ locale = 'en' }) {
   function handleCenter() {
     const location = window.__gensaiCurrentLocation || {
       lng: 139.6917,
@@ -20,7 +22,7 @@ export default function CenterOnMe() {
       onClick={handleCenter}
     >
       <LocateFixed aria-hidden="true" />
-      Center on me
+      {locale === 'ja' ? '現在地を表示' : 'Center on me'}
     </Button>
   );
 }
