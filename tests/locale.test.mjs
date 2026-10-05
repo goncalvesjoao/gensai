@@ -23,8 +23,14 @@ test('locale navigation preserves origin and URL details', () => {
 });
 test('built pages render only their selected language', () => {
   for (const route of ['help', 'getting-ready']) {
-    const english = readFileSync(`dist/${route}/index.html`, 'utf8');
-    const japanese = readFileSync(`dist/ja/${route}/index.html`, 'utf8');
+    const english = readFileSync(
+      new URL(`../dist/${route}/index.html`, import.meta.url),
+      'utf8',
+    );
+    const japanese = readFileSync(
+      new URL(`../dist/ja/${route}/index.html`, import.meta.url),
+      'utf8',
+    );
     assert.match(english, /<html lang="en"/);
     assert.match(japanese, /<html lang="ja"/);
     assert.ok(!english.includes('ようこそ'));
