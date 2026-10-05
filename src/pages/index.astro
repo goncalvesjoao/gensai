@@ -1,0 +1,31 @@
+---
+import MapView from '../components/MapView.jsx';
+import ReuiDemo from '../components/ReuiDemo.jsx';
+import '../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gensai Map</title>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Gensai</p>
+        <h1>Disaster readiness, centered on you.</h1>
+      </header>
+
+      <div class="content-grid">
+        <aside class="sidebar">
+          <ReuiDemo client:only="react" />
+        </aside>
+
+        <section class="map-panel" aria-label="Map of your location">
+          <MapView client:only="react" />
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
