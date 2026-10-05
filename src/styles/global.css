@@ -8,6 +8,7 @@
   --color-popover: var(--panel);
   --color-popover-foreground: var(--ink);
   --color-primary: var(--brand);
+  --color-primary-strong: #0b5f5b;
   --color-primary-foreground: #fff;
   --color-secondary: #e8edf6;
   --color-secondary-foreground: var(--ink);
