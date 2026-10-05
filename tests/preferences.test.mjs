@@ -4,7 +4,7 @@ import { runInNewContext } from 'node:vm';
 import test from 'node:test';
 
 const html = readFileSync(
-  new URL('../dist/help/index.html', import.meta.url),
+  new URL('../dist/index.html', import.meta.url),
   'utf8',
 );
 const head = html.slice(0, html.indexOf('</head>'));
@@ -57,10 +57,14 @@ for (const scenario of [
   test(`preferences applied before body renders: ${scenario.name}`, () => {
     const root = { dataset: {}, lang: scenario.locale || 'en' };
     const context = {
+      URL,
       document: { documentElement: root },
       window: {
         matchMedia: () => ({ matches: scenario.systemDark }),
-        location: { hostname: scenario.hostname || 'gensai.example' },
+        location: {
+          href: `https://${scenario.hostname || 'map.gensai.help'}/`,
+          replace() {},
+        },
       },
       localStorage: {
         getItem(key) {
