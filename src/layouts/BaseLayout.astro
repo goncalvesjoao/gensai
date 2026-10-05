@@ -1,0 +1,51 @@
+---
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><slot name="title">Gensai Map</slot></title>
+  </head>
+  <body>
+    <slot />
+
+    <script type="module">
+      const React = await import('react');
+      const PropTypes = await import('prop-types');
+
+      if (!React.default.PropTypes) {
+        Object.defineProperty(React.default, 'PropTypes', {
+          value: PropTypes.default,
+          configurable: true,
+        });
+      }
+
+      const ReuiModule = await import('reui/lib/Reui.js');
+      const Reui = ReuiModule.default ?? ReuiModule;
+      Reui.setGlobalTheme({
+        Panel: {
+          panel: 'reui-panel',
+          panelHeading: 'reui-panel__heading',
+          panelBody: 'reui-panel__body',
+        },
+        Button: {
+          button: 'reui-button',
+          buttonXs: 'reui-button--xs',
+          buttonSm: 'reui-button--sm',
+          buttonMd: 'reui-button--md',
+          buttonLg: 'reui-button--lg',
+          buttonDisabled: 'reui-button--disabled',
+          buttonActive: 'reui-button--active',
+          buttonDefault: 'reui-button--default',
+          buttonPrimary: 'reui-button--primary',
+          buttonSuccess: 'reui-button--success',
+          buttonWarning: 'reui-button--warning',
+          buttonDanger: 'reui-button--danger',
+        },
+      });
+
+      window.__GENSAI_REUI = Reui;
+    </script>
+  </body>
+</html>
