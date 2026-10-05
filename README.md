@@ -20,11 +20,11 @@ Gensai aims to bring that guidance together in one place, with practical instruc
 
 Gensai will initially support English and Japanese speakers, with additional languages and locales planned later.
 
-| Audience | Situation |
-| --- | --- |
-| Prospective resident | Wants to understand local disaster risks before choosing where to live. |
-| Current resident | Wants to build or improve their disaster kit and evacuation plan. |
-| Traveler | Wants to know what to expect, what to do, and where to go during a disaster. |
+| Audience             | Situation                                                                    |
+| -------------------- | ---------------------------------------------------------------------------- |
+| Prospective resident | Wants to understand local disaster risks before choosing where to live.      |
+| Current resident     | Wants to build or improve their disaster kit and evacuation plan.            |
+| Traveler             | Wants to know what to expect, what to do, and where to go during a disaster. |
 
 ## Current status
 
@@ -49,13 +49,19 @@ Open [localhost:4321](http://localhost:4321) to view the app. If that port is oc
 
 ### Available commands
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the development server. |
-| `npm run build` | Create a production build. |
-| `npm run preview` | Preview the production build locally after running `npm run build`. |
+| Command                | Purpose                                                             |
+| ---------------------- | ------------------------------------------------------------------- |
+| `npm run dev`          | Start the development server.                                       |
+| `npm run build`        | Create a production build.                                          |
+| `npm run preview`      | Preview the production build locally after running `npm run build`. |
+| `npm run lint`         | Check JavaScript, JSX, and Astro files with ESLint.                 |
+| `npm run lint:fix`     | Apply automatic ESLint fixes.                                       |
+| `npm run format`       | Format the project with Prettier, including Astro files.            |
+| `npm run format:check` | Check formatting without changing files.                            |
 
-No lint command or automated test suite is configured. The current `npm test` script is a placeholder that exits with an error.
+ESLint checks code correctness and React Hooks; Prettier handles formatting.
+Generated files and the dependency lockfile are excluded from formatting.
+No automated test suite is configured. The current `npm test` script is a placeholder that exits with an error.
 
 ### Project structure
 

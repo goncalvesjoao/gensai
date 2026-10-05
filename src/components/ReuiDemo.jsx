@@ -31,7 +31,10 @@ export default function ReuiDemo() {
   const handleCenter = () => {
     if (typeof window === 'undefined') return;
 
-    const nextLocation = window.__gensaiCurrentLocation || { lng: 139.6917, lat: 35.6895 };
+    const nextLocation = window.__gensaiCurrentLocation || {
+      lng: 139.6917,
+      lat: 35.6895,
+    };
     const map = window.__gensaiMapInstance;
 
     if (map) {
@@ -45,8 +48,14 @@ export default function ReuiDemo() {
 
   return (
     <Reui.Panel title="Preparedness map">
-      <p className="panel-copy">Use the map to check conditions near your current location.</p>
-      <button type="button" className="reui-button reui-button--md reui-button--primary" onClick={handleCenter}>
+      <p className="panel-copy">
+        Use the map to check conditions near your current location.
+      </p>
+      <button
+        type="button"
+        className="reui-button reui-button--md reui-button--primary"
+        onClick={handleCenter}
+      >
         Center on me
       </button>
     </Reui.Panel>
