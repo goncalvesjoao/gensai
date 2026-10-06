@@ -228,9 +228,10 @@ body {
 
 .map-selection {
   position: absolute;
-  top: 64px;
+  z-index: 2;
+  bottom: 44px;
   left: 12px;
-  right: 12px;
+  right: 60px;
   max-width: 360px;
   padding: 10px 12px;
   border-radius: 10px;
@@ -310,4 +311,53 @@ body {
     gap: 4px;
     padding-left: 6px;
   }
+}
+
+.address-search-panel {
+  position: absolute;
+  top: 52px;
+  left: 52px;
+  right: 0;
+  padding: 6px 10px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.address-search-panel p:empty {
+  display: none;
+}
+
+.address-search-panel a {
+  text-decoration: underline;
+}
+
+.address-search-choices {
+  max-height: min(30vh, 240px);
+  overflow-y: auto;
+  margin: 6px 0;
+  padding: 2px;
+  list-style: none;
+}
+
+.address-search-choices button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  color: var(--ink);
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.address-search-choices button:hover {
+  background: var(--surface-hover);
+}
+
+.address-search-choices button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
 }

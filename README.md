@@ -28,7 +28,7 @@ Gensai will initially support English and Japanese speakers, with additional lan
 
 ## Current status
 
-Gensai is in early development. The current prototype has a MapLibre GL JS map using demo tiles, automatic startup geolocation with a silent Tokyo fallback, and a "Center on me" button in a collapsible sidebar. Floating controls toggle the sidebar; the search field is layout only and does not search. The map lives at the root of the map subdomain; the main site address redirects to it. The prototype has English and Japanese routes, plus light and dark application themes.
+Gensai is in early development. The current prototype has a MapLibre GL JS map using official GSI basemap tiles and a Japan-wide initial view. People can select a Japan land point on the map, correct coordinates, use device location explicitly, or submit an address search with Enter. Address search selects a single supported match automatically and offers choices for ambiguous results. Device-location failures or positions outside Japan select an explained Tokyo fallback. A marker and readable label show the selected location. Floating controls toggle a collapsible sidebar. The map lives at the root of the map subdomain; the main site address redirects to it. The prototype has English and Japanese routes, plus light and dark application themes.
 
 The [product-spec index](docs/specs/index.md) provides portable, framework-independent
 requirements for the map baseline, selected location, address search, official
@@ -43,12 +43,12 @@ The [Excalidraw mockups](docs/mockups.excalidraw) define the first-release visua
 and interaction direction. The [map-controls spec](docs/specs/map-controls.md)
 records the floating controls and initially closed, explicitly dismissed hazard
 menu. Feature specs add Enter submission for search and independent hazard switches.
-These requirements are not implemented in the current prototype.
+The floating address-search group and Enter submission are implemented. The remaining menu changes and independent hazard switches are not implemented yet.
 
 The [tracker index](docs/spec-tracking.md) maps the same feature structure to this
 repository's issues and records delivery status. The release requires location
 access only after "Use my location", with an explained Tokyo fallback if location
-fails or is outside Japan. That behavior is not implemented yet.
+fails or is outside Japan. That behavior is implemented.
 
 Official hazard layers and preparedness guidance are not implemented yet. The planned hazard map will use official tiles and legends from Japan's [Hazard Map Portal](https://disaportal.gsi.go.jp/). The portal's [open-data catalogue](https://disaportal.gsi.go.jp/hazardmap/copyright/opendata.html) lists tile URLs, zoom levels, data providers, attribution requirements, and coverage notes.
 
@@ -92,7 +92,7 @@ npm ci
 npm run dev
 ```
 
-Open [map.localhost:4321](http://map.localhost:4321) to view the map directly, or [localhost:4321](http://localhost:4321) to follow the redirect. If that port is occupied, use the port printed by the development server on both hosts. The demo map needs an internet connection to load its tiles. Allow location access to center it on your position; otherwise, it defaults to Tokyo.
+Open [map.localhost:4321](http://map.localhost:4321) to view the map directly, or [localhost:4321](http://localhost:4321) to follow the redirect. If that port is occupied, use the port printed by the development server on both hosts. The map needs an internet connection to load its tiles and search addresses. It opens with a Japan-wide view. Choose "Use my location" to request device access; failures or positions outside Japan select an explained Tokyo fallback.
 
 ### UI components and styling
 
@@ -137,9 +137,9 @@ equivalent routes. Component-specific animation styles are not configured.
 
 Following [Astro's framework component conventions](https://docs.astro.build/en/guides/framework-components/),
 the layout and panel content stay in Astro. Card sections render as static HTML
-without hydration. The React preference controls and centering button use `client:load` so their
-actions are available immediately; the centering handler accesses the existing
-browser map instance and uses Tokyo when geolocation is unavailable.
+without hydration. The React preference controls and address-search group use `client:load` so their
+actions are available immediately. The device-location control requests permission
+only when activated and uses the shared selected-location behavior.
 MapLibre stays in a `client:only="react"` island so its browser-only code is not
 rendered on the server. No React root, theme provider, or PropTypes compatibility
 shim is needed.
@@ -172,12 +172,15 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `src/pages/index.astro`: English map page.
 - `src/pages/ja/index.astro`: Japanese map page.
 - `src/layouts/BaseLayout.astro`: shared HTML layout, entry-point redirect, and theme initialization.
-- `src/components/MapView.jsx`: map and browser geolocation.
+- `src/components/MapView.jsx`: Japan basemap, selected-location marker and point correction.
 - `src/components/MapLayout.astro`: floating toolbar and responsive sidebar toggles.
 - `src/components/PreparednessPanel.astro`: static sidebar content.
 - `src/components/PreferenceControls.jsx`: interactive theme and language controls.
 - `src/lib/locale.mjs`: route language and locale navigation.
-- `src/components/CenterOnMe.jsx`: interactive map centering button with a Lucide icon.
+- `src/components/AddressSearch.jsx`: Enter submission, provider states and explicit address choices.
+- `src/components/UseMyLocation.jsx`: explicit device-location request and explained Tokyo fallback.
+- `src/lib/selected-location.mjs`: shared Japan bounds and land-point validation.
+- `src/lib/japan-boundary.mjs`: Japan land-boundary check.
 - `src/components/ui/`: local shadcn component sources.
 - `src/styles/global.css`: Tailwind theme tokens and existing page/map styles.
 - `components.json`: shadcn/ReUI registry setup.
