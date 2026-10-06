@@ -106,14 +106,44 @@ body {
 }
 
 .map-panel {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   position: relative;
 }
 
 .map-shell {
   width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   background: var(--bg);
+}
+
+.hazard-legends {
+  flex-shrink: 0;
+  max-height: 28%;
+  overflow-y: auto;
+  margin: 8px 12px 40px;
+  padding: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.hazard-legends h2 {
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.hazard-legends ul {
+  padding: 0;
+  list-style: none;
+}
+
+.hazard-legends a {
+  text-decoration: underline;
 }
 
 /* Both toolbar controls stay available when the sidebar is closed. */

@@ -3,6 +3,8 @@ import * as maplibregl from 'maplibre-gl';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { JAPAN_BOUNDS, isJapanLocation } from '../lib/selected-location.mjs';
+import { attachHazardLayers } from '../lib/hazard-layers.mjs';
+import HazardLegends from './HazardLegends.jsx';
 
 if (typeof window !== 'undefined') maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
@@ -12,6 +14,8 @@ export default function MapView({ locale = 'en' }) {
   const [selected, setSelected] = useState(null);
   const [message, setMessage] = useState('');
   const [ready, setReady] = useState(false);
+  const [basemapFailed, setBasemapFailed] = useState(false);
+  const [hazardStates, setHazardStates] = useState({});
   const [coordinates, setCoordinates] = useState({ lat: '', lng: '' });
   const japanese = locale === 'ja';
   const text = japanese
@@ -73,6 +77,9 @@ export default function MapView({ locale = 'en' }) {
       renderWorldCopies: false,
     });
     map.setMinZoom(map.getZoom());
+    map.on('error', (event) => {
+      if (event.sourceId === 'basemap') setBasemapFailed(true);
+    });
     const [[west, south], [east, north]] = JAPAN_BOUNDS;
     map.on('moveend', () => {
       const { lng, lat } = map.getCenter();
@@ -162,9 +169,14 @@ export default function MapView({ locale = 'en' }) {
     window.dispatchEvent(new Event('gensai:map-ready'));
     const observer = new ResizeObserver(() => map.resize());
     observer.observe(containerRef.current);
+    let detachHazards;
+    map.once('style.load', () => {
+      detachHazards = attachHazardLayers(map, setHazardStates);
+    });
     map.once('load', () => setReady(true));
     return () => {
       selection++;
+      detachHazards?.();
       observer.disconnect();
       window.removeEventListener('gensai:select-location', receive);
       canvas.removeEventListener('keydown', keyboard);
@@ -193,7 +205,15 @@ export default function MapView({ locale = 'en' }) {
   return (
     <>
       <div className="map-shell" ref={containerRef} aria-label={text.map} />
+      <HazardLegends locale={locale} states={hazardStates} />
       <div className="map-selection">
+        {basemapFailed && (
+          <p aria-live="polite">
+            {japanese
+              ? '背景地図の取得に失敗しました。ハザードの取得状況とは別です。再読み込みしてお試しください。'
+              : 'Basemap request failed. Hazard requests are separate. Reload to retry.'}
+          </p>
+        )}
         {!ready && <p>{text.loading}</p>}
         <p id="map-selection-instructions">{text.instruction}</p>
         <p role="status" aria-live="polite">
