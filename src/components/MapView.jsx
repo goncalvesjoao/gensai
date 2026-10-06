@@ -376,7 +376,6 @@ export default function MapView({ locale = 'en' }) {
         <div className="map-selection">
           {!ready && <p>{text.loading}</p>}
           {mapFailed && <p role="alert">{text.mapFailed}</p>}
-          <p id="map-selection-instructions">{text.instruction}</p>
           <p role="status" aria-live="polite">
             {selected &&
               `${selected.label}: ${selected.lat.toFixed(5)}, ${selected.lng.toFixed(5)}`}
@@ -384,6 +383,7 @@ export default function MapView({ locale = 'en' }) {
           </p>
           <details>
             <summary>{text.coordinates}</summary>
+            <p id="map-selection-instructions">{text.instruction}</p>
             <form onSubmit={submit}>
               <label>
                 {text.latitude}

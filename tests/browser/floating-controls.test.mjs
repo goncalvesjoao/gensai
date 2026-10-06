@@ -34,6 +34,10 @@ test('floating controls offer independent search, device and horizontal zoom', a
       exact: true,
     });
     await location.waitFor();
+    await page.locator('canvas').waitFor();
+    await page
+      .getByText('Loading map…', { exact: true })
+      .waitFor({ state: 'hidden' });
     assert.equal(await page.evaluate(() => window.locationRequests), 0);
     await page.getByRole('searchbox').fill('Tokyo');
     await page.getByRole('searchbox').press('Enter');
@@ -134,10 +138,14 @@ test('preferences retain localized public URLs and visible controls at phone and
             })
             .click();
           await page.waitForURL(
-            locale === 'ja' ? '**/?view=hazards#map' : '**/ja?view=hazards#map',
+            (url) =>
+              (url.pathname.replace(/\/$/, '') || '/') ===
+                (locale === 'ja' ? '/' : '/ja') &&
+              url.search === '?view=hazards' &&
+              url.hash === '#map',
           );
           assert.equal(
-            new URL(page.url()).pathname,
+            new URL(page.url()).pathname.replace(/\/$/, '') || '/',
             locale === 'ja' ? '/' : '/ja',
           );
           await page.close();

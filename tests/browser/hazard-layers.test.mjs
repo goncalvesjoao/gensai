@@ -24,6 +24,7 @@ test('muted official basemap loads, and unavailable basemap is explained', async
       return route.fulfill({ contentType: 'image/png', body: png });
     });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page.locator('canvas').waitFor();
     await page.waitForTimeout(1500);
     assert.equal(pale, true);
@@ -60,6 +61,7 @@ test('tsunami switch exposes official legend, reports delayed and failed tiles, 
       await route.abort();
     });
     await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page.getByRole('switch', { name: 'Tsunami', exact: true }).check();
     const legend = page.locator('[data-hazard-legend="tsunami"]');
     await legend.getByText('Loading tiles…', { exact: false }).waitFor();
@@ -72,7 +74,7 @@ test('tsunami switch exposes official legend, reports delayed and failed tiles, 
       await page.locator('.hazard-warning').textContent(),
       /No colour does not mean safe/,
     );
-    await page.locator('.grip-toggle').click();
+    await page.locator('[data-sidebar-close]').click();
     assert.equal(await legend.isVisible(), true);
     assert.equal(
       await page
@@ -101,6 +103,7 @@ test('landslide legend separates three types and explains partial failure withou
         : route.fulfill({ contentType: 'image/png', body: png }),
     );
     await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page.getByRole('switch', { name: 'Landslide', exact: true }).check();
     const legend = page.locator('[data-hazard-legend="landslide"]');
     await legend.getByText('Debris flow', { exact: true }).waitFor();
@@ -142,6 +145,7 @@ test('flooding shows maximum-scale river depths and independent combined and nat
         : route.fulfill({ contentType: 'image/png', body: png }),
     );
     await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page.getByRole('switch', { name: 'Flooding', exact: true }).check();
     const legend = page.locator('[data-hazard-legend="flooding"]');
     await legend.getByText('20 m or more', { exact: true }).waitFor();
@@ -182,6 +186,7 @@ test(
           });
       });
       await page.goto(base, { waitUntil: 'domcontentloaded' });
+      await page.locator('[data-sidebar-opener]').click();
       for (const name of ['Flooding', 'Landslide'])
         await page.getByRole('switch', { name, exact: true }).check();
       await page
@@ -254,6 +259,7 @@ test('turning all categories off explicitly avoids a safety verdict', async () =
       route.fulfill({ contentType: 'image/png', body: png }),
     );
     await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page.getByRole('switch', { name: 'Tsunami', exact: true }).uncheck();
     await page
       .getByText(
@@ -263,6 +269,7 @@ test('turning all categories off explicitly avoids a safety verdict', async () =
       .waitFor();
     assert.equal(await page.locator('[data-hazard-legend]').count(), 0);
     await page.goto(`${base}/ja/`, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page.getByRole('switch', { name: '津波', exact: true }).uncheck();
     await page
       .getByText(
@@ -281,12 +288,12 @@ for (const status of [404, 500])
       headless: true,
       executablePath: process.env.CHROMIUM_PATH,
     });
+    let release = () => {};
     try {
       const page = await browser.newPage();
       let requests = 0;
       let fail = true;
       let hold = false;
-      let release;
       const gate = new Promise((resolve) => {
         release = resolve;
       });
@@ -301,6 +308,7 @@ for (const status of [404, 500])
           : route.fulfill({ contentType: 'image/png', body: png });
       });
       await page.goto(base, { waitUntil: 'domcontentloaded' });
+      await page.locator('[data-sidebar-opener]').click();
       const explanation =
         status === 404
           ? 'Some requested tiles were not supplied'
@@ -343,6 +351,7 @@ for (const status of [404, 500])
       await source.filter({ hasText: 'Viewport tiles loaded' }).waitFor();
       assert.ok(requests > before);
     } finally {
+      release();
       await browser.close();
     }
   });
@@ -359,6 +368,7 @@ test('missing basemap tiles explain failure while hazard tiles remain usable', a
       route.fulfill({ contentType: 'image/png', body: png }),
     );
     await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-sidebar-opener]').click();
     await page
       .getByText(
         'Could not load the basemap. Hazard data may still be available.',

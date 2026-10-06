@@ -243,15 +243,10 @@ async function assertVisibleSelectedLocation(page, open) {
   );
   const marker = await page.locator('.maplibregl-marker').boundingBox();
   const canvas = await page.locator('canvas').boundingBox();
-  const sidebar = open ? await page.locator('.sidebar').boundingBox() : null;
-  const visibleLeft = Math.max(
-    canvas.x,
-    sidebar ? sidebar.x + sidebar.width : 0,
-  );
-  const visibleCenter = (visibleLeft + canvas.x + canvas.width) / 2;
+  const visibleCenter = canvas.x + canvas.width / 2;
   assert.ok(
     Math.abs(marker.x + marker.width / 2 - visibleCenter) < 2,
-    'Selected location centers in the visible map beside the open menu',
+    'Selected location remains centered in the map viewport',
   );
 }
 
@@ -310,7 +305,11 @@ for (const japanese of [false, true])
                 'true') !==
               open
             )
-              await page.locator('.grip-toggle').click();
+              await page
+                .locator(
+                  open ? '[data-sidebar-opener]' : '[data-sidebar-close]',
+                )
+                .click();
             features = [
               match(
                 japanese ? '与那国の住所' : 'Yonaguni address',
@@ -426,7 +425,7 @@ for (const japanese of [false, true])
               await page.setViewportSize({ width: 430, height: 844 });
               await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, true);
-              await page.locator('.grip-toggle').click();
+              await page.locator('[data-sidebar-close]').click();
               await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               assert.match(
@@ -435,11 +434,11 @@ for (const japanese of [false, true])
               );
               await page.setViewportSize({ width: 1280, height: 800 });
               await page.waitForTimeout(100);
-              await assertVisibleSelectedLocation(page, true);
+              await assertVisibleSelectedLocation(page, false);
               await page.setViewportSize({ width: 390, height: 844 });
               await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
-              await page.locator('.grip-toggle').click();
+              await page.locator('[data-sidebar-opener]').click();
               await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, true);
               await page

@@ -61,7 +61,10 @@ for (const japanese of [false, true]) {
           true,
         );
         await page.locator('canvas').waitFor();
-        await page.locator('canvas').click({ position: { x: 300, y: 180 } });
+        const mapBox = await page.locator('canvas').boundingBox();
+        await page.locator('canvas').click({
+          position: { x: mapBox.width * 0.9, y: mapBox.height * 0.4 },
+        });
         const selectedUrl = page.url();
         await page.setViewportSize({
           width: width === 390 ? 1280 : 390,
@@ -88,6 +91,83 @@ for (const japanese of [false, true]) {
         );
         await page.reload();
         assert.equal(await panel.isVisible(), false);
+      } finally {
+        await browser.close();
+      }
+    });
+  }
+}
+
+for (const japanese of [false, true]) {
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 360, height: 640 },
+  ]) {
+    test(`phone search choices do not cover hazard controls (${japanese ? 'Japanese' : 'English'}, ${viewport.height})`, async () => {
+      const browser = await chromium.launch({
+        headless: true,
+        executablePath: process.env.CHROMIUM_PATH,
+      });
+      try {
+        const page = await browser.newPage({
+          viewport,
+        });
+        await page.route('https://photon.komoot.io/api/**', (route) =>
+          route.fulfill({
+            json: {
+              type: 'FeatureCollection',
+              features: Array.from({ length: 4 }, (_, index) => ({
+                type: 'Feature',
+                properties: { name: `Place ${index}`, countrycode: 'JP' },
+                geometry: {
+                  type: 'Point',
+                  coordinates: [139.6917 + index / 100, 35.6895],
+                },
+              })),
+            },
+          }),
+        );
+        await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
+        await page.locator('[data-sidebar-opener]').click();
+        await page.getByRole('searchbox').fill('Tokyo');
+        await page.getByRole('searchbox').press('Enter');
+        await page.locator('.address-search-choices button').first().waitFor();
+        for (const selector of [
+          '[data-sidebar-close]',
+          '[data-hazard-category="flooding"]',
+          '.maplibregl-ctrl-scale',
+          '.maplibregl-ctrl-attrib',
+        ]) {
+          const control = page.locator(selector);
+          await control.scrollIntoViewIfNeeded();
+          assert.equal(
+            await control.evaluate((el) => {
+              const box = el.getBoundingClientRect();
+              return el.contains(
+                document.elementFromPoint(
+                  box.x + box.width / 2,
+                  box.y + box.height / 2,
+                ),
+              );
+            }),
+            true,
+            `${selector} remains exposed with search choices`,
+          );
+        }
+        await page
+          .locator('.address-search-choices button')
+          .last()
+          .scrollIntoViewIfNeeded();
+        await page.locator('.address-search-choices button').last().click();
+        assert.equal(
+          await page
+            .locator('[data-sidebar-opener]')
+            .getAttribute('aria-expanded'),
+          'true',
+        );
+        await page.screenshot({
+          path: `/tmp/gensai-controls-search-${japanese ? 'ja' : 'en'}-phone.png`,
+        });
       } finally {
         await browser.close();
       }
