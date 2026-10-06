@@ -190,6 +190,25 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
   }
 });
 
+async function assertVisibleSelectedLocation(page, open) {
+  assert.equal(
+    await page.locator('.page-shell').getAttribute('data-sidebar-open'),
+    String(open),
+  );
+  const marker = await page.locator('.maplibregl-marker').boundingBox();
+  const canvas = await page.locator('canvas').boundingBox();
+  const sidebar = open ? await page.locator('.sidebar').boundingBox() : null;
+  const visibleLeft = Math.max(
+    canvas.x,
+    sidebar ? sidebar.x + sidebar.width : 0,
+  );
+  const visibleCenter = (visibleLeft + canvas.x + canvas.width) / 2;
+  assert.ok(
+    Math.abs(marker.x + marker.width / 2 - visibleCenter) < 2,
+    'Selected location centers in the visible map beside the open menu',
+  );
+}
+
 for (const japanese of [false, true])
   for (const mobile of [false, true]) {
     test(`address outcomes remain usable (${japanese ? 'Japanese' : 'English'}, ${mobile ? 'phone' : 'computer'}, both themes)`, async () => {
@@ -270,6 +289,7 @@ for (const japanese of [false, true])
               japanese ? /与那国の住所/ : /Yonaguni address/,
             );
             assert.equal(await page.locator('.maplibregl-marker').count(), 1);
+            await assertVisibleSelectedLocation(page, open);
             features = [];
             await search.press('Enter');
             await feedback
@@ -322,6 +342,7 @@ for (const japanese of [false, true])
               await selection.textContent(),
               /35\.68950, 139\.69170/,
             );
+            await assertVisibleSelectedLocation(page, open);
             if (mobile && open) {
               assert.equal(
                 await selection.evaluate((el) => {
@@ -355,6 +376,26 @@ for (const japanese of [false, true])
               await selection
                 .filter({ hasText: '35.68900, 139.69200' })
                 .waitFor();
+              await assertVisibleSelectedLocation(page, open);
+              await page.setViewportSize({ width: 430, height: 844 });
+              await page.waitForTimeout(100);
+              await assertVisibleSelectedLocation(page, true);
+              await page.locator('.grip-toggle').click();
+              await page.waitForTimeout(100);
+              await assertVisibleSelectedLocation(page, false);
+              assert.match(
+                await selection.textContent(),
+                /35\.68900, 139\.69200/,
+              );
+              await page.setViewportSize({ width: 1280, height: 800 });
+              await page.waitForTimeout(100);
+              await assertVisibleSelectedLocation(page, true);
+              await page.setViewportSize({ width: 390, height: 844 });
+              await page.waitForTimeout(100);
+              await assertVisibleSelectedLocation(page, false);
+              await page.locator('.grip-toggle').click();
+              await page.waitForTimeout(100);
+              await assertVisibleSelectedLocation(page, true);
               await page
                 .getByText(
                   japanese

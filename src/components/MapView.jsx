@@ -160,12 +160,30 @@ export default function MapView({ locale = 'en' }) {
     window.addEventListener('gensai:select-location', receive);
     window.addEventListener('gensai:selection-start', cancel);
     window.dispatchEvent(new Event('gensai:map-ready'));
-    const observer = new ResizeObserver(() => map.resize());
+    function resize() {
+      map.resize();
+      const bounds = containerRef.current.getBoundingClientRect();
+      const sidebar = document.getElementById('map-sidebar');
+      const open =
+        sidebar.closest('.page-shell').dataset.sidebarOpen === 'true';
+      const overlap = open
+        ? Math.max(0, sidebar.getBoundingClientRect().right - bounds.left)
+        : 0;
+      map.setPadding({ left: overlap, right: 0, top: 0, bottom: 0 });
+    }
+    resize();
+    const sidebarObserver = new MutationObserver(resize);
+    sidebarObserver.observe(containerRef.current.closest('.page-shell'), {
+      attributes: true,
+      attributeFilter: ['data-sidebar-open'],
+    });
+    const observer = new ResizeObserver(resize);
     observer.observe(containerRef.current);
     map.once('load', () => setReady(true));
     return () => {
       selection++;
       observer.disconnect();
+      sidebarObserver.disconnect();
       window.removeEventListener('gensai:select-location', receive);
       window.removeEventListener('gensai:selection-start', cancel);
       canvas.removeEventListener('keydown', keyboard);
