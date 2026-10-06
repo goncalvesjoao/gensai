@@ -69,6 +69,127 @@ test('Enter selects a Japan address, while typing and device activation do not s
   }
 });
 
+test('ambiguous Japan matches require an explicit keyboard choice', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    const page = await browser.newPage();
+    await page.route('https://photon.komoot.io/api/**', (route) =>
+      route.fulfill({
+        json: {
+          type: 'FeatureCollection',
+          features: [
+            match('Tokyo home'),
+            match('Yonaguni home', 122.998, 24.467),
+            match('Outside', 126.978, 37.5665),
+          ],
+        },
+      }),
+    );
+    await page.goto(base);
+    await page.locator('canvas').waitFor();
+    const search = page.getByRole('searchbox');
+    const selection = page.locator('.map-selection [role=status]');
+    await search.fill('home');
+    await search.press('Enter');
+    const choice = page.getByRole('button', {
+      name: 'Select Yonaguni home',
+      exact: true,
+    });
+    await choice.waitFor({ timeout: 2000 });
+    assert.equal(await page.locator('.maplibregl-marker').count(), 0);
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Select Outside', exact: true })
+        .count(),
+      0,
+    );
+    await search.press('Tab');
+    await page.keyboard.press('Tab');
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Select Tokyo home', exact: true })
+        .evaluate((el) => el === document.activeElement),
+      true,
+    );
+    await page.keyboard.press('Tab');
+    assert.equal(
+      await choice.evaluate((el) => el === document.activeElement),
+      true,
+    );
+    assert.equal(
+      await choice.evaluate((el) => getComputedStyle(el).outlineStyle),
+      'solid',
+    );
+    await page.keyboard.press('Enter');
+    await selection.filter({ hasText: 'Yonaguni home' }).waitFor();
+    assert.match(await selection.textContent(), /24\.46700, 122\.99800/);
+    assert.equal(await page.locator('.maplibregl-marker').count(), 1);
+    assert.equal(await choice.count(), 0);
+    assert.equal(
+      await search.evaluate((el) => el === document.activeElement),
+      true,
+    );
+  } finally {
+    await browser.close();
+  }
+});
+
+test('typing a newer query dismisses choices and prevents an earlier response from selecting', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    const page = await browser.newPage();
+    const requests = [];
+    await page.route('https://photon.komoot.io/api/**', (route) =>
+      requests.push(route),
+    );
+    await page.goto(base);
+    await page.locator('canvas').waitFor();
+    const search = page.getByRole('searchbox');
+    await search.fill('old');
+    await search.press('Enter');
+    while (!requests.length) await page.waitForTimeout(10);
+    await search.fill('new unfinished input');
+    await requests[0]
+      .fulfill({
+        json: { type: 'FeatureCollection', features: [match('Obsolete')] },
+      })
+      .catch(() => {});
+    await page.waitForTimeout(200);
+    assert.equal(await page.locator('.maplibregl-marker').count(), 0);
+    assert.equal(
+      await page.locator('#address-search-feedback').textContent(),
+      '',
+    );
+    await search.press('Enter');
+    while (requests.length < 2) await page.waitForTimeout(10);
+    await requests[1].fulfill({
+      json: {
+        type: 'FeatureCollection',
+        features: [match('Tokyo'), match('Yonaguni', 122.998, 24.467)],
+      },
+    });
+    await page
+      .getByRole('button', { name: 'Select Tokyo', exact: true })
+      .waitFor();
+    await search.fill('another unfinished input');
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Select Tokyo', exact: true })
+        .count(),
+      0,
+    );
+    assert.equal(await page.locator('.maplibregl-marker').count(), 0);
+  } finally {
+    await browser.close();
+  }
+});
+
 for (const japanese of [false, true])
   for (const mobile of [false, true]) {
     test(`address outcomes remain usable (${japanese ? 'Japanese' : 'English'}, ${mobile ? 'phone' : 'computer'}, both themes)`, async () => {
@@ -158,7 +279,13 @@ for (const japanese of [false, true])
                   : 'No supported Japan results',
               })
               .waitFor();
-            features = [match('Tokyo'), match('Yonaguni', 122.998, 24.467)];
+            const home = japanese
+              ? '東京都新宿区の自宅の住所'
+              : 'Tokyo home address with a long building name';
+            const island = japanese
+              ? '与那国島の住所'
+              : 'Yonaguni island address';
+            features = [match(home), match(island, 122.998, 24.467)];
             await search.press('Enter');
             await feedback
               .filter({
@@ -168,6 +295,78 @@ for (const japanese of [false, true])
             assert.match(
               await selection.textContent(),
               /24\.46700, 122\.99800/,
+            );
+            const choice = page.getByRole('button', {
+              name: japanese ? `${home}を選択` : `Select ${home}`,
+              exact: true,
+            });
+            await choice.focus();
+            assert.equal(
+              await choice.evaluate((el) => getComputedStyle(el).outlineStyle),
+              'solid',
+            );
+            const choiceBox = await choice.boundingBox();
+            const panelBox = await page
+              .locator('.address-search-panel')
+              .boundingBox();
+            assert.ok(choiceBox.width > 40);
+            assert.ok(panelBox.x + panelBox.width <= (mobile ? 390 : 1280));
+            assert.ok(panelBox.height < (mobile ? 844 : 800) / 2);
+            if (process.env.SCREENSHOT_DIR)
+              await page.screenshot({
+                path: `${process.env.SCREENSHOT_DIR}/chooser-${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-${theme}-${open ? 'open' : 'closed'}.png`,
+              });
+            await page.keyboard.press('Enter');
+            await selection.filter({ hasText: home }).waitFor();
+            assert.match(
+              await selection.textContent(),
+              /35\.68950, 139\.69170/,
+            );
+            if (mobile && open) {
+              assert.equal(
+                await selection.evaluate((el) => {
+                  const rect = el.getBoundingClientRect();
+                  return el.contains(
+                    document.elementFromPoint(rect.x + 10, rect.y + 10),
+                  );
+                }),
+                true,
+              );
+              await page
+                .getByText(
+                  japanese
+                    ? '座標で場所を選択・修正'
+                    : 'Choose or correct coordinates',
+                  { exact: true },
+                )
+                .click();
+              await page
+                .getByLabel(japanese ? '緯度' : 'Latitude', { exact: true })
+                .fill('35.689');
+              await page
+                .getByLabel(japanese ? '経度' : 'Longitude', { exact: true })
+                .fill('139.692');
+              await page
+                .getByRole('button', {
+                  name: japanese ? '座標を選択' : 'Select coordinates',
+                  exact: true,
+                })
+                .click();
+              await selection
+                .filter({ hasText: '35.68900, 139.69200' })
+                .waitFor();
+              await page
+                .getByText(
+                  japanese
+                    ? '座標で場所を選択・修正'
+                    : 'Choose or correct coordinates',
+                  { exact: true },
+                )
+                .click();
+            }
+            assert.equal(
+              await page.locator('.address-search-choices button').count(),
+              0,
             );
             features = [
               match('Seoul', 126.978, 37.5665, 'KR'),
@@ -224,10 +423,6 @@ for (const japanese of [false, true])
             assert.ok(
               box.width > 40 && box.x + box.width < (mobile ? 390 : 1280),
             );
-            if (process.env.SCREENSHOT_DIR)
-              await page.screenshot({
-                path: `${process.env.SCREENSHOT_DIR}/address-${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-${theme}-${open ? 'open' : 'closed'}.png`,
-              });
           }
         }
       } finally {
@@ -235,6 +430,103 @@ for (const japanese of [false, true])
       }
     });
   }
+
+test('capped suggestions remain explicit choices from an overseas device and location attempts clear them', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    const page = await browser.newPage();
+    let features = [
+      match('Tokyo home'),
+      ...Array.from({ length: 9 }, (_, i) =>
+        match(`Outside ${i}`, 126.978, 37.5665),
+      ),
+    ];
+    await page.route('https://photon.komoot.io/api/**', (route) =>
+      route.fulfill({ json: { type: 'FeatureCollection', features } }),
+    );
+    await page.addInitScript(() => {
+      navigator.geolocation.getCurrentPosition = (success) =>
+        success({ coords: { latitude: 37.5665, longitude: 126.978 } });
+    });
+    await page.goto(base);
+    await page.locator('canvas').waitFor();
+    const device = page.getByRole('button', {
+      name: 'Use my location',
+      exact: true,
+    });
+    const selection = page.locator('.map-selection [role=status]');
+    const search = page.getByRole('searchbox');
+    await device.click();
+    await selection.filter({ hasText: 'Tokyo fallback' }).waitFor();
+    await search.fill('Home in Japan');
+    await search.press('Enter');
+    await selection
+      .filter({ hasText: 'Selected location: Tokyo home' })
+      .waitFor();
+    features = Array.from({ length: 10 }, (_, i) =>
+      match(
+        `Home candidate ${i} with a long readable address`,
+        i === 9 ? 122.998 : 139.6917,
+        i === 9 ? 24.467 : 35.6895,
+      ),
+    );
+    await search.press('Enter');
+    const last = page.getByRole('button', {
+      name: 'Select Home candidate 9 with a long readable address',
+      exact: true,
+    });
+    await last.waitFor();
+    assert.match(
+      await page.locator('#address-search-feedback').textContent(),
+      /Showing some matches. More places may match/,
+    );
+    await last.focus();
+    await page.keyboard.press('Enter');
+    await selection.filter({ hasText: '24.46700, 122.99800' }).waitFor();
+    await page.locator('canvas').focus();
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(400);
+    await page.keyboard.press('Enter');
+    await selection.filter({ hasNotText: 'Checking' }).waitFor();
+    assert.doesNotMatch(await selection.textContent(), /Home candidate 9/);
+    await search.press('Enter');
+    await last.waitFor();
+    await device.click();
+    await last.waitFor({ state: 'detached' });
+    await selection.filter({ hasText: 'Tokyo fallback' }).waitFor();
+    await search.press('Enter');
+    await last.waitFor();
+    await page.locator('canvas').focus();
+    await page.keyboard.press('Enter');
+    await last.waitFor({ state: 'detached' });
+    await selection.filter({ hasNotText: 'Checking' }).waitFor();
+    await search.press('Enter');
+    await last.waitFor();
+    // A newer submission removes old choices even while its response is pending.
+    let release;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    await page.route('https://photon.komoot.io/api/**', async (route) => {
+      await gate;
+      await route.fulfill({
+        json: { type: 'FeatureCollection', features: [] },
+      });
+    });
+    await search.press('Enter');
+    await last.waitFor({ state: 'detached' });
+    release();
+    await page
+      .locator('#address-search-feedback')
+      .filter({ hasText: 'No supported Japan results' })
+      .waitFor();
+  } finally {
+    await browser.close();
+  }
+});
 
 test('new searches and selection attempts supersede older provider and boundary responses', async () => {
   const browser = await chromium.launch({
@@ -395,9 +687,23 @@ test(
         );
         await page
           .locator('#address-search-feedback')
-          .filter({ hasText: path ? '複数の場所' : 'Multiple places found' })
+          .filter({
+            hasText: path
+              ? /複数の場所|検索結果の一部/
+              : /Multiple places found|Showing some matches/,
+          })
           .waitFor();
         assert.equal(await page.locator('.maplibregl-marker').count(), 0);
+        await page
+          .getByRole('button')
+          .filter({ hasText: expected })
+          .first()
+          .click();
+        await page
+          .locator('.map-selection [role=status]')
+          .filter({ hasText: expected })
+          .waitFor();
+        assert.equal(await page.locator('.maplibregl-marker').count(), 1);
         console.log(
           `${query}: ${data.features.length} Japan matches, expected place present, ambiguity retained`,
         );

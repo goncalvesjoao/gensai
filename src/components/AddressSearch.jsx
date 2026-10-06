@@ -7,6 +7,8 @@ import { isJapanLocation } from '../lib/selected-location.mjs';
 export default function AddressSearch({ locale = 'en' }) {
   const [query, setQuery] = useState('');
   const [message, setMessage] = useState('');
+  const [choices, setChoices] = useState([]);
+  const input = useRef(null);
   const [available, setAvailable] = useState(false);
   const request = useRef(0);
   const controller = useRef(null);
@@ -19,8 +21,10 @@ export default function AddressSearch({ locale = 'en' }) {
           '日本の検索結果がありません。住所を短くするか、地図で場所を選択してください。',
         failed:
           '住所を検索できませんでした。再試行するか、地図で場所を選択してください。',
-        multiple:
-          '複数の場所が見つかりました。市区町村や住所を追加して検索してください。',
+        multiple: '複数の場所が見つかりました。目的の場所を選択してください。',
+        limited:
+          '検索結果の一部を表示しています。他にも候補がある場合があります。市区町村や住所を追加すると絞り込めます。',
+        choose: '場所を選択',
         selected: '選択した場所',
       }
     : {
@@ -30,18 +34,34 @@ export default function AddressSearch({ locale = 'en' }) {
           'No supported Japan results. Try a shorter address or choose a point on the map.',
         failed:
           'Address search failed. Try again or choose a point on the map.',
-        multiple:
-          'Multiple places found. Add a city or more address details to refine your search.',
+        multiple: 'Multiple places found. Choose the intended place.',
+        limited:
+          'Showing some matches. More places may match. Add a city or more address details to narrow the search.',
+        choose: 'Select',
         selected: 'Selected location',
       };
 
+  function cancel() {
+    request.current++;
+    controller.current?.abort();
+    setChoices([]);
+    setMessage('');
+  }
+
+  function choose(match) {
+    window.dispatchEvent(
+      new CustomEvent('gensai:select-location', {
+        detail: {
+          location: match.location,
+          label: `${text.selected}: ${match.label}`,
+        },
+      }),
+    );
+    input.current?.focus();
+  }
+
   useEffect(() => {
     const ready = () => setAvailable(true);
-    const cancel = () => {
-      request.current++;
-      controller.current?.abort();
-      setMessage('');
-    };
     if (window.__gensaiMapInstance) ready();
     window.addEventListener('gensai:map-ready', ready);
     window.addEventListener('gensai:selection-start', cancel);
@@ -54,8 +74,8 @@ export default function AddressSearch({ locale = 'en' }) {
 
   async function submit(event) {
     event.preventDefault();
-    if (!query.trim() || !available) return;
     window.dispatchEvent(new Event('gensai:selection-start'));
+    if (!query.trim() || !available) return;
     const active = ++request.current;
     const abort = new AbortController();
     controller.current = abort;
@@ -114,15 +134,17 @@ export default function AddressSearch({ locale = 'en' }) {
       }
       if (active !== request.current) return;
       if (matches.length === 1) {
-        window.dispatchEvent(
-          new CustomEvent('gensai:select-location', {
-            detail: {
-              location: matches[0].location,
-              label: `${text.selected}: ${matches[0].label}`,
-            },
-          }),
+        choose(matches[0]);
+      } else {
+        setChoices(matches);
+        setMessage(
+          matches.length
+            ? data.features.length >= 10
+              ? text.limited
+              : text.multiple
+            : text.empty,
         );
-      } else setMessage(matches.length ? text.multiple : text.empty);
+      }
     } catch {
       if (active === request.current) setMessage(text.failed);
     }
@@ -132,12 +154,16 @@ export default function AddressSearch({ locale = 'en' }) {
     <form className="map-search" onSubmit={submit}>
       <Search size={18} aria-hidden="true" />
       <input
+        ref={input}
         type="search"
         aria-label={text.search}
         placeholder={text.search}
         maxLength={300}
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => {
+          cancel();
+          setQuery(event.target.value);
+        }}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing && event.key === 'Enter')
             event.preventDefault();
@@ -149,6 +175,25 @@ export default function AddressSearch({ locale = 'en' }) {
         <p id="address-search-feedback" aria-live="polite">
           {message}
         </p>
+        {choices.length > 0 && (
+          <ul className="address-search-choices" aria-label={text.choose}>
+            {choices.map((match, index) => (
+              <li key={index}>
+                <button
+                  type="button"
+                  aria-label={
+                    japanese
+                      ? `${match.label}を選択`
+                      : `${text.choose} ${match.label}`
+                  }
+                  onClick={() => choose(match)}
+                >
+                  {match.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         <small>
           <a href="https://photon.komoot.io/">Photon</a> · ©{' '}
           <a href="https://www.openstreetmap.org/copyright">
