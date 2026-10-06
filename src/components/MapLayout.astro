@@ -1,0 +1,100 @@
+---
+import { Grip, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import MapView from './MapView.jsx';
+import PreparednessPanel from './PreparednessPanel.astro';
+const { locale = 'en' } = Astro.props;
+const japanese = locale === 'ja';
+const openLabel = japanese ? 'サイドバーを開く' : 'Open sidebar';
+const closeLabel = japanese ? 'サイドバーを閉じる' : 'Close sidebar';
+---
+
+<main class="page-shell" data-sidebar-open="true">
+  <div class="map-toolbar">
+    <button
+      class="map-control grip-toggle"
+      type="button"
+      data-sidebar-toggle
+      data-open-label={openLabel}
+      data-close-label={closeLabel}
+      aria-controls="map-sidebar"
+      aria-expanded="true"
+      aria-label={closeLabel}
+    >
+      <Grip size={20} aria-hidden="true" />
+    </button>
+    <label class="map-search">
+      <Search size={18} aria-hidden="true" />
+      <input
+        type="search"
+        aria-label={japanese ? '場所を検索' : 'Search for a location'}
+        placeholder={japanese ? '場所を検索' : 'Search for a location'}
+      />
+    </label>
+  </div>
+  <div class="content-grid">
+    <aside
+      class="sidebar"
+      id="map-sidebar"
+      aria-label={japanese ? '防災マップ' : 'Preparedness map'}
+    >
+      <PreparednessPanel locale={locale} />
+    </aside>
+    <section
+      class="map-panel"
+      aria-label={
+        japanese ? '選択した場所の地図' : 'Map of your selected location'
+      }
+    >
+      <MapView client:only="react" locale={locale} />
+    </section>
+  </div>
+  <button
+    class="map-control sidebar-toggle"
+    type="button"
+    data-sidebar-toggle
+    data-open-label={openLabel}
+    data-close-label={closeLabel}
+    aria-controls="map-sidebar"
+    aria-expanded="true"
+    aria-label={closeLabel}
+  >
+    <ChevronLeft className="collapse-icon" size={20} aria-hidden="true" />
+    <ChevronRight className="expand-icon" size={20} aria-hidden="true" />
+  </button>
+</main>
+
+<script is:inline>
+  (() => {
+    const shell = document.querySelector('.page-shell');
+    const sidebar = document.getElementById('map-sidebar');
+    const buttons = shell.querySelectorAll('[data-sidebar-toggle]');
+    const smallScreen = window.matchMedia('(max-width: 600px)');
+    function setOpen(open) {
+      shell.dataset.sidebarOpen = String(open);
+      sidebar.inert = !open;
+      for (const button of buttons) {
+        button.setAttribute('aria-expanded', String(open));
+        button.setAttribute(
+          'aria-label',
+          open ? button.dataset.closeLabel : button.dataset.openLabel,
+        );
+      }
+    }
+    setOpen(!smallScreen.matches);
+    for (const button of buttons) {
+      button.addEventListener('click', () =>
+        setOpen(shell.dataset.sidebarOpen !== 'true'),
+      );
+    }
+    smallScreen.addEventListener('change', (event) => {
+      if (sidebar.contains(document.activeElement)) buttons[0].focus();
+      setOpen(!event.matches);
+    });
+    sidebar.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        buttons[0].focus();
+      }
+    });
+  })();
+</script>
