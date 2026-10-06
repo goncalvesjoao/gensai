@@ -97,11 +97,11 @@ export default function UseMyLocation({ locale = 'en' }) {
         type="button"
         className="map-control device-location"
         disabled={!available}
+        aria-label={text.button}
         aria-busy={pending}
         onClick={acquire}
       >
         <LocateFixed size={18} aria-hidden="true" />
-        <span>{text.button}</span>
       </button>
       <span className="device-location-progress" aria-live="polite">
         {pending ? text.pending : ''}

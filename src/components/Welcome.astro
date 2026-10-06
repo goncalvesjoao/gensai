@@ -1,0 +1,58 @@
+---
+const { locale = 'en' } = Astro.props;
+const ja = locale === 'ja';
+const path = ja ? '/ja' : '/';
+const mapOrigin =
+  import.meta.env.DEV && Astro.url.hostname === '127.0.0.1'
+    ? Astro.url.origin
+    : import.meta.env.DEV && Astro.url.hostname === 'localhost'
+      ? `${Astro.url.protocol}//map.localhost${Astro.url.port ? `:${Astro.url.port}` : ''}`
+      : 'https://map.gensai.help';
+---
+
+<main class="welcome">
+  <h1>{ja ? 'Gensaiへようこそ' : 'Welcome to Gensai'}</h1>
+  <p>
+    {ja
+      ? 'Gensaiは現在開発中のプロジェクトです。'
+      : 'Gensai is a work-in-progress project.'}
+  </p>
+  <p>
+    {ja
+      ? '日本の地図で、選んだ場所の災害リスクを確認できます。'
+      : 'Explore mapped hazards around a selected location in Japan.'}
+  </p>
+  <a class="map-link" href={`${mapOrigin}${path}`}>
+    {ja ? 'Gensaiの地図を開く' : 'Open the Gensai map'}
+  </a>
+</main>
+
+<style>
+  .welcome {
+    margin: auto;
+    width: min(100%, 44rem);
+    padding: 5rem 1.5rem;
+    line-height: 1.7;
+  }
+  h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    line-height: 1.3;
+  }
+  .map-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.5rem;
+    background: var(--brand);
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .map-link:hover {
+    text-decoration: underline;
+  }
+  .map-link:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 4px;
+  }
+</style>

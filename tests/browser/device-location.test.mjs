@@ -131,7 +131,7 @@ for (const japanese of [false, true]) {
               .locator('.page-shell')
               .getAttribute('data-sidebar-open')) === 'true'
           )
-            await page.locator('.grip-toggle').click();
+            await page.locator('[data-sidebar-close]').click();
           await page
             .getByLabel(japanese ? '緯度' : 'Latitude', { exact: true })
             .fill('26.2124');
@@ -183,7 +183,13 @@ for (const japanese of [false, true]) {
                 .locator('.page-shell')
                 .getAttribute('data-sidebar-open')) === 'true';
             if (open !== (index % 2 === 0))
-              await page.locator('.grip-toggle').click();
+              await page
+                .locator(
+                  index % 2 === 0
+                    ? '[data-sidebar-opener]'
+                    : '[data-sidebar-close]',
+                )
+                .click();
             if (outcome.unavailable)
               await page.evaluate(() =>
                 Object.defineProperty(navigator, 'geolocation', {
@@ -281,7 +287,7 @@ for (const japanese of [false, true]) {
                 .locator('.page-shell')
                 .getAttribute('data-sidebar-open')) === 'true'
             )
-              await page.locator('.grip-toggle').click();
+              await page.locator('[data-sidebar-close]').click();
             await search.focus();
             await page.keyboard.press('Tab');
             await page.screenshot({

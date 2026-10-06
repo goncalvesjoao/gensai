@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { preview } from 'astro';
+import { startPreview } from '../scripts/preview.mjs';
 
 test('production map worker and its static imports are served as JavaScript', async () => {
   // Exercise the emitted URL, not the source import: plain ?url works in dev.
@@ -15,7 +15,8 @@ test('production map worker and its static imports are served as JavaScript', as
   )?.[1];
   assert.ok(workerPath, 'MapView must reference the emitted MapLibre worker');
 
-  const server = await preview({ server: { host: '127.0.0.1', port: 0 } });
+  const server = await startPreview({ host: '127.0.0.1', port: 0 });
+  const port = server.httpServer.address().port;
   try {
     const visited = new Set();
     async function checkModule(url) {
@@ -37,8 +38,8 @@ test('production map worker and its static imports are served as JavaScript', as
         await checkModule(new URL(match[1], url));
       }
     }
-    await checkModule(new URL(workerPath, `http://127.0.0.1:${server.port}`));
+    await checkModule(new URL(workerPath, `http://127.0.0.1:${port}`));
   } finally {
-    await server.stop();
+    await server.close();
   }
 });

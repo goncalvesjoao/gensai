@@ -1,37 +1,39 @@
 ---
-import { Grip, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Layers, X } from 'lucide-react';
 import MapView from './MapView.jsx';
+import MapHome from './MapHome.astro';
 import AddressSearch from './AddressSearch.jsx';
 import PreparednessPanel from './PreparednessPanel.astro';
 const { locale = 'en' } = Astro.props;
 const japanese = locale === 'ja';
-const openLabel = japanese ? 'サイドバーを開く' : 'Open sidebar';
-const closeLabel = japanese ? 'サイドバーを閉じる' : 'Close sidebar';
+const openLabel = japanese ? '災害メニューを開く' : 'Open hazard menu';
+const closeLabel = japanese ? '災害メニューを閉じる' : 'Close hazard menu';
 ---
 
-<main class="page-shell" data-sidebar-open="true">
+<main class="page-shell" data-sidebar-open="false">
   <div class="map-toolbar">
-    <button
-      class="map-control grip-toggle"
-      type="button"
-      data-sidebar-toggle
-      data-open-label={openLabel}
-      data-close-label={closeLabel}
-      aria-controls="map-sidebar"
-      aria-expanded="true"
-      aria-label={closeLabel}
-    >
-      <Grip size={20} aria-hidden="true" />
-    </button>
+    <MapHome locale={locale} />
     <AddressSearch client:load locale={locale} />
   </div>
   <div class="content-grid">
     <aside
       class="sidebar"
       id="map-sidebar"
+      inert
+      hidden
       aria-label={japanese ? '防災マップ' : 'Preparedness map'}
     >
-      <PreparednessPanel locale={locale} />
+      <button
+        class="map-control hazard-menu-close"
+        type="button"
+        data-sidebar-close
+        aria-label={closeLabel}
+      >
+        <X size={20} aria-hidden="true" />
+      </button>
+      <div class="hazard-menu-content">
+        <PreparednessPanel locale={locale} />
+      </div>
     </aside>
     <section
       class="map-panel"
@@ -43,17 +45,14 @@ const closeLabel = japanese ? 'サイドバーを閉じる' : 'Close sidebar';
     </section>
   </div>
   <button
-    class="map-control sidebar-toggle"
+    class="map-control hazard-menu-open"
     type="button"
-    data-sidebar-toggle
-    data-open-label={openLabel}
-    data-close-label={closeLabel}
+    data-sidebar-opener
     aria-controls="map-sidebar"
-    aria-expanded="true"
-    aria-label={closeLabel}
+    aria-expanded="false"
+    aria-label={openLabel}
   >
-    <ChevronLeft className="collapse-icon" size={20} aria-hidden="true" />
-    <ChevronRight className="expand-icon" size={20} aria-hidden="true" />
+    <Layers size={20} aria-hidden="true" />
   </button>
 </main>
 
@@ -61,34 +60,33 @@ const closeLabel = japanese ? 'サイドバーを閉じる' : 'Close sidebar';
   (() => {
     const shell = document.querySelector('.page-shell');
     const sidebar = document.getElementById('map-sidebar');
-    const buttons = shell.querySelectorAll('[data-sidebar-toggle]');
-    const smallScreen = window.matchMedia('(max-width: 600px)');
+    const opener = shell.querySelector('[data-sidebar-opener]');
+    const close = shell.querySelector('[data-sidebar-close]');
     function setOpen(open) {
       shell.dataset.sidebarOpen = String(open);
       sidebar.inert = !open;
-      for (const button of buttons) {
-        button.setAttribute('aria-expanded', String(open));
-        button.setAttribute(
-          'aria-label',
-          open ? button.dataset.closeLabel : button.dataset.openLabel,
-        );
-      }
+      sidebar.hidden = !open;
+      opener.setAttribute('aria-expanded', String(open));
     }
-    setOpen(!smallScreen.matches);
-    for (const button of buttons) {
-      button.addEventListener('click', () =>
-        setOpen(shell.dataset.sidebarOpen !== 'true'),
-      );
+    function dismiss() {
+      setOpen(false);
+      opener.focus();
     }
-    smallScreen.addEventListener('change', (event) => {
-      if (sidebar.contains(document.activeElement)) buttons[0].focus();
-      setOpen(!event.matches);
-    });
-    sidebar.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
-        buttons[0].focus();
-      }
-    });
+    opener.addEventListener('click', () => setOpen(true));
+    close.addEventListener('click', dismiss);
+    window.addEventListener(
+      'keydown',
+      (event) => {
+        if (
+          event.key === 'Escape' &&
+          !event.defaultPrevented &&
+          !document.querySelector('[role="menu"]') &&
+          shell.dataset.sidebarOpen === 'true'
+        ) {
+          dismiss();
+        }
+      },
+      true,
+    );
   })();
 </script>

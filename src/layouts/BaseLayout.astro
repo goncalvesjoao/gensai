@@ -13,23 +13,6 @@ const { title = 'Gensai Map' } = Astro.props;
 
     <title>{title}</title>
 
-    <!-- Resolve the entry-point host before the map can hydrate. -->
-    <script is:inline>
-      (() => {
-        const url = new URL(window.location.href);
-        if (url.hostname === 'gensai.help') {
-          url.hostname = 'map.gensai.help';
-          url.protocol = 'https:';
-          url.port = '';
-        } else if (url.hostname === 'localhost') {
-          url.hostname = 'map.localhost';
-        } else {
-          return;
-        }
-        // ponytail: static build uses a browser redirect; use a host HTTP redirect when hosting is chosen.
-        window.location.replace(url.href);
-      })();
-    </script>
     <!-- Apply preferences synchronously before the body can paint. -->
     <script is:inline>
       (() => {

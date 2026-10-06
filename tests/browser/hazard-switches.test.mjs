@@ -17,6 +17,12 @@ for (const japanese of [false, true]) {
         viewport: { width: 1280, height: 800 },
       });
       await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
+      await page
+        .getByRole('button', {
+          name: japanese ? '災害メニューを開く' : 'Open hazard menu',
+          exact: true,
+        })
+        .click();
       const switches = (
         japanese
           ? ['津波', '洪水', '土砂災害']
@@ -55,10 +61,9 @@ for (const japanese of [false, true]) {
       assert.equal(focus.focused, true);
       assert.notEqual(focus.outline, 'none');
       assert.notEqual(focus.width, '0px');
-      await page.locator('.grip-toggle').click();
-      await page.locator('.grip-toggle').click();
+      await page.locator('[data-sidebar-close]').click();
+      await page.locator('[data-sidebar-opener]').click();
       await page.setViewportSize({ width: 390, height: 844 });
-      await page.locator('.grip-toggle').click();
       for (let index = 0; index < switches.length; index++) {
         assert.equal(await switches[index].isChecked(), index === 2);
       }
@@ -90,6 +95,7 @@ for (const japanese of [false, true]) {
         assert.equal(await switches[index].isChecked(), index === 2);
       }
       await page.reload();
+      await page.locator('[data-sidebar-opener]').click();
       for (let index = 0; index < switches.length; index++) {
         assert.equal(await switches[index].isChecked(), index === 0);
       }

@@ -177,7 +177,8 @@ for (const japanese of [false, true])
           });
         await page.locator('#theme-toggle').click();
         assert.equal(await status.textContent(), retained);
-        for (let i = 0; i < 2; i++) await page.locator('.grip-toggle').click();
+        await page.locator('[data-sidebar-opener]').click();
+        await page.locator('[data-sidebar-close]').click();
         assert.equal(await status.textContent(), retained);
         await page.setViewportSize(
           mobile ? { width: 430, height: 900 } : { width: 1100, height: 760 },

@@ -246,15 +246,14 @@ export default function MapView({ locale = 'en' }) {
         map.jumpTo({ center });
     });
     window.__gensaiMapInstance = map;
-    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      'bottom-right',
+    );
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     for (const [selector, label] of [
       ['.maplibregl-ctrl-zoom-in', japanese ? '拡大' : 'Zoom in'],
       ['.maplibregl-ctrl-zoom-out', japanese ? '縮小' : 'Zoom out'],
-      [
-        '.maplibregl-ctrl-compass',
-        japanese ? '北を上にする' : 'Reset bearing to north',
-      ],
       [
         '.maplibregl-ctrl-attrib-button',
         japanese ? '地図の出典' : 'Map attribution',
@@ -330,21 +329,8 @@ export default function MapView({ locale = 'en' }) {
     window.dispatchEvent(new Event('gensai:map-ready'));
     function resize() {
       map.resize();
-      const bounds = containerRef.current.getBoundingClientRect();
-      const sidebar = document.getElementById('map-sidebar');
-      const open =
-        sidebar.closest('.page-shell').dataset.sidebarOpen === 'true';
-      const overlap = open
-        ? Math.max(0, sidebar.getBoundingClientRect().right - bounds.left)
-        : 0;
-      map.setPadding({ left: overlap, right: 0, top: 0, bottom: 0 });
     }
     resize();
-    const sidebarObserver = new MutationObserver(resize);
-    sidebarObserver.observe(containerRef.current.closest('.page-shell'), {
-      attributes: true,
-      attributeFilter: ['data-sidebar-open'],
-    });
     const observer = new ResizeObserver(resize);
     observer.observe(containerRef.current);
 
@@ -353,7 +339,6 @@ export default function MapView({ locale = 'en' }) {
       selection++;
       document.removeEventListener('gensai:hazards-change', updateHazards);
       observer.disconnect();
-      sidebarObserver.disconnect();
       maplibregl.removeProtocol('gensai-raster');
       window.removeEventListener('gensai:select-location', receive);
       window.removeEventListener('gensai:selection-start', cancel);
@@ -387,7 +372,6 @@ export default function MapView({ locale = 'en' }) {
         <div className="map-selection">
           {!ready && <p>{text.loading}</p>}
           {mapFailed && <p role="alert">{text.mapFailed}</p>}
-          <p id="map-selection-instructions">{text.instruction}</p>
           <p role="status" aria-live="polite">
             {selected &&
               `${selected.label}: ${selected.lat.toFixed(5)}, ${selected.lng.toFixed(5)}`}
@@ -395,6 +379,7 @@ export default function MapView({ locale = 'en' }) {
           </p>
           <details>
             <summary>{text.coordinates}</summary>
+            <p id="map-selection-instructions">{text.instruction}</p>
             <form onSubmit={submit}>
               <label>
                 {text.latitude}

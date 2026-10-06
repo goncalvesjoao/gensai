@@ -5,6 +5,11 @@ import test from 'node:test';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
+const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
+const fixture = new PNG({ width: 256, height: 256 });
+for (let pixel = 0; pixel < fixture.data.length; pixel += 4)
+  fixture.data.set([240, 240, 240, 255], pixel);
+const fixtureTile = PNG.sync.write(fixture);
 
 for (const japanese of [false, true]) {
   for (const mobile of [false, true]) {
@@ -21,6 +26,12 @@ for (const japanese of [false, true]) {
               height: mobile ? 844 : 900,
             },
           });
+          await page.route('**/xyz/**', (route) =>
+            route.fulfill({ contentType: 'image/png', body: fixtureTile }),
+          );
+          await page.route('**/raster/**', (route) =>
+            route.fulfill({ contentType: 'image/png', body: fixtureTile }),
+          );
           await page.addInitScript(
             (theme) => localStorage.setItem('gensai-theme', theme),
             theme,
@@ -43,11 +54,15 @@ for (const japanese of [false, true]) {
             }),
           );
           await page.addInitScript(() => {
-            navigator.geolocation.getCurrentPosition = (success) =>
+            window.deviceRequests = 0;
+            navigator.geolocation.getCurrentPosition = (success) => {
+              window.deviceRequests++;
               success({ coords: { latitude: 35.6895, longitude: 139.6917 } });
+            };
           });
           await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
           await page.locator('canvas').waitFor();
+          assert.equal(await page.evaluate(() => window.deviceRequests), 0);
           const warning = page.getByText(
             japanese
               ? '色なし＝安全ではありません。データが存在しない場合があります'
@@ -55,14 +70,42 @@ for (const japanese of [false, true]) {
             { exact: true },
           );
           await warning.waitFor();
-          const opener = page.locator('[data-sidebar-toggle]').first();
+          const opener = page.locator('[data-sidebar-opener]');
+          assert.equal(await opener.getAttribute('aria-expanded'), 'false');
+          await page.screenshot({
+            path: `/tmp/gensai-controls-initial-${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-${theme}.png`,
+          });
           if ((await opener.getAttribute('aria-expanded')) !== 'true')
             await opener.click();
+          await opener.click();
+          assert.equal(await opener.getAttribute('aria-expanded'), 'true');
           const names = japanese
             ? ['津波', '洪水', '土砂災害']
             : ['Tsunami', 'Flooding', 'Landslide'];
           for (const name of names)
             await page.getByRole('switch', { name, exact: true }).check();
+          await page.screenshot({
+            path: `/tmp/gensai-controls-open-${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-${theme}.png`,
+          });
+          const scale = page.locator('.maplibregl-ctrl-scale');
+          const beforeZoom = await scale.textContent();
+          await page
+            .getByRole('button', {
+              name: japanese ? '拡大' : 'Zoom in',
+              exact: true,
+            })
+            .click();
+          await page.waitForTimeout(500);
+          assert.notEqual(await scale.textContent(), beforeZoom);
+          await page
+            .getByRole('button', {
+              name: japanese ? '縮小' : 'Zoom out',
+              exact: true,
+            })
+            .click();
+          await page.locator('#theme-toggle').click();
+          assert.equal(await opener.getAttribute('aria-expanded'), 'true');
+          await page.locator('#theme-toggle').click();
           await page
             .getByText(
               japanese
@@ -158,7 +201,30 @@ for (const japanese of [false, true]) {
           await page.screenshot({
             path: `/tmp/gensai-hazards-open-${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-${theme}.png`,
           });
+          const selectedBeforeClose = await page
+            .locator('.map-selection [role=status]')
+            .textContent();
+          await page.setViewportSize({
+            width: mobile ? 430 : 1100,
+            height: mobile ? 844 : 900,
+          });
+          assert.equal(await opener.getAttribute('aria-expanded'), 'true');
+          await page.setViewportSize({
+            width: mobile ? 390 : 1280,
+            height: mobile ? 844 : 900,
+          });
+          await page.locator('[data-sidebar-close]').click();
           await opener.click();
+          assert.equal(
+            await page.locator('.map-selection [role=status]').textContent(),
+            selectedBeforeClose,
+          );
+          for (const name of names)
+            assert.equal(
+              await page.getByRole('switch', { name, exact: true }).isChecked(),
+              true,
+            );
+          await page.locator('[data-sidebar-close]').click();
           await warning.waitFor();
           const legend = page.locator('.hazard-legend');
           assert.equal(await legend.isVisible(), true);
@@ -233,6 +299,7 @@ test('all eight category combinations preserve source colours and drawing order'
     });
     await page.goto(base);
     await page.locator('canvas').waitFor();
+    await page.locator('[data-sidebar-opener]').click();
     const switches = ['Tsunami', 'Flooding', 'Landslide'].map((name) =>
       page.getByRole('switch', { name, exact: true }),
     );
