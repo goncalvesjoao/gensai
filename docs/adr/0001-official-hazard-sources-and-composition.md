@@ -18,14 +18,14 @@ datasets below at native zoom **2–17**. Use HTTPS XYZ PNG tiles following the
 Braces below are substitutions, not literal URL components. `{p}` is the
 two-digit prefecture code (01–47), not the catalogue's CSV row number.
 
-| Dataset / legend name | Exact URL template |
-| --- | --- |
-| Tsunami inundation depth / 津波浸水想定 | `https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/{z}/{x}/{y}.png` |
-| Maximum-scale river depth, national / 洪水浸水想定区域（想定最大規模）_国管理河川 | `https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_kuni_data/{z}/{x}/{y}.png` |
+| Dataset / legend name                                                                      | Exact URL template                                                                              |
+| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Tsunami inundation depth / 津波浸水想定                                                    | `https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/{z}/{x}/{y}.png`             |
+| Maximum-scale river depth, national / 洪水浸水想定区域（想定最大規模）_国管理河川          | `https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_kuni_data/{z}/{x}/{y}.png`     |
 | Maximum-scale river depth, prefectural / 洪水浸水想定区域（想定最大規模）_都道府県管理河川 | `https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_pref_data/{p}/{z}/{x}/{y}.png` |
-| Debris flow / 土砂災害警戒区域（土石流） | `https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/{p}/{z}/{x}/{y}.png` |
-| Steep-slope collapse / 土砂災害警戒区域（急傾斜地の崩壊） | `https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki_data/{p}/{z}/{x}/{y}.png` |
-| Landslide / 土砂災害警戒区域（地すべり） | `https://disaportaldata.gsi.go.jp/raster/05_jisuberikeikaikuiki_data/{p}/{z}/{x}/{y}.png` |
+| Debris flow / 土砂災害警戒区域（土石流）                                                   | `https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki_data/{p}/{z}/{x}/{y}.png`      |
+| Steep-slope collapse / 土砂災害警戒区域（急傾斜地の崩壊）                                  | `https://disaportaldata.gsi.go.jp/raster/05_kyukeishakeikaikuiki_data/{p}/{z}/{x}/{y}.png`      |
+| Landslide / 土砂災害警戒区域（地すべり）                                                   | `https://disaportaldata.gsi.go.jp/raster/05_jisuberikeikaikuiki_data/{p}/{z}/{x}/{y}.png`       |
 
 The catalogue lists all 47 prefecture paths for prefectural river depth and each
 landslide type. **Do not remove the prefecture component**: no aggregate
@@ -67,16 +67,16 @@ enabled category's own readable legend. Hex values below were sampled from
 the interiors of that PNG, not inferred from color names. Boundary notation
 uses the official Japanese lower-inclusive, upper-exclusive ranges.
 
-| Depth | Japanese label | Official RGB hex |
-| --- | --- | --- |
-| < 0.3 m | 0.3m未満 | `#FFFFB3` |
-| 0.3 ≤ depth < 0.5 m | 0.3m以上0.5m未満 | `#F7F5A9` |
-| 0.5 ≤ depth < 1 m | 0.5m以上1m未満 | `#F8E1A6` |
-| 1 ≤ depth < 3 m | 1m以上3m未満 | `#FFD8C0` |
-| 3 ≤ depth < 5 m | 3m以上5m未満 | `#FFB7B7` |
-| 5 ≤ depth < 10 m | 5m以上10m未満 | `#FF9191` |
-| 10 ≤ depth < 20 m | 10m以上20m未満 | `#F285C9` |
-| ≥ 20 m | 20m以上 | `#DC7ADC` |
+| Depth               | Japanese label   | Official RGB hex |
+| ------------------- | ---------------- | ---------------- |
+| < 0.3 m             | 0.3m未満         | `#FFFFB3`        |
+| 0.3 ≤ depth < 0.5 m | 0.3m以上0.5m未満 | `#F7F5A9`        |
+| 0.5 ≤ depth < 1 m   | 0.5m以上1m未満   | `#F8E1A6`        |
+| 1 ≤ depth < 3 m     | 1m以上3m未満     | `#FFD8C0`        |
+| 3 ≤ depth < 5 m     | 3m以上5m未満     | `#FFB7B7`        |
+| 5 ≤ depth < 10 m    | 5m以上10m未満    | `#FF9191`        |
+| 10 ≤ depth < 20 m   | 10m以上20m未満   | `#F285C9`        |
+| ≥ 20 m              | 20m以上          | `#DC7ADC`        |
 
 The PNG's low-depth bands have stepped shapes: sample the **interior of each
 swatch**, not the far-left strip (which includes neighboring bands). These
@@ -87,11 +87,11 @@ Each landslide type needs its own section, with warning / 警戒区域 and speci
 warning / 特別警戒区域, plus designated / 指定済 and planned designation /
 指定予定. The official legend images provide these colors:
 
-| Type and official legend | Warning, designated | Special warning, designated | Warning, planned | Special warning, planned |
-| --- | --- | --- | --- | --- |
-| [Debris flow][debrislegend] | `#E6C832` | `#A50021` | `#EBD35B` | `#B7334D` |
-| [Steep-slope collapse][slopelegend] | `#FAE600` | `#FA2800` | `#FBEB33` | `#FB5333` |
-| [Landslide][slidelegend] | `#FF9900` | `#B40028` | `#FFAD33` | `#C33353` |
+| Type and official legend            | Warning, designated | Special warning, designated | Warning, planned | Special warning, planned |
+| ----------------------------------- | ------------------- | --------------------------- | ---------------- | ------------------------ |
+| [Debris flow][debrislegend]         | `#E6C832`           | `#A50021`                   | `#EBD35B`        | `#B7334D`                |
+| [Steep-slope collapse][slopelegend] | `#FAE600`           | `#FA2800`                   | `#FBEB33`        | `#FB5333`                |
+| [Landslide][slidelegend]            | `#FF9900`           | `#B40028`                   | `#FFAD33`        | `#C33353`                |
 
 Planned areas have **dark-blue dashed borders** in the official legends; keep
 the source borders and explain that they indicate planned designation, not
@@ -157,14 +157,14 @@ examples rather than prescribe one universal sentence. Display them readably
 with the menu closed, linked to the cited source pages. Japanese provenance
 names remain intact in either UI language.
 
-| Source | Display attribution / additional disclosure |
-| --- | --- |
-| Tsunami | `出典：ハザードマップポータルサイト（津波浸水想定／都道府県データ）` linked to the catalogue |
-| National river | `出典：ハザードマップポータルサイト（洪水浸水想定区域（想定最大規模）／国土交通省各地方整備局等）` linked to the catalogue |
-| Prefectural river | `出典：ハザードマップポータルサイト（洪水浸水想定区域（想定最大規模）／都道府県・市町村等）` linked to the catalogue |
+| Source                    | Display attribution / additional disclosure                                                                                                                                                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tsunami                   | `出典：ハザードマップポータルサイト（津波浸水想定／都道府県データ）` linked to the catalogue                                                                                                                                                                           |
+| National river            | `出典：ハザードマップポータルサイト（洪水浸水想定区域（想定最大規模）／国土交通省各地方整備局等）` linked to the catalogue                                                                                                                                             |
+| Prefectural river         | `出典：ハザードマップポータルサイト（洪水浸水想定区域（想定最大規模）／都道府県・市町村等）` linked to the catalogue                                                                                                                                                   |
 | All three landslide types | `出典：ハザードマップポータルサイト、国土交通省国土数値情報ダウンロードサイト（令和７年度土砂災害警戒区域）` linked to the catalogue and [A33-2025][a33]; `国土交通省政策統括官付地理空間情報課「国土数値情報（令和７年度土砂災害警戒区域）」をもとに国土地理院が加工` |
-| Hazard composition | `「ハザードマップポータルサイト」を加工してGensaiが作成（表示順序・重なりの処理）` |
-| Pale basemap | `地理院タイル（国土地理院）` linked to the [GSI tile list][tiles] |
+| Hazard composition        | `「ハザードマップポータルサイト」を加工してGensaiが作成（表示順序・重なりの処理）`                                                                                                                                                                                     |
+| Pale basemap              | `地理院タイル（国土地理院）` linked to the [GSI tile list][tiles]                                                                                                                                                                                                      |
 
 Real-time pale-map use is attribution-only, without a Survey Act application,
 under the explicit tile-list guidance. Offline redistribution, exports and
@@ -181,14 +181,14 @@ conditions in the official [R7 conditions/data-date workbook][conditions].
 It lists 41 prefectures as commercial-use/redistribution permitted and six as
 conditional. The workbook was retrieved and its conditions checked:
 
-| Prefecture | Condition to preserve |
-| --- | --- |
-| Kanagawa (14) | Not evidence for applications under the landslide prevention law. |
-| Kyoto (26) | **Commercial secondary use prohibited.** |
-| Wakayama (30) | Not for applications/other supporting documents; disclose processing of Wakayama's original data. |
-| Tottori (31) | Approximate reference positions, not legal zone boundaries; consult the responsible authority for precise information. |
+| Prefecture     | Condition to preserve                                                                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kanagawa (14)  | Not evidence for applications under the landslide prevention law.                                                                                                                                    |
+| Kyoto (26)     | **Commercial secondary use prohibited.**                                                                                                                                                             |
+| Wakayama (30)  | Not for applications/other supporting documents; disclose processing of Wakayama's original data.                                                                                                    |
+| Tottori (31)   | Approximate reference positions, not legal zone boundaries; consult the responsible authority for precise information.                                                                               |
 | Hiroshima (34) | Approximate reference, not all statutory information; consult prefectural construction offices. Workbook also specifies CC BY and processing provenance from 土砂災害ポータルひろしま / 広島県Dobox. |
-| Nagasaki (42) | Credit original source. Workbook specifies CC BY 4.0 and attribution to 長崎県、国土数値情報、クリエイティブ・コモンズ・ライセンス 表示 4.0 国際. |
+| Nagasaki (42)  | Credit original source. Workbook specifies CC BY 4.0 and attribution to 長崎県、国土数値情報、クリエイティブ・コモンズ・ライセンス 表示 4.0 国際.                                                    |
 
 When applicable, additionally show:
 `原典資料提供元の和歌山県が有しているデータを加工したものです。`;
