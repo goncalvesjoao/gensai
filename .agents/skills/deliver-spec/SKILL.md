@@ -34,6 +34,11 @@ Preserve the user's constraints throughout.
 3. Read and apply [pr-review-loop](../pr-review-loop/SKILL.md) with the exact PR
    URL from step 2 and the originating spec. Start its first cycle and schedule
    subsequent cycles under that skill's rules, honoring any supplied cadence.
+   Pass this delivery completion action to the review loop and its saved prompt:
+   after the PR is confirmed merged and the review loop's Blow sound has played,
+   run `afplay /System/Library/Sounds/Hero.aiff` once. Record delivery in the
+   review loop's existing ledger to avoid replay on resumed cycles. Playback
+   failure does not change the delivery result.
    Report the PR URL and monitoring status. Delivery is complete only when the
    PR is confirmed merged; scheduled monitoring may continue after this turn.
 

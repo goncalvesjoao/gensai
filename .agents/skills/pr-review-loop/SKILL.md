@@ -42,6 +42,8 @@ below, preserve unrelated work, stay quiet while unchanged, notify on a
 push/merge/failure/required decision, and
 disable this automation when the PR is merged or closed. Retain these instructions
 when updating an existing schedule.
+Carry any caller-supplied delivery completion action into the saved prompt and
+retain it on schedule updates.
 
 ## Run one cycle
 
@@ -119,3 +121,11 @@ the same fix, stop editing and ask for a decision instead of oscillating between
 commits. On a user request to stop, disable this PR's automation. Retain the ledger
 and branch for inspection; archive temporary worktrees only after their work is
 pushed or otherwise preserved.
+
+## Completion sound
+
+Once the PR is confirmed merged, run `afplay /System/Library/Sounds/Blow.aiff`
+before any caller-supplied delivery completion action. Record completion sound
+delivery in the existing ledger so resumed cycles do not replay it. Play only
+on successful merge, rather than on each cycle or closure without merge.
+Playback failure does not change the merge result.
