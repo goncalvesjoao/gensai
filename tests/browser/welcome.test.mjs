@@ -1,0 +1,106 @@
+import assert from 'node:assert/strict';
+import process from 'node:process';
+import { createRequire } from 'node:module';
+import test from 'node:test';
+const require = createRequire(import.meta.url);
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const base = process.env.HOME_TEST_URL || 'http://localhost:4337';
+
+test('entry point welcomes visitors without scripting and opens the corresponding map', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    for (const [path, heading, statement, label] of [
+      [
+        '/',
+        'Welcome to Gensai',
+        'Gensai is a work-in-progress project.',
+        'Open the Gensai map',
+      ],
+      [
+        '/ja',
+        'Gensaiへようこそ',
+        'Gensaiは現在開発中のプロジェクトです。',
+        'Gensaiの地図を開く',
+      ],
+    ]) {
+      const page = await browser.newPage({ javaScriptEnabled: false });
+      await page.goto(`${base}${path}`);
+      await page
+        .getByRole('heading', { name: heading })
+        .waitFor({ timeout: 2000 });
+      assert.equal(await page.getByText(statement, { exact: true }).count(), 1);
+      assert.equal(page.url(), `${base}${path}`);
+      const link = page.getByRole('link', { name: label });
+      await link.focus();
+      assert.ok(
+        await link.evaluate((element) => element === document.activeElement),
+      );
+      await link.press('Enter');
+      assert.equal(new URL(page.url()).hostname, 'map.localhost');
+      assert.equal(
+        new URL(page.url()).pathname.replace(/\/$/, '') || '/',
+        path,
+      );
+      await page.close();
+    }
+  } finally {
+    await browser.close();
+  }
+});
+
+test('welcome remains readable in both languages, themes and viewport sizes without requesting location', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    for (const [path, label] of [
+      ['/', 'Open the Gensai map'],
+      ['/ja', 'Gensaiの地図を開く'],
+    ]) {
+      for (const theme of ['light', 'dark']) {
+        for (const width of [390, 1280]) {
+          const page = await browser.newPage({
+            viewport: { width, height: 844 },
+            colorScheme: theme,
+          });
+          await page.addInitScript(() => {
+            window.locationRequests = 0;
+            navigator.geolocation.getCurrentPosition = () =>
+              window.locationRequests++;
+          });
+          await page.goto(`${base}${path}`);
+          const link = page.getByRole('link', { name: label });
+          await link.waitFor();
+          await link.focus();
+          assert.equal(await page.evaluate(() => window.locationRequests), 0);
+          assert.equal(
+            await page.locator('html').getAttribute('data-theme'),
+            theme,
+          );
+          assert.ok(
+            await link.evaluate(
+              (element) => element === document.activeElement,
+            ),
+          );
+          const bounds = await link.boundingBox();
+          assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= width);
+          assert.equal(
+            await page.evaluate(() => document.documentElement.scrollWidth),
+            width,
+          );
+          if (process.env.WELCOME_SCREENSHOT_DIR)
+            await page.screenshot({
+              path: `${process.env.WELCOME_SCREENSHOT_DIR}/welcome-${path === '/' ? 'en' : 'ja'}-${theme}-${width}.png`,
+            });
+          await page.close();
+        }
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+});
