@@ -23,3 +23,7 @@ completion here does not establish completion in a rebuild.
 Mockup reconciliation on 2026-10-06 adds the map-controls spec and updates location,
 address search, hazards and release acceptance. The historical baseline stays
 completed; its sidebar requirements are superseded for the first release.
+
+Home-page clarification on 2026-10-06 updates production access and map controls.
+The Gensai entry point will show a welcome, a work-in-progress message and an
+explicit map call to action. This supersedes the historical automatic redirect.

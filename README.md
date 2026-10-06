@@ -56,21 +56,23 @@ Coverage varies by layer and region. The map will need to distinguish unavailabl
 
 ## First release URLs
 
-The [production-access spec](docs/specs/release-acceptance.md) places the Gensai map at
-`https://map.gensai.help/`, with `https://gensai.help/` redirecting to it.
-In development, `http://localhost:4321/` redirects to
-`http://map.localhost:4321/`. Both development hosts use the same server port,
-including when it differs from 4321.
+The [production-access spec](docs/specs/release-acceptance.md) places a welcoming
+home page at `https://gensai.help/` and the Gensai map at
+`https://map.gensai.help/`. The home page will state that Gensai is a work in progress
+and provide a prominent call to action to open the map. It will remain visible
+without automatically redirecting. The map's home button will return to it.
 
-English uses the map host's root and Japanese uses `/ja`. The entry point's
-`/ja` route redirects to `/ja` on the map host. Language switching stays on the
-map host.
+English uses the root and Japanese uses `/ja` on both hosts. The home page's map
+link opens the corresponding language route. Language switching on the map stays
+on the map host. Both production hosts require HTTPS.
 
-The static build uses a browser redirect in the page head for the entry-point
-host, preserving the path, query string, and fragment. Serve the same `dist/`
-build on both production hosts with HTTPS. DNS and hosting setup are required
-before the production URLs are live. When a hosting provider is chosen, configure
-an HTTP redirect there so the entry point also redirects without JavaScript.
+This welcome-page behavior is specified but not implemented. The current static
+build still uses a browser redirect from the entry-point host to the map host,
+preserving the path, query and fragment. In development, `http://localhost:4321/`
+currently redirects to `http://map.localhost:4321/`; both hosts use the same server
+port, including when it differs from 4321. Implementation must replace the
+entry-point redirect with the welcome page and map link, including any hosting
+redirect rules.
 
 ## Local development
 

@@ -12,7 +12,7 @@ tracker is needed.
 | [Selected location and device-location fallback](location-selection.md)   | Explicit location acquisition, Japan validation, Tokyo fallback and selected-place state | Map baseline                                                    |
 | [Japanese and Latin-character address search](address-search.md)          | Working address search and result selection                                              | Selected location                                               |
 | [Official hazard categories, legends and coverage](hazard-exploration.md) | Hazard exploration with correct colour, availability and failure interpretation          | Selected location; search is optional for delivery              |
-| [Production access and first-release acceptance](release-acceptance.md)   | Deployed access and integrated checks                                                    | All feature specs, including map controls, for final acceptance |
+| [Production access and first-release acceptance](release-acceptance.md)   | Welcome page, explicit map link, deployed access and integrated checks                   | All feature specs, including map controls, for final acceptance |
 
 Feature specs take precedence where they change the baseline. For a complete
 release, implement explicit location permission, functioning search and official
@@ -29,6 +29,9 @@ sidebar controls, desktop-open default and responsive reset. The hazard spec
 interprets the depicted switches as independent visibility controls, replacing
 the earlier exclusive-category rule. Search submits on Enter. Existing URL,
 source-data, coverage and safety requirements continue where the wireframe is silent.
+The owner's home-page clarification supersedes the baseline's automatic entry-point
+redirect. The [production-access and release spec](release-acceptance.md) now owns
+the welcome, work-in-progress message and explicit map call to action.
 
 To hand the specifications to another agent, copy this folder, `docs/mockups.excalidraw`, the release scope and the glossary together,
 preserving relative paths. Track

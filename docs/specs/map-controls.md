@@ -11,7 +11,7 @@ Provide the map layout shown in the initial-state and interactions mockups: home
 ## User stories
 
 1. As a current resident, I want the map to occupy the main viewing area, so that I can inspect surroundings without an initially open panel.
-2. As a current resident, I want a home button at the upper left, so that I can navigate to the Gensai entry point.
+2. As a current resident, I want a home button at the upper left, so that I can return to the welcoming home page at the Gensai entry point.
 3. As a Japanese-speaking current resident, I want home navigation to retain my language, so that I reach the equivalent Japanese route.
 4. As a current resident, I want address search beside the home button, so that I can find a selected location directly from the map.
 5. As a current resident, I want a device-location button at the right end of the search control, so that I can request my current location without opening a panel.
@@ -45,7 +45,7 @@ These are framework-independent product and interaction requirements. Reuse the 
 - Address submission is owned by the address-search spec; device acquisition and Tokyo fallback are owned by the selected-location spec. These actions remain available while the hazard menu is closed.
 - The theme control toggles light/dark and reflects the current theme with sun/moon respectively. Preserve system-theme initialization, saved explicit choices, pre-paint application and operation without browser storage. The wireframe's light appearance does not override those requirements.
 - The language dropdown lists English and 日本語. Preserve the existing route contract: English at the map root, Japanese at /ja, with equivalent paths, query and fragment preserved on the map host. The annotation about a locale prefix does not establish a new /en route or more launch languages.
-- The home button navigates to the Gensai entry point in the active language. Under the existing release routing, that entry point redirects back to the equivalent map route. The mockups do not specify a separate home page's content or a change to that redirect. A distinct landing page requires its own spec and a revision of production routing.
+- The home button navigates to the welcoming home page at the Gensai entry point in the active language: the root for English or /ja for Japanese. The home page does not redirect back to the map. It displays a welcome, explicitly identifies Gensai as a work-in-progress project and provides a prominent map call to action. Home-page content, routing and acceptance belong to the [production-access and release spec](release-acceptance.md).
 - Give every icon control a localized accessible action name and visible keyboard focus. Treat decorative icons as decorative. Separate the location button from address submission so activating it does not submit the query.
 - Adapt spacing and control sizing for narrow screens without overlap or loss of functionality. Exact pixel dimensions, breakpoints, animations and colors are implementation choices. The pink rectangle is a map placeholder; it is not a basemap palette or hazard area.
 
@@ -61,18 +61,20 @@ Prior art in the existing project covers sidebar expanded state, hidden-content 
 4. Closing/reopening preserves the selected location, enabled categories and visible hazard data. Legends, warning and attribution remain readable with the menu closed.
 5. Enter submits address search. The adjacent location button requests device acquisition only when activated and does not submit the address field. Feature-specific outcomes follow their respective specs.
 6. Minus zooms out and plus zooms in. Both remain usable with the menu open; panning, scale and attribution remain usable on narrow screens.
-7. Theme switching changes the shell and sun/moon icon consistently. Language selection follows the root-/ja contract and preserves URL details; home navigation reaches the language-equivalent entry point and follows its redirect without loops.
+7. Theme switching changes the shell and sun/moon icon consistently. Language selection follows the root-/ja contract and preserves URL details; home navigation reaches the language-equivalent welcome page and stays there. Its localized map call to action opens the corresponding map route.
 8. Capture initial/open-menu states in both languages and themes at computer and phone widths. Check control overlap, readable panel contents, focus and retained map area against the mockups' layout, including the longer Japanese labels.
 
 ## Out of scope
 
-Implementing address providers, location acquisition or hazard datasets; a new home page or preparation content; more launch languages; persistent menu state across page navigation; replacing the specified production routes; exact wireframe colors or pixel-perfect reproduction.
+Implementing address providers, location acquisition or hazard datasets; home-page implementation owned by the production-access and release spec; preparation content; more launch languages; persistent menu state across page navigation; replacing the specified production routes; exact wireframe colors or pixel-perfect reproduction.
 
 ## Further notes
 
 The initial-state board establishes a closed hazard menu and the floating control groups. The interactions board explicitly describes Enter submission, device permission on button activation, theme switching, locale navigation, home navigation, zooming and keeping the hazard menu visible until close. Escape dismissal adds keyboard equivalence to the close button.
 
 The independent hazard switches are interpreted in the hazard-exploration spec. Ellipsis in the menu does not add unnamed categories. Existing source, coverage, legend and safety requirements remain necessary even though the wireframe does not draw them.
+
+The owner clarified on 2026-10-06 that home navigation must reach a work-in-progress welcome page with an explicit map call to action, replacing the entry-point redirect.
 
 This spec overrides the map baseline's sidebar layout, opener controls, desktop default and responsive reset. It does not redefine the historical baseline as unfinished. Final release acceptance includes this layout together with the selected-location, address-search and hazard-exploration specs.
 

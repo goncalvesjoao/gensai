@@ -84,7 +84,9 @@ Role: baseline product capabilities. This document defines what to recreate when
 
 Use this spec to recreate the baseline in any framework. Use the [mockups](../mockups.excalidraw) and [map-controls spec](map-controls.md)
 for the first-release layout, which overrides the historical sidebar controls,
-desktop default and responsive reset. Combine it with the
+desktop default and responsive reset. The [production-access and release spec](release-acceptance.md)
+also replaces the historical entry-point redirect with a welcoming work-in-progress
+home page and an explicit map link. Combine it with the
 [selected-location](location-selection.md), [address-search](address-search.md),
 [hazard-exploration](hazard-exploration.md) and [release-acceptance](release-acceptance.md)
 specs for the full first release. Each takes precedence where it changes baseline

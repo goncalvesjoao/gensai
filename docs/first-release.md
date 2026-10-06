@@ -26,15 +26,16 @@ mapped hazards around it. Current location and selected location are distinct.
   tsunami inundation depth, and landslide warning zones for debris flow,
   steep-slope collapse and landslide hazards. Independent switches permit any
   combination, including all off; tsunami alone is enabled initially.
-- A home button leading to the language-equivalent Gensai entry point under the
-  existing redirect contract; separate home-page content remains outside scope.
+- A welcoming home page at the Gensai entry point, with an explicit work-in-progress
+  message and a prominent localized call to action to open the map. It does not
+  automatically redirect. The map's home button returns to it in the active language.
 - A selected-place marker and label, category legends, attribution, verified
   coverage information where available, and separate loading/failure explanations.
 - English and Japanese throughout the workflow on phones and computers, with
   keyboard access, visible focus and an internet connection.
 - Selection retained for the open-page experience, without saved places.
-- HTTPS production access through a dedicated map host, with the main entry point
-  redirecting to the equivalent map route.
+- HTTPS production access through separate home and map hosts, with direct English
+  and Japanese routes and an explicit home-page link to the corresponding map route.
 
 An uncoloured area does not establish safety or missing coverage. Keep
 "No colour does not mean safe. Data may be missing" prominent beside the legend.
