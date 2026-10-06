@@ -13,6 +13,11 @@ test('device location is explicitly acquired and fresh on later activation', asy
   });
   try {
     const page = await browser.newPage();
+    const boundaryRequests = [];
+    page.on('request', (request) => {
+      if (/\/japan-boundary\.[^/]+\.js/.test(request.url()))
+        boundaryRequests.push(request.url());
+    });
     await page.addInitScript(() => {
       window.locationRequests = [];
       navigator.geolocation.getCurrentPosition = (success, failure, options) =>
@@ -26,6 +31,11 @@ test('device location is explicitly acquired and fresh on later activation', asy
       exact: true,
     });
     await button.click({ timeout: 2000 });
+    assert.equal(
+      boundaryRequests.length,
+      0,
+      'Overview must not load boundary geometry',
+    );
     await page.getByText('Finding your location…', { exact: true }).waitFor();
     await page.evaluate(() =>
       window.locationRequests[0].success({
@@ -36,6 +46,11 @@ test('device location is explicitly acquired and fresh on later activation', asy
       .getByRole('status')
       .filter({ hasText: '35.68950, 139.69170' })
       .waitFor();
+    assert.equal(
+      boundaryRequests.length,
+      1,
+      'First selection loads boundary geometry',
+    );
     await button.click();
     assert.equal(await page.evaluate(() => window.locationRequests.length), 2);
     assert.equal(

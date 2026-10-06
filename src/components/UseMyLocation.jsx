@@ -42,11 +42,11 @@ export default function UseMyLocation({ locale = 'en' }) {
     };
     if (window.__gensaiMapInstance) ready();
     window.addEventListener('gensai:map-ready', ready);
-    window.addEventListener('gensai:selection-result', cancel);
+    window.addEventListener('gensai:selection-start', cancel);
     return () => {
       cancel();
       window.removeEventListener('gensai:map-ready', ready);
-      window.removeEventListener('gensai:selection-result', cancel);
+      window.removeEventListener('gensai:selection-start', cancel);
     };
   }, []);
 
@@ -68,9 +68,14 @@ export default function UseMyLocation({ locale = 'en' }) {
     }
     if (!navigator.geolocation) return finish(null, text.unavailable);
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
+      async ({ coords }) => {
         const location = { lng: coords.longitude, lat: coords.latitude };
-        finish(location, isJapanLocation(location) ? null : text.outside);
+        try {
+          const valid = await isJapanLocation(location);
+          finish(location, valid ? null : text.outside);
+        } catch {
+          finish(null, text.unavailable);
+        }
       },
       ({ code }) =>
         finish(

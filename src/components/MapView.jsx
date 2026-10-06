@@ -22,6 +22,9 @@ export default function MapView({ locale = 'en' }) {
         instruction:
           '地図をクリックして場所を選択。矢印キーで地図を移動し、Enterで中心を選択できます。',
         outside: '日本の陸地を選択してください。',
+        checking: '選択した場所を確認中…',
+        failed:
+          '日本の境界データを読み込めませんでした。ページを再読み込みしてお試しください。',
         latitude: '緯度',
         longitude: '経度',
         coordinates: '座標で場所を選択・修正',
@@ -34,6 +37,9 @@ export default function MapView({ locale = 'en' }) {
         instruction:
           'Click the map to choose a place. Use arrow keys to move the map, then Enter to select its center.',
         outside: 'Choose a point on land in Japan.',
+        checking: 'Checking selected location…',
+        failed:
+          'Could not load the Japan boundary. Reload the page to try again.',
         latitude: 'Latitude',
         longitude: 'Longitude',
         coordinates: 'Choose or correct coordinates',
@@ -95,8 +101,19 @@ export default function MapView({ locale = 'en' }) {
     canvas.setAttribute('aria-label', text.map);
     canvas.setAttribute('aria-describedby', 'map-selection-instructions');
     let marker;
-    function select(location, explanation = '', label = text.selected) {
-      const valid = isJapanLocation(location);
+    let selection = 0;
+    async function select(location, explanation = '', label = text.selected) {
+      const active = ++selection;
+      window.dispatchEvent(new Event('gensai:selection-start'));
+      setMessage(text.checking);
+      let valid;
+      try {
+        valid = await isJapanLocation(location);
+      } catch {
+        if (active === selection) setMessage(text.failed);
+        return;
+      }
+      if (active !== selection) return;
       if (valid) {
         const next = { lng: location.lng, lat: location.lat };
         setSelected({ ...next, label });
@@ -142,6 +159,7 @@ export default function MapView({ locale = 'en' }) {
     observer.observe(containerRef.current);
     map.once('load', () => setReady(true));
     return () => {
+      selection++;
       observer.disconnect();
       window.removeEventListener('gensai:select-location', receive);
       canvas.removeEventListener('keydown', keyboard);

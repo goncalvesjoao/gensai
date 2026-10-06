@@ -28,6 +28,10 @@ The visible map and coordinate form share the same flow used by later device/add
 
 ## Verification
 
+PR review follow-up: `selected-location.mjs` now holds the lightweight overview constants and an asynchronous validator. The validator dynamically imports `japan-boundary.mjs` on the first selection, so opening the overview does not download the geometry. Selection announces validation in progress; the latest selection wins during a delayed download. A failed boundary download retains the previous selected place and asks the person to reload in the active language. Device callbacks are cancelled when a newer selection starts, before its validation completes.
+
+`npm test` includes fast mainland/island, overseas/ocean, polygon-hole, Okinotorishima allowance, and invalid-coordinate checks. Browser regressions verify that the overview makes no boundary request, first selection loads the chunk, delayed validation preserves the latest choice, and failed downloads show an explanation.
+
 The browser test uses the built site's public URLs and actual controls/canvas. Run `npm run build`, serve `npm run preview`, then `node --test tests/browser/selected-location.test.mjs`. Playwright must be available in the environment or selected with `PLAYWRIGHT_MODULE`; `CHROMIUM_PATH` selects a preinstalled browser and `TEST_URL` selects the preview URL. No test dependency is added to the application. `SCREENSHOT_DIR` optionally records screenshots.
 
 Verification completed: 17 existing Node tests and four browser scenarios passed. Each browser scenario covers both themes; eight rendered screenshots were inspected at `/tmp/gensai-spec-9/{en,ja}-{phone,computer}-{light,dark}.png`. The browser runs exercise Tokyo, Naha, Yonaguni, Chichijima, Minamitorishima and the GSI Okinotorishima point, then reject Seoul without replacing the previous selection. They use actual pointer and keyboard map selection, theme/menu/resize retention, language navigation reset and fresh reload.
