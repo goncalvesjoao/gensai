@@ -31,7 +31,9 @@ const closeLabel = japanese ? '災害メニューを閉じる' : 'Close hazard m
       >
         <X size={20} aria-hidden="true" />
       </button>
-      <PreparednessPanel locale={locale} />
+      <div class="hazard-menu-content">
+        <PreparednessPanel locale={locale} />
+      </div>
     </aside>
     <section
       class="map-panel"

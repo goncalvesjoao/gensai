@@ -104,7 +104,7 @@ body {
   bottom: calc(28% + 72px);
   width: min(280px, calc(100% - 76px));
   max-height: min(240px, calc(72% - 152px - min(20dvh, 170px)));
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 3;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -112,10 +112,17 @@ body {
 }
 
 .hazard-menu-close {
-  position: sticky;
-  top: 4px;
   margin: 4px 4px 0 auto;
-  z-index: 1;
+}
+
+.sidebar:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
+.hazard-menu-content {
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .hazard-menu-open {
