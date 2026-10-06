@@ -5,6 +5,10 @@ import test from 'node:test';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.HOME_TEST_URL || 'http://localhost:4337';
+const mapBase =
+  process.env.MAP_TEST_URL ||
+  process.env.TEST_URL ||
+  base.replace('localhost', 'map.localhost');
 
 test('entry point welcomes visitors without scripting and opens the corresponding map', async () => {
   const browser = await chromium.launch({
@@ -39,7 +43,7 @@ test('entry point welcomes visitors without scripting and opens the correspondin
         await link.evaluate((element) => element === document.activeElement),
       );
       await link.press('Enter');
-      assert.equal(new URL(page.url()).hostname, 'map.localhost');
+      assert.equal(new URL(page.url()).origin, new URL(mapBase).origin);
       assert.equal(
         await page.locator('html').getAttribute('lang'),
         path === '/ja' ? 'ja' : 'en',
@@ -130,7 +134,7 @@ test('visitors can return from the map and reopen it in the same language', asyn
       await page.waitForTimeout(150);
       assert.equal(page.url(), `${base}${path}`);
       await page.getByRole('link', { name: label }).click();
-      assert.equal(new URL(page.url()).hostname, 'map.localhost');
+      assert.equal(new URL(page.url()).origin, new URL(mapBase).origin);
       assert.equal(
         new URL(page.url()).pathname.replace(/\/$/, '') || '/',
         path,

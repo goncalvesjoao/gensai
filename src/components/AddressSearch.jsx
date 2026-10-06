@@ -158,6 +158,7 @@ export default function AddressSearch({ locale = 'en' }) {
       <input
         ref={input}
         type="search"
+        disabled={!available}
         aria-label={text.search}
         placeholder={text.search}
         maxLength={300}
