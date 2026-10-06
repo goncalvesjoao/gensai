@@ -9,7 +9,7 @@ access.
 | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------- |
 | [Map baseline](specs/map-baseline.md)                                           | [Existing Gensai map capabilities](https://github.com/goncalvesjoao/gensai/issues/8)                  | Completed                    |
 | [Gensai map controls and persistent hazard menu](specs/map-controls.md)         | [Gensai map controls and persistent hazard menu](https://github.com/goncalvesjoao/gensai/issues/13)   | Open                         |
-| [Selected location and device-location fallback](specs/location-selection.md)   | [Selected location and device-location fallback](https://github.com/goncalvesjoao/gensai/issues/9)    | Open                         |
+| [Selected location and device-location fallback](specs/location-selection.md)   | [Selected location and device-location fallback](https://github.com/goncalvesjoao/gensai/issues/9)    | Completed                    |
 | [Japanese and Latin-character address search](specs/address-search.md)          | [Japanese and Latin-character address search](https://github.com/goncalvesjoao/gensai/issues/10)      | Open                         |
 | [Official hazard categories, legends and coverage](specs/hazard-exploration.md) | [Official hazard categories, legends and coverage](https://github.com/goncalvesjoao/gensai/issues/11) | Open                         |
 | [Production access and first-release acceptance](specs/release-acceptance.md)   | [Production access and first-release acceptance](https://github.com/goncalvesjoao/gensai/issues/12)   | Open                         |
