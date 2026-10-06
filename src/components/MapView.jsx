@@ -94,18 +94,18 @@ export default function MapView({ locale = 'en' }) {
     canvas.setAttribute('aria-label', text.map);
     canvas.setAttribute('aria-describedby', 'map-selection-instructions');
     let marker;
-    function select(location, explanation = '') {
+    function select(location, explanation = '', label = text.selected) {
       const valid = isJapanLocation(location);
       if (valid) {
         const next = { lng: location.lng, lat: location.lat };
-        setSelected(next);
+        setSelected({ ...next, label });
         setCoordinates({ lat: String(next.lat), lng: String(next.lng) });
         setMessage(explanation);
         marker ??= new maplibregl.Marker({ color: '#ef4444' })
           .setLngLat([next.lng, next.lat])
           .addTo(map);
         marker.setLngLat([next.lng, next.lat]);
-        marker.getElement().title = `${text.selected}: ${next.lat.toFixed(5)}, ${next.lng.toFixed(5)}`;
+        marker.getElement().title = `${label}: ${next.lat.toFixed(5)}, ${next.lng.toFixed(5)}`;
         marker
           .getElement()
           .setAttribute('aria-label', marker.getElement().title);
@@ -121,7 +121,11 @@ export default function MapView({ locale = 'en' }) {
       );
     }
     function receive(event) {
-      select(event.detail?.location, event.detail?.explanation);
+      select(
+        event.detail?.location,
+        event.detail?.explanation,
+        event.detail?.label,
+      );
     }
     function keyboard(event) {
       if (event.key === 'Enter') {
@@ -132,6 +136,7 @@ export default function MapView({ locale = 'en' }) {
     map.on('click', (event) => select(event.lngLat));
     canvas.addEventListener('keydown', keyboard);
     window.addEventListener('gensai:select-location', receive);
+    window.dispatchEvent(new Event('gensai:map-ready'));
     const observer = new ResizeObserver(() => map.resize());
     observer.observe(containerRef.current);
     map.once('load', () => setReady(true));
@@ -169,7 +174,7 @@ export default function MapView({ locale = 'en' }) {
         <p id="map-selection-instructions">{text.instruction}</p>
         <p role="status" aria-live="polite">
           {selected &&
-            `${text.selected}: ${selected.lat.toFixed(5)}, ${selected.lng.toFixed(5)}`}
+            `${selected.label}: ${selected.lat.toFixed(5)}, ${selected.lng.toFixed(5)}`}
           {message && <span className="block">{message}</span>}
         </p>
         <details>
