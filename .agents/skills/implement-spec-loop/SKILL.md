@@ -1,6 +1,6 @@
 ---
 name: implement-spec-loop
-description: "Implement a spec and its tickets, repeating code review and fixes until both review axes report zero findings."
+description: 'Implement a spec and its tickets, repeating code review and fixes until both review axes report zero findings.'
 ---
 
 You have been provided a spec. This spec should have tickets associated with it, describing how to implement the spec.
