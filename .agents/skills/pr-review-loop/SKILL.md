@@ -2,8 +2,8 @@
 name: pr-review-loop
 description: >-
   Monitor a Gensai GitHub pull request on a schedule, evaluate new review feedback,
-  implement valid findings, verify and push fixes, and merge when review comments
-  are resolved and all checks pass.
+  implement valid findings, verify and push fixes, and merge after Copilot reviews
+  the current head, review comments are resolved and all checks pass.
   Use when asked to automate or keep following a PR review cycle.
 ---
 
@@ -48,9 +48,10 @@ when updating an existing schedule.
 1. Check the PR state and current head. If merged or closed, disable the saved
    automation and report completion once. Evaluate merge readiness on every open-PR
    cycle, including cycles without new feedback.
-2. Fetch all review comments, submitted reviews, conversation comments and review
-   threads with their resolved state, using pagination. Read the current diff and
-   spec to interpret actionable feedback.
+2. Fetch all review comments, reviews, requested reviewers, conversation comments
+   and review threads with their resolved state, using pagination. Retain each
+   review's ID, author login, state, `submitted_at` and `commit_id` to evaluate
+   completion in step 8. Read the current diff and spec to interpret actionable feedback.
    Ordinary deployment notifications and review summaries are not extra findings.
 3. Read the local feedback ledger. Store it under the absolute Git common
    directory at `pr-review-loop/<PR-number>.json`, outside version control and
@@ -77,12 +78,21 @@ when updating an existing schedule.
    head matches the pushed commit. Mark fixes handled only after that confirmation;
    reconcile any unpublished commit on the next cycle rather than duplicating it.
    Record rejected/already-fixed findings without creating an empty commit.
-8. Merge only when no finding awaits a fix or user decision, every review thread is
-   resolved, and all checks on the current head have completed successfully. A
+8. Merge only after GitHub reports a completed Copilot review of the current head:
+   a review by `copilot-pull-request-reviewer[bot]` with a populated `submitted_at`,
+   `commit_id` equal to the current head SHA, and state `COMMENTED`, `APPROVED` or
+   `CHANGES_REQUESTED`. A `COMMENTED` review counts as completed even with zero
+   findings; required approvals remain a separate gate. Missing, pending, dismissed
+   or older-head reviews, a review request, an empty findings list and elapsed time
+   are not completion evidence. Wait while Copilot is still a requested reviewer
+   or has a pending review, even if an earlier review meets those conditions.
+   Also require that no finding awaits a fix or user decision, every review thread
+   is resolved, and all checks on the current head have completed successfully. A
    ledger entry marked handled does not resolve a GitHub thread. Pending, failed,
    cancelled, skipped or unavailable checks, or an empty checks list, do not satisfy
    this gate. Respect required approvals, mergeability and repository merge rules.
-   Refresh feedback, thread state, head SHA and checks immediately before merging.
+   Refresh Copilot reviews and review requests, feedback, thread state, head SHA
+   and checks immediately before merging.
    If the head or feedback changed, evaluate the new state first. Use an enabled
    repository merge method with `gh pr merge --match-head-commit <verified-SHA>`;
    do not bypass rules with admin mode or enable auto-merge. Confirm GitHub reports
@@ -97,9 +107,11 @@ when updating an existing schedule.
 
 Each scheduled run returns after one cycle; the scheduler provides the next check.
 Do not leave a shell polling loop running. A push may produce new feedback, which
-the next cycle evaluates. Do not assume Copilot automatically reviews new pushes;
-inspect its configuration or review activity when asked to ensure another review.
-Requesting reviews is a separate user-authorized action.
+the next cycle evaluates. Every push requires a completed Copilot review of the
+new head before merging. Do not assume Copilot automatically reviews new pushes;
+inspect its configuration or review activity. If a review is not being triggered,
+report the blocker once and obtain authorization to request it. Requesting reviews
+is a separate user-authorized action; never bypass the completion gate.
 
 Notify once for a repeated unchanged blocker and wait for changed evidence or
 user input. If reviewers repeatedly contradict the spec or request reversals of
