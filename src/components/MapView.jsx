@@ -103,8 +103,8 @@ export default function MapView({ locale = 'en' }) {
     let marker;
     let selection = 0;
     async function select(location, explanation = '', label = text.selected) {
-      const active = ++selection;
       window.dispatchEvent(new Event('gensai:selection-start'));
+      const active = ++selection;
       setMessage(text.checking);
       let valid;
       try {
@@ -138,6 +138,10 @@ export default function MapView({ locale = 'en' }) {
         }),
       );
     }
+    function cancel() {
+      selection++;
+      setMessage('');
+    }
     function receive(event) {
       select(
         event.detail?.location,
@@ -154,6 +158,7 @@ export default function MapView({ locale = 'en' }) {
     map.on('click', (event) => select(event.lngLat));
     canvas.addEventListener('keydown', keyboard);
     window.addEventListener('gensai:select-location', receive);
+    window.addEventListener('gensai:selection-start', cancel);
     window.dispatchEvent(new Event('gensai:map-ready'));
     const observer = new ResizeObserver(() => map.resize());
     observer.observe(containerRef.current);
@@ -162,6 +167,7 @@ export default function MapView({ locale = 'en' }) {
       selection++;
       observer.disconnect();
       window.removeEventListener('gensai:select-location', receive);
+      window.removeEventListener('gensai:selection-start', cancel);
       canvas.removeEventListener('keydown', keyboard);
       marker?.remove();
       map.remove();
