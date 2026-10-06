@@ -1,0 +1,19 @@
+---
+import { House } from 'lucide-react';
+const { locale = 'en' } = Astro.props;
+---
+
+<a
+  class="map-control home-control"
+  href={locale === 'ja' ? 'https://gensai.help/ja' : 'https://gensai.help/'}
+  aria-label={locale === 'ja' ? 'ホーム' : 'Home'}
+>
+  <House size={20} aria-hidden="true" />
+</a>
+
+<script>
+  import { homeUrl } from '../lib/navigation.mjs';
+  const home = document.querySelector('.home-control');
+  if (home)
+    home.href = homeUrl(window.location.href, document.documentElement.lang);
+</script>

@@ -1,6 +1,7 @@
 ---
 import { Layers, X } from 'lucide-react';
 import MapView from './MapView.jsx';
+import MapHome from './MapHome.astro';
 import AddressSearch from './AddressSearch.jsx';
 import PreparednessPanel from './PreparednessPanel.astro';
 const { locale = 'en' } = Astro.props;
@@ -11,6 +12,7 @@ const closeLabel = japanese ? '災害メニューを閉じる' : 'Close hazard m
 
 <main class="page-shell" data-sidebar-open="false">
   <div class="map-toolbar">
+    <MapHome locale={locale} />
     <AddressSearch client:load locale={locale} />
   </div>
   <div class="content-grid">

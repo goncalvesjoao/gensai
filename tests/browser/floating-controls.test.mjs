@@ -94,6 +94,17 @@ test('preferences retain localized public URLs and visible controls at phone and
               search.x + search.width < preferences.x,
           );
           const scale = page.locator('.maplibregl-ctrl-scale');
+          const scaleBox = await scale.boundingBox();
+          const layersBox = await page
+            .getByRole('button', {
+              name: locale === 'ja' ? '災害メニューを開く' : 'Open hazard menu',
+              exact: true,
+            })
+            .boundingBox();
+          assert.ok(
+            scaleBox.x >= layersBox.x + layersBox.width ||
+              scaleBox.y >= layersBox.y + layersBox.height,
+          );
           const originalScale = await scale.textContent();
           await page
             .getByRole('button', {
@@ -132,6 +143,83 @@ test('preferences retain localized public URLs and visible controls at phone and
           await page.close();
         }
       }
+    }
+  } finally {
+    await browser.close();
+  }
+});
+
+test('theme remains usable with unavailable storage and respects saved explicit choice', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    const saved = await browser.newPage({ colorScheme: 'dark' });
+    await saved.addInitScript(() =>
+      localStorage.setItem('gensai-theme', 'light'),
+    );
+    await saved.goto(base);
+    assert.equal(
+      await saved.locator('html').getAttribute('data-theme'),
+      'light',
+    );
+    await saved.locator('#theme-toggle').click();
+    assert.equal(
+      await saved.locator('html').getAttribute('data-theme'),
+      'dark',
+    );
+    const unavailable = await browser.newPage({ colorScheme: 'dark' });
+    await unavailable.addInitScript(() => {
+      Object.defineProperty(window, 'localStorage', {
+        get() {
+          throw new Error('Storage unavailable');
+        },
+      });
+    });
+    await unavailable.goto(base);
+    assert.equal(
+      await unavailable.locator('html').getAttribute('data-theme'),
+      'dark',
+    );
+    await unavailable.locator('#theme-toggle').click();
+    assert.equal(
+      await unavailable.locator('html').getAttribute('data-theme'),
+      'light',
+    );
+  } finally {
+    await browser.close();
+  }
+});
+
+test('home destination follows active language and preserves a separate search group', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    for (const locale of ['en', 'ja']) {
+      const page = await browser.newPage({
+        viewport: { width: 390, height: 844 },
+      });
+      await page.goto(`${base}${locale === 'ja' ? '/ja' : '/'}`);
+      const home = page.getByRole('link', {
+        name: locale === 'ja' ? 'ホーム' : 'Home',
+        exact: true,
+      });
+      await home.waitFor({ timeout: 3000 });
+      const destination = new URL(await home.getAttribute('href'), base);
+      assert.equal(
+        destination.pathname,
+        locale === 'ja' ? '/ja/welcome' : '/welcome',
+      );
+      const box = await home.boundingBox();
+      const search = await page.getByRole('searchbox').boundingBox();
+      assert.ok(box.x + box.width <= search.x);
+      assert.ok(
+        search.y >= box.y && search.y + search.height <= box.y + box.height,
+      );
+      await page.close();
     }
   } finally {
     await browser.close();

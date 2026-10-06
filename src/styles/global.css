@@ -402,6 +402,7 @@ body {
 
 /* Floating navigation shares the map without changing its viewport. */
 .map-toolbar {
+  z-index: 4;
   max-width: calc(100% - 132px);
 }
 .map-search {
@@ -442,4 +443,25 @@ body {
   .device-location {
     padding: 0;
   }
+}
+
+.map-selection {
+  top: 100px;
+  bottom: auto;
+  max-height: 30%;
+  overflow-y: auto;
+}
+@media (max-width: 600px) {
+  .map-selection {
+    top: 152px;
+  }
+}
+
+.address-search-panel {
+  z-index: 4;
+  max-height: 35dvh;
+  overflow-y: auto;
+}
+.map-panel .maplibregl-ctrl-bottom-left {
+  left: 60px;
 }
