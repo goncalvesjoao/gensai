@@ -1,0 +1,5 @@
+interface:
+  display_name: 'Implement Spec Loop'
+  short_description: 'Implement a spec and review until findings are cleared'
+policy:
+  allow_implicit_invocation: false
