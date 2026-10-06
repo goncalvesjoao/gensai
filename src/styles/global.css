@@ -96,6 +96,8 @@ body {
   height: 100%;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar {
@@ -143,10 +145,10 @@ body {
   position: absolute;
   top: 8px;
   left: 8px;
-  z-index: 2;
+  z-index: 4;
   display: flex;
   gap: 8px;
-  max-width: calc(100% - 116px);
+  max-width: calc(100% - 132px);
 }
 
 .map-control,
@@ -185,6 +187,7 @@ body {
   padding: 0 0 0 12px;
   min-width: 0;
   width: 450px;
+  position: relative;
 }
 
 .map-search svg {
@@ -209,7 +212,7 @@ body {
 .map-selection {
   position: absolute;
   z-index: 2;
-  bottom: 44px;
+  bottom: auto;
   left: 12px;
   right: 60px;
   max-width: 360px;
@@ -219,6 +222,9 @@ body {
   color: var(--ink);
   font-size: 13px;
   box-shadow: 0 1px 3px #0000001a;
+  top: 100px;
+  max-height: min(112px, calc(min(20dvh, 170px) - 40px));
+  overflow-y: auto;
 }
 
 .map-selection p {
@@ -259,8 +265,8 @@ body {
 }
 
 .device-location {
-  width: auto;
-  padding: 0 10px;
+  width: 44px;
+  padding: 0;
   gap: 6px;
   box-shadow: none;
   border-width: 0 0 0 1px;
@@ -281,22 +287,11 @@ body {
 .device-location-progress:empty {
   display: none;
 }
-@media (max-width: 600px) {
-  .device-location {
-    padding: 0 6px;
-    gap: 4px;
-    font-size: 11px;
-  }
-  .map-search {
-    gap: 4px;
-    padding-left: 6px;
-  }
-}
 
 .address-search-panel {
   position: absolute;
   top: 52px;
-  left: 52px;
+  left: 0;
   right: 0;
   padding: 6px 10px;
   background: var(--panel);
@@ -304,6 +299,9 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 14px;
+  z-index: 4;
+  max-height: min(20dvh, 170px);
+  overflow-y: auto;
 }
 
 .address-search-panel p:empty {
@@ -340,11 +338,6 @@ body {
 .address-search-choices button:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: -2px;
-}
-
-.map-panel {
-  display: flex;
-  flex-direction: column;
 }
 
 .map-viewport {
@@ -408,20 +401,7 @@ body {
 }
 
 /* Floating navigation shares the map without changing its viewport. */
-.map-toolbar {
-  z-index: 4;
-  max-width: calc(100% - 132px);
-}
-.map-search {
-  position: relative;
-}
-.device-location {
-  width: 44px;
-  padding: 0;
-}
-.address-search-panel {
-  left: 0;
-}
+
 .maplibregl-ctrl-group:has(.maplibregl-ctrl-zoom-in) {
   display: flex;
   flex-direction: row-reverse;
@@ -438,43 +418,34 @@ body {
   border-top: 0;
   border-right: 1px solid var(--border);
 }
-@media (max-width: 600px) {
-  .map-toolbar {
-    top: 64px;
-    max-width: calc(100% - 16px);
-    width: calc(100% - 16px);
-  }
-  .map-search {
-    flex: 1;
-  }
-  .device-location {
-    padding: 0;
-  }
-}
 
-.map-selection {
-  top: 100px;
-  bottom: auto;
-  max-height: min(112px, calc(min(20dvh, 170px) - 40px));
-  overflow-y: auto;
-}
-@media (max-width: 600px) {
-  .map-selection {
-    top: 152px;
-    max-height: min(16dvh, 104px);
-  }
-}
-
-.address-search-panel {
-  z-index: 4;
-  max-height: min(20dvh, 170px);
-  overflow-y: auto;
-}
 .map-panel .maplibregl-ctrl-bottom-left {
   left: 60px;
 }
 
 @media (max-width: 600px) {
+  .device-location {
+    padding: 0;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .map-search {
+    gap: 4px;
+    padding-left: 6px;
+    flex: 1;
+  }
+
+  .map-toolbar {
+    top: 64px;
+    max-width: calc(100% - 16px);
+    width: calc(100% - 16px);
+  }
+
+  .map-selection {
+    top: 152px;
+    max-height: min(16dvh, 104px);
+  }
+
   .sidebar {
     max-height: min(220px, calc(72% - 216px - min(20dvh, 170px)));
   }

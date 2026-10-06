@@ -255,10 +255,6 @@ export default function MapView({ locale = 'en' }) {
       ['.maplibregl-ctrl-zoom-in', japanese ? '拡大' : 'Zoom in'],
       ['.maplibregl-ctrl-zoom-out', japanese ? '縮小' : 'Zoom out'],
       [
-        '.maplibregl-ctrl-compass',
-        japanese ? '北を上にする' : 'Reset bearing to north',
-      ],
-      [
         '.maplibregl-ctrl-attrib-button',
         japanese ? '地図の出典' : 'Map attribution',
       ],
