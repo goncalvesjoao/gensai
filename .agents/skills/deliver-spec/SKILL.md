@@ -1,7 +1,7 @@
 ---
 name: deliver-spec
 description: >-
-  Deliver a Gensai spec by running implement-spec, then pr-to-gh, then
+  Deliver a Gensai spec by running implement-spec-loop, then pr-to-gh, then
   pr-review-loop. Use when asked to implement, publish and follow a spec
   through review and merge as one workflow.
 ---
@@ -9,7 +9,7 @@ description: >-
 # Deliver spec
 
 Run the following skills sequentially in the current chat. Pass all supplied
-arguments and context to `implement-spec` without narrowing or rewriting the
+arguments and context to `implement-spec-loop` without narrowing or rewriting the
 request. If no input was supplied, ask for the spec or issue reference.
 
 A request to run `deliver-spec` authorizes implementation, scoped commits and
@@ -19,8 +19,7 @@ Preserve the user's constraints throughout.
 
 ## Workflow
 
-1. Read and apply `implement-spec` at
-   `/Users/goncalvesjoao/.agents/skills/implement-spec/SKILL.md` with the original
+1. Read and apply [implement-spec-loop](../implement-spec-loop/SKILL.md) with the original
    input. Follow `docs/agents/issue-tracker.md` before reading tickets and
    `docs/agents/domain.md` before exploring code. Finish all implementation,
    verification and code review before proceeding. In this workflow, defer PR
