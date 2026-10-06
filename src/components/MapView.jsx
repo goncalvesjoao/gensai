@@ -62,11 +62,12 @@ export default function MapView({ locale = 'en' }) {
       renderWorldCopies: false,
     });
     map.setMinZoom(map.getZoom());
+    const [[west, south], [east, north]] = JAPAN_BOUNDS;
     map.on('moveend', () => {
       const { lng, lat } = map.getCenter();
       const center = [
-        Math.max(122.5, Math.min(154.5, lng)),
-        Math.max(20, Math.min(46, lat)),
+        Math.max(west, Math.min(east, lng)),
+        Math.max(south, Math.min(north, lat)),
       ];
       if (lng !== center[0] || lat !== center[1]) map.jumpTo({ center });
     });
