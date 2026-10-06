@@ -217,10 +217,17 @@ test('home destination follows active language and preserves a separate search g
       });
       await home.waitFor({ timeout: 3000 });
       const destination = new URL(await home.getAttribute('href'), base);
-      assert.equal(
-        destination.pathname,
-        locale === 'ja' ? '/ja/welcome' : '/welcome',
+      const expected = new URL(
+        process.env.HOME_TEST_URL
+          ? locale === 'ja'
+            ? '/ja'
+            : '/'
+          : locale === 'ja'
+            ? '/ja/welcome'
+            : '/welcome',
+        process.env.HOME_TEST_URL || base,
       );
+      assert.equal(destination.href, expected.href);
       const box = await home.boundingBox();
       const search = await page.getByRole('searchbox').boundingBox();
       assert.ok(box.x + box.width <= search.x);

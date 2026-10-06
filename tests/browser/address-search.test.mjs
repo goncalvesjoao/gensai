@@ -5,6 +5,32 @@ import test from 'node:test';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
+
+test('address input waits for map selection readiness', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    const page = await browser.newPage();
+    let release;
+    const pending = new Promise((resolve) => (release = resolve));
+    await page.route(/\/MapView\.[^/]+\.js$/, async (route) => {
+      await pending;
+      await route.continue();
+    });
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    try {
+      assert.equal(await page.getByRole('searchbox').isDisabled(), true);
+    } finally {
+      release();
+    }
+    await page.getByRole('searchbox').fill('Tokyo');
+    assert.equal(await page.getByRole('searchbox').isEnabled(), true);
+  } finally {
+    await browser.close();
+  }
+});
 const match = (name, lng = 139.6917, lat = 35.6895, countrycode = 'JP') => ({
   type: 'Feature',
   properties: { name, countrycode },
