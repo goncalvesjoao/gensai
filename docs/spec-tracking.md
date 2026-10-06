@@ -1,0 +1,20 @@
+# Specification tracking
+
+This file maps portable product documents to this repository's GitHub Issues.
+It is repository administration, separate from the restart specification package.
+Product documents use feature names and local links so they work without tracker
+access.
+
+| Portable spec                                                                   | GitHub issue                                                                                          | Tracker status on 2026-10-06 |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------- |
+| [Map baseline](specs/map-baseline.md)                                           | [Existing Gensai map capabilities](https://github.com/goncalvesjoao/gensai/issues/8)                  | Completed                    |
+| [Selected location and device-location fallback](specs/location-selection.md)   | [Selected location and device-location fallback](https://github.com/goncalvesjoao/gensai/issues/9)    | Open                         |
+| [Japanese and Latin-character address search](specs/address-search.md)          | [Japanese and Latin-character address search](https://github.com/goncalvesjoao/gensai/issues/10)      | Open                         |
+| [Official hazard categories, legends and coverage](specs/hazard-exploration.md) | [Official hazard categories, legends and coverage](https://github.com/goncalvesjoao/gensai/issues/11) | Open                         |
+| [Production access and first-release acceptance](specs/release-acceptance.md)   | [Production access and first-release acceptance](https://github.com/goncalvesjoao/gensai/issues/12)   | Open                         |
+
+Issues remain the working tracker for this repository. The local documents are
+portable versions of the same scope, exported on 2026-10-06 with named dependencies
+instead of issue references. When scope changes, update the corresponding issue
+and portable document. Keep delivery status here, separate from requirements;
+completion here does not establish completion in a rebuild.
