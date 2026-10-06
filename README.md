@@ -28,7 +28,25 @@ Gensai will initially support English and Japanese speakers, with additional lan
 
 ## Current status
 
-Gensai is in early development. The current prototype has a MapLibre GL JS map using demo tiles, browser geolocation with a Tokyo fallback, and a "Center on me" button in a ReUI panel. The map lives at the root of the map subdomain; the main site address redirects to it. The prototype has English and Japanese routes.
+Gensai is in early development. The current prototype has a MapLibre GL JS map using demo tiles, automatic startup geolocation with a silent Tokyo fallback, and a "Center on me" button in a collapsible sidebar. Floating controls toggle the sidebar; the search field is layout only and does not search. The map lives at the root of the map subdomain; the main site address redirects to it. The prototype has English and Japanese routes, plus light and dark application themes.
+
+The [product-spec index](docs/specs/index.md) provides portable, framework-independent
+requirements for the map baseline, selected location, address search, official
+hazards with coverage, and production access with release acceptance. Each feature
+spec overrides baseline behavior where it explicitly changes it.
+The [release overview](docs/first-release.md) defines the audience, outcome, scope
+and exclusions. Each feature spec records its open decisions and acceptance
+checks. These documents can be copied to another project without GitHub access
+or the original implementation.
+
+The [visual reference](docs/design/visual-reference.md) links a neutral Canva UX
+playground for desktop and mobile layout experiments, alongside historical
+screenshots of the prototype. The current styling does not constrain a rebuild.
+
+The [tracker index](docs/spec-tracking.md) maps the same feature structure to this
+repository's issues and records delivery status. The release requires location
+access only after "Use my location", with an explained Tokyo fallback if location
+fails or is outside Japan. That behavior is not implemented yet.
 
 Official hazard layers and preparedness guidance are not implemented yet. The planned hazard map will use official tiles and legends from Japan's [Hazard Map Portal](https://disaportal.gsi.go.jp/). The portal's [open-data catalogue](https://disaportal.gsi.go.jp/hazardmap/copyright/opendata.html) lists tile URLs, zoom levels, data providers, attribution requirements, and coverage notes.
 
@@ -36,7 +54,7 @@ Coverage varies by layer and region. The map will need to distinguish unavailabl
 
 ## First release URLs
 
-The [first-release spec](docs/first-release.md) places the Gensai map at
+The [production-access spec](docs/specs/release-acceptance.md) places the Gensai map at
 `https://map.gensai.help/`, with `https://gensai.help/` redirecting to it.
 In development, `http://localhost:4321/` redirects to
 `http://map.localhost:4321/`. Both development hosts use the same server port,
@@ -106,8 +124,8 @@ page layout remain CSS; reusable controls use component styles and semantic toke
 [Astro's Tailwind 4 integration](https://docs.astro.build/en/guides/styling/#tailwind)
 uses `@tailwindcss/vite`, not the legacy `@astrojs/tailwind` integration.
 `BaseLayout.astro` imports the global stylesheet, which imports Tailwind and maps
-shadcn/ReUI semantic color tokens to the existing light palette. The existing
-page grid, sidebar, and map sizing remain plain CSS. The layout applies the saved
+shadcn/ReUI semantic color tokens to the existing light palette. The responsive
+page grid, collapsible sidebar, and map sizing remain plain CSS. The layout applies the saved
 or system theme before first paint; dark-mode tokens also style the menu and
 tooltips. English routes are unprefixed and Japanese routes use `/ja`; each page
 renders only its selected language. The language menu navigates between
@@ -129,7 +147,7 @@ shim is needed.
 | `npm run dev`          | Start the development server.                                       |
 | `npm run build`        | Create a production build.                                          |
 | `npm run preview`      | Preview the production build locally after running `npm run build`. |
-| `npm test`             | Build and check production map worker requests through preview.     |
+| `npm test`             | Build and check routing, locales, themes, sidebar and map worker.   |
 | `npm run lint`         | Check JavaScript, JSX, and Astro files with ESLint.                 |
 | `npm run lint:fix`     | Apply automatic ESLint fixes.                                       |
 | `npm run format`       | Format the project with Prettier, including Astro files.            |
@@ -137,7 +155,9 @@ shim is needed.
 
 ESLint checks code correctness and React Hooks; Prettier handles formatting.
 Generated files and the dependency lockfile are excluded from formatting.
-The Node.js test suite checks that the emitted MapLibre worker and its relative
+The Node.js test suite checks built-page language output, locale navigation,
+entry-point redirects, pre-paint themes, sidebar interactions and theme tokens.
+It also checks that the emitted MapLibre worker and its relative
 static imports are served successfully with JavaScript MIME types by Astro preview.
 MapLibre 6's worker imports a shared module, so its Vite import must use
 `.mjs?worker&url` to bundle that dependency; plain `?url` can work in development
@@ -149,7 +169,10 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `src/pages/ja/index.astro`: Japanese map page.
 - `src/layouts/BaseLayout.astro`: shared HTML layout, entry-point redirect, and theme initialization.
 - `src/components/MapView.jsx`: map and browser geolocation.
-- `src/components/PreparednessPanel.astro`: static sidebar panel.
+- `src/components/MapLayout.astro`: floating toolbar and responsive sidebar toggles.
+- `src/components/PreparednessPanel.astro`: static sidebar content.
+- `src/components/PreferenceControls.jsx`: interactive theme and language controls.
+- `src/lib/locale.mjs`: route language and locale navigation.
 - `src/components/CenterOnMe.jsx`: interactive map centering button with a Lucide icon.
 - `src/components/ui/`: local shadcn component sources.
 - `src/styles/global.css`: Tailwind theme tokens and existing page/map styles.
@@ -158,6 +181,10 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `astro.config.mjs`: Astro, React, Tailwind Vite plugin, and server configuration.
 - `tests/map-worker.test.mjs`: production worker request regression test.
 - `tests/map-routing.test.mjs`: entry-point redirect checks.
+- `tests/map-sidebar.test.mjs`: sidebar state, controls, focus and breakpoint checks.
+- `tests/locale.test.mjs`: route language and locale navigation checks.
+- `tests/preferences.test.mjs`: pre-paint theme checks.
+- `tests/theme-styles.test.mjs`: runtime theme-token regression checks.
 
 ## License
 
