@@ -41,6 +41,10 @@ test('entry point welcomes visitors without scripting and opens the correspondin
       await link.press('Enter');
       assert.equal(new URL(page.url()).hostname, 'map.localhost');
       assert.equal(
+        await page.locator('html').getAttribute('lang'),
+        path === '/ja' ? 'ja' : 'en',
+      );
+      assert.equal(
         new URL(page.url()).pathname.replace(/\/$/, '') || '/',
         path,
       );
@@ -99,6 +103,39 @@ test('welcome remains readable in both languages, themes and viewport sizes with
           await page.close();
         }
       }
+    }
+  } finally {
+    await browser.close();
+  }
+});
+
+test('visitors can return from the map and reopen it in the same language', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    for (const [path, label, home] of [
+      ['/', 'Open the Gensai map', 'Home'],
+      ['/ja', 'Gensaiの地図を開く', 'ホーム'],
+    ]) {
+      const page = await browser.newPage();
+      await page.goto(`${base}${path}`);
+      await page.getByRole('link', { name: label }).click();
+      await page
+        .getByRole('link', { name: home, exact: true })
+        .click({ timeout: 2000 });
+      await page.getByRole('link', { name: label }).waitFor();
+      assert.equal(page.url(), `${base}${path}`);
+      await page.waitForTimeout(150);
+      assert.equal(page.url(), `${base}${path}`);
+      await page.getByRole('link', { name: label }).click();
+      assert.equal(new URL(page.url()).hostname, 'map.localhost');
+      assert.equal(
+        new URL(page.url()).pathname.replace(/\/$/, '') || '/',
+        path,
+      );
+      await page.close();
     }
   } finally {
     await browser.close();
