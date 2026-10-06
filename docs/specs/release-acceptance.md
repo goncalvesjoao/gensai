@@ -11,7 +11,7 @@ Provide reliable production entry-point and map URLs and verify the integrated f
 ## User stories
 
 1. As an English- or Japanese-speaking current resident, I want controls, legends, location explanations and coverage warnings in my chosen language, so that I can complete the workflow.
-2. As a keyboard user, I want to search, choose results, select a category and use sidebar controls, so that the workflow is accessible without a pointer.
+2. As a keyboard user, I want to search, choose results, select a category and use floating map controls and the hazard menu, so that the workflow is accessible without a pointer.
 3. As a current resident on a phone, I want usable controls and enough map visible to inspect surroundings, so that the workflow works on a narrow screen.
 4. As a current resident, I want the deployed Gensai entry point to redirect to the map and the map's English and Japanese URLs to load directly, so that I can reach the release reliably.
 5. As a visitor without client-side scripting, I want the entry point to redirect to the map host, so that reaching the correct URL does not depend on page scripts.
@@ -26,7 +26,7 @@ This is a framework-independent product spec. No existing code, library, renderi
 - Provide https://gensai.help/ as the Gensai entry point and https://map.gensai.help/ as the map. English uses the map root; Japanese uses /ja. Entry-point navigation reaches the equivalent map URL, preserving language, path, query and fragment without loops.
 - Serve both production hosts over HTTPS and support opening English/Japanese map routes directly. Entry-point redirects must work without client-side scripting. This requires access to the correct URL without scripting, not an interactive map without scripting.
 - Any hosting/rendering architecture satisfying those outcomes is acceptable. Choose hosting and verify host configuration during implementation rather than inheriting the original framework or static-build arrangement.
-- Carry forward [map-baseline spec](map-baseline.md)'s unchanged URL, language, theme and sidebar capabilities. Apply [selected-location spec](location-selection.md)'s changed startup/selection behavior and the separate search and hazard requirements.
+- Carry forward [map-baseline spec](map-baseline.md)'s unchanged URL, language and theme capabilities. Apply [map-controls spec](map-controls.md)'s floating layout, initially closed hazard menu and explicit dismissal in place of the old sidebar requirements. Apply [selected-location spec](location-selection.md)'s changed startup/selection behavior and the separate search and hazard requirements.
 - Feature-owned localization, keyboard behavior, responsive layout and failures remain in their respective specs. This spec verifies those features work together; it does not duplicate their implementation ownership.
 - Require an internet connection, with explained map/search/hazard failures as specified by each feature. Do not advertise offline functionality.
 - Declare the first release ready only after each feature's acceptance criteria and the integrated checks here pass. Retain explicit outstanding source checks or product decisions rather than marking them completed.
@@ -36,9 +36,9 @@ This is a framework-independent product spec. No existing code, library, renderi
 Use the complete visible feature and its public behavior as the acceptance boundary. Any suitable tools may be used; controlled device/provider responses allow repeatable checks without prescribing internal interfaces.
 
 1. Verify deployed DNS and HTTPS for both hosts. Opening the entry point reaches the equivalent map URL, including Japanese paths and URL details, without loops. Test entry-point navigation with scripting disabled.
-2. Direct map root and /ja URLs load. Switching languages stays on the map host, and themes/sidebar behavior continue to satisfy [map-baseline spec](map-baseline.md).
+2. Direct map root and /ja URLs load. Switching languages stays on the map host, and themes continue to satisfy [map-baseline spec](map-baseline.md). Floating controls and hazard-menu behavior satisfy [map-controls spec](map-controls.md), including home navigation through the existing entry-point redirect.
 3. Opening the map starts at a Japan overview with no location request. Explicit inside-Japan acquisition works; denial, timeout, unavailable acquisition and outside-Japan location produce explained Tokyo fallback.
-4. Search in Japanese script and Latin characters, choose ambiguous results, correct a point, and inspect the selected place using each hazard category. Preserve category after location changes.
+4. Submit Japanese-script and Latin-character addresses with Enter, handle single and ambiguous matches, correct a point, and inspect the selected place using the independent hazard switches. Preserve enabled categories after location changes and menu dismissal. Verify menu persistence during search, location selection and map navigation, with matching legends, attribution and warnings visible when it is closed.
 5. Complete the flow in English/Japanese on phone/computer viewports and both themes with keyboard controls, readable focus and usable panel/map layering.
 6. Exercise map, search and hazard failure cases and unknown coverage in the integrated experience. Verify failures never imply safety, no mapped hazard or verified unavailable coverage.
 7. Verify selection persists for the open-page workflow and is not restored after closing, including the recorded language-switch decision.
@@ -54,6 +54,6 @@ Role: first-release feature requirements. Evaluate completion against this spec 
 
 Final acceptance depends on the [selected-location](location-selection.md),
 [address-search](address-search.md) and [hazard-exploration](hazard-exploration.md)
-specs, together with the unchanged [map baseline](map-baseline.md). Production
+specs and the [map-controls spec](map-controls.md), together with the unchanged capabilities of the [map baseline](map-baseline.md). Production
 routing can be delivered earlier; complete release acceptance requires both
 verified production access and the integrated workflow.

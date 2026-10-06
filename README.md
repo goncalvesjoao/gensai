@@ -39,9 +39,11 @@ and exclusions. Each feature spec records its open decisions and acceptance
 checks. These documents can be copied to another project without GitHub access
 or the original implementation.
 
-The [visual reference](docs/design/visual-reference.md) links a neutral Canva UX
-playground for desktop and mobile layout experiments, alongside historical
-screenshots of the prototype. The current styling does not constrain a rebuild.
+The [Excalidraw mockups](docs/mockups.excalidraw) define the first-release visual
+and interaction direction. The [map-controls spec](docs/specs/map-controls.md)
+records the floating controls and initially closed, explicitly dismissed hazard
+menu. Feature specs add Enter submission for search and independent hazard switches.
+These requirements are not implemented in the current prototype.
 
 The [tracker index](docs/spec-tracking.md) maps the same feature structure to this
 repository's issues and records delivery status. The release requires location

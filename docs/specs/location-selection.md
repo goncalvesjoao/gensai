@@ -27,19 +27,20 @@ Provide a Japan overview, explicit device-location acquisition and map-point sel
 15. As an English- or Japanese-speaking current resident, I want location controls and explanations in my chosen language, so that I can understand the result of my action.
 16. As a keyboard user, I want accessible location controls and a supported way to correct the selected place, so that I can complete location selection without relying only on a pointer.
 17. As a current resident on a phone, I want location controls to leave enough map visible, so that I can inspect my selected place.
+18. As a current resident, I want the device-location button beside the address field to work with the hazard menu closed, so that I can select my current location directly from the map.
 
 ## Product decisions
 
 This is a framework-independent product spec. No existing code, library, rendering architecture or testing tool is required.
 
-- Start with an overview of Japan without requesting device location. Request it only after the person chooses "Use my location".
+- Start with an overview of Japan without requesting device location. Request it only after the person activates the device-location button at the right end of the search group, with the localized accessible action "Use my location". It remains available with the hazard menu closed and does not submit address search. This replaces the historical sidebar centering button and requests acquisition rather than merely returning to a cached position.
 - A successful device position inside Japan becomes the selected location. Current location and selected location are distinct; a home can be examined from work or overseas.
 - On denial, unavailable geolocation, timeout or an outside-Japan device position, center on Tokyo and show a localized explanation of the cause. Never identify fallback as detected current location. Keep map-point selection and, when available, address search usable.
 - Let the person select and correct a point on the map. Validate all selections against a verified Japan boundary that includes its islands. This same geographic rule applies to device positions and address results.
 - Keep navigation focused on Japan while allowing neighbouring geography near viewport edges.
 - Show a marker and readable selected-place label for an actual selected location. Keep one selected location while the page remains open, including after layout changes. Do not restore it after the page closes or encode saved map state in a shareable URL.
 - Provide the selected-location behavior that address search and hazard exploration use. Those features can be delivered separately; this spec does not require a search provider or hazard dataset to prove device and map-point selection.
-- Keep selection, marker and readable map stable through location updates, sidebar changes and resizing. Preserve the active hazard category when that separate capability is available.
+- Keep selection, marker and readable map stable through location updates, hazard-menu changes and resizing. Preserve the enabled hazard categories when that separate capability is available.
 - Localize the controls and acquisition outcomes in English and Japanese, support keyboard access and visible focus, and keep the workflow usable on phone and computer layouts in both application themes.
 - Choose verified boundary evidence during implementation. Suitable overview/selected-place scales, fallback-marker semantics, selected-place labels, language-switch retention and exact failure wording remain details to resolve. This split does not invent answers to them.
 
@@ -47,12 +48,12 @@ This is a framework-independent product spec. No existing code, library, renderi
 
 Use the complete visible feature and its public behavior as the acceptance boundary. Any suitable tools may be used; controlled device/provider responses allow repeatable checks without prescribing internal interfaces.
 
-1. Opening shows a Japan overview and makes no location request. Only the explicit action requests access.
+1. Opening shows a Japan overview and makes no location request. Only activation of the device-location button requests access. Verify it with the hazard menu closed and open, without submitting the address field.
 2. Successful mainland and island positions in Japan become selected locations. Device positions outside Japan produce Tokyo fallback rather than an unsupported selection.
 3. Denial, unavailability and timeout each produce Tokyo with the appropriate explanation. Visible and accessible labels never call fallback the person's current location.
 4. Choosing and correcting a map point updates marker and selected-place label. Outside-Japan points cannot become valid selections. A person using an overseas device can still inspect a home in Japan.
 5. Selection remains stable through layout changes and other in-page actions, is forgotten after closing, and follows the recorded language-switch decision.
-6. Location updates retain the chosen hazard category when integrated with hazard exploration. An address chosen through the search spec uses the same selection and boundary rules.
+6. Location updates retain the enabled hazard categories when integrated with hazard exploration. An address chosen through the search spec uses the same selection and boundary rules.
 7. Exercise localized controls, keyboard access, focus and phone/computer layouts in both themes. Check fallback-marker behavior against its recorded decision.
 
 ## Out of scope
@@ -64,5 +65,7 @@ Address-query handling and provider choice; official hazards, legends and covera
 Role: first-release feature requirements. Evaluate completion against this spec in the implementation being built.
 
 This spec is open and supersedes [map-baseline spec](map-baseline.md)'s startup and centering behavior for the first release. Address search adds another way to establish the same selected location; hazard exploration reads it. Implement this spec independently of those providers, then verify the integrations. The owner confirmed explicit permission and explained Tokyo fallback on 2026-10-06.
+
+The [map-controls spec](map-controls.md) defines the floating device-location button and panel behavior from the mockups.
 
 Related specs: [address-search spec](address-search.md) adds an address-selection method; [hazard-exploration spec](hazard-exploration.md) uses the selected location; [release-acceptance spec](release-acceptance.md) checks their integration. This feature needs neither a search provider nor a hazard provider for its own device/map-selection acceptance.

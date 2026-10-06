@@ -8,6 +8,7 @@ access.
 | Portable spec                                                                   | GitHub issue                                                                                          | Tracker status on 2026-10-06 |
 | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------- |
 | [Map baseline](specs/map-baseline.md)                                           | [Existing Gensai map capabilities](https://github.com/goncalvesjoao/gensai/issues/8)                  | Completed                    |
+| [Gensai map controls and persistent hazard menu](specs/map-controls.md)         | [Gensai map controls and persistent hazard menu](https://github.com/goncalvesjoao/gensai/issues/13)   | Open                         |
 | [Selected location and device-location fallback](specs/location-selection.md)   | [Selected location and device-location fallback](https://github.com/goncalvesjoao/gensai/issues/9)    | Open                         |
 | [Japanese and Latin-character address search](specs/address-search.md)          | [Japanese and Latin-character address search](https://github.com/goncalvesjoao/gensai/issues/10)      | Open                         |
 | [Official hazard categories, legends and coverage](specs/hazard-exploration.md) | [Official hazard categories, legends and coverage](https://github.com/goncalvesjoao/gensai/issues/11) | Open                         |
@@ -18,3 +19,7 @@ portable versions of the same scope, exported on 2026-10-06 with named dependenc
 instead of issue references. When scope changes, update the corresponding issue
 and portable document. Keep delivery status here, separate from requirements;
 completion here does not establish completion in a rebuild.
+
+Mockup reconciliation on 2026-10-06 adds the map-controls spec and updates location,
+address search, hazards and release acceptance. The historical baseline stays
+completed; its sidebar requirements are superseded for the first release.

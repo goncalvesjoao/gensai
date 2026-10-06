@@ -82,8 +82,9 @@ Accounts, guides, live alerts, offline maps, saved places and shareable map stat
 
 Role: baseline product capabilities. This document defines what to recreate when building the baseline; it does not certify delivery in a new implementation.
 
-Use this spec to recreate the baseline in any framework. Combine it with the
-[visual reference](../design/visual-reference.md) for the existing appearance and
+Use this spec to recreate the baseline in any framework. Use the [mockups](../mockups.excalidraw) and [map-controls spec](map-controls.md)
+for the first-release layout, which overrides the historical sidebar controls,
+desktop default and responsive reset. Combine it with the
 [selected-location](location-selection.md), [address-search](address-search.md),
 [hazard-exploration](hazard-exploration.md) and [release-acceptance](release-acceptance.md)
 specs for the full first release. Each takes precedence where it changes baseline

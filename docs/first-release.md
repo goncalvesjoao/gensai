@@ -14,16 +14,20 @@ mapped hazards around it. Current location and selected location are distinct.
 ## In scope
 
 - A map experience with bilingual routes, theme preferences, accessible controls
-  and a responsive sidebar.
+  and floating map controls with a responsive hazard menu that starts closed and
+  remains open until explicit dismissal.
 - Location selection throughout Japan, including its islands, through an explicit
   device-location action, address search or a point on the map.
-- Japanese-script and Latin-character address queries with ambiguity handling and
-  correction of the selected point.
+- Japanese-script and Latin-character address queries submitted with Enter, with
+  ambiguity handling and correction of the selected point.
 - Explained Tokyo fallback when device acquisition fails or the position is
   outside Japan.
 - Three official hazard categories: maximum-scale river inundation depth,
   tsunami inundation depth, and landslide warning zones for debris flow,
-  steep-slope collapse and landslide hazards.
+  steep-slope collapse and landslide hazards. Independent switches permit any
+  combination, including all off; tsunami alone is enabled initially.
+- A home button leading to the language-equivalent Gensai entry point under the
+  existing redirect contract; separate home-page content remains outside scope.
 - A selected-place marker and label, category legends, attribution, verified
   coverage information where available, and separate loading/failure explanations.
 - English and Japanese throughout the workflow on phones and computers, with
@@ -36,6 +40,10 @@ An uncoloured area does not establish safety or missing coverage. Keep
 "No colour does not mean safe. Data may be missing" prominent beside the legend.
 Do not offer an automatic property verdict, calculated hazard score or textual
 point summary.
+
+The [mockups](mockups.excalidraw) and [map-controls spec](specs/map-controls.md)
+define the floating layout and menu behavior. The independent hazard switches
+supersede the earlier exclusive-category requirement without adding hazard types.
 
 The feature specs take precedence where they change the intermediate baseline.
 A full-release rebuild uses explicit location permission, functioning search and
