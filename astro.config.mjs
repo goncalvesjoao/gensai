@@ -38,17 +38,17 @@ export default defineConfig({
             const path = url.pathname.startsWith('/ja')
               ? 'ja/welcome'
               : 'welcome';
-            const mapOrigin =
-              host === '127.0.0.1'
-                ? `http://${req.headers.host}`
-                : `http://map.localhost${new URL(`http://${req.headers.host}`).port ? `:${new URL(`http://${req.headers.host}`).port}` : ''}`;
+            const mapUrl = new URL(`http://${req.headers.host}`);
+            if (host !== '127.0.0.1') mapUrl.hostname = 'map.localhost';
             try {
               const html = await readFile(
                 new URL(`./dist/${path}/index.html`, import.meta.url),
                 'utf8',
               );
               res.setHeader('Content-Type', 'text/html; charset=utf-8');
-              res.end(html.replaceAll('https://map.gensai.help', mapOrigin));
+              res.end(
+                html.replaceAll('https://map.gensai.help', mapUrl.origin),
+              );
             } catch (error) {
               next(error);
             }
