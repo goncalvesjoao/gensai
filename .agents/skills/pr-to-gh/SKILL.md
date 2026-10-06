@@ -47,7 +47,3 @@ merging and starting a review loop belong to separate workflows.
    with `attach_artifact` when available. Report its URL and verification results;
    distinguish pending remote checks from local checks that passed. If blocked,
    report the blocker and any branch or PR already published.
-
-4. After successful publication and verification, run
-   `afplay /System/Library/Sounds/Blow.aiff` once. Playback failure does not
-   change the publication result.
