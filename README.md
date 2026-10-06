@@ -190,6 +190,35 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `tests/preferences.test.mjs`: pre-paint theme checks.
 - `tests/theme-styles.test.mjs`: runtime theme-token regression checks.
 
+### Hazard category state
+
+The hazard menu provides independent Tsunami, Flooding and Landslide switches
+in both languages. Tsunami starts enabled. Choices last for the current page,
+including selected-location changes, menu closing and responsive layout changes;
+reloads and language navigation start a fresh page. No hazard layers are rendered
+by this switch-only implementation.
+
+`src/lib/hazard-categories.mjs` owns resident intent independently of the map and
+menu. Future React layer/legend islands can use `useSyncExternalStore` with
+`hazardCategories.subscribe`, `getSnapshot` and `getServerSnapshot`. Snapshots
+are immutable and stable until a switch changes. Only resident controls should
+call `setEnabled(category, boolean)`; asynchronous layer results must never
+change enabled categories. Layer tickets should check the current enabled set
+before displaying delayed results and unsubscribe on cleanup.
+
+The public-browser checks include all eight combinations, bilingual keyboard
+accessibility, both themes, location persistence, delayed location validation
+and responsive menu behavior. After building, run against Astro preview:
+
+```bash
+npm run preview -- --host 127.0.0.1
+# In another terminal; use an externally installed Playwright if needed:
+PLAYWRIGHT_MODULE=/path/to/playwright CHROMIUM_PATH=/path/to/chromium \
+  node --test tests/browser/*.test.mjs
+```
+
+`TEST_URL` can override the default `http://127.0.0.1:4321`.
+
 ## License
 
 [MIT](LICENSE).

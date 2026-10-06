@@ -1,5 +1,6 @@
 ---
 import { Card, CardContent } from './ui/card';
+import HazardSwitches from './HazardSwitches.jsx';
 const { locale = 'en' } = Astro.props;
 const japanese = locale === 'ja';
 ---
@@ -11,5 +12,6 @@ const japanese = locale === 'ja';
         ? '選択した場所の周辺を地図で確認できます。色が付いていない場所も、安全とは限りません。'
         : 'Explore the map near your selected location. Uncoloured areas do not necessarily mean safety.'}
     </p>
+    <HazardSwitches client:load locale={locale} />
   </CardContent>
 </Card>
