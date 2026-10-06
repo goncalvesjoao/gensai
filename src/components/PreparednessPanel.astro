@@ -2,10 +2,32 @@
 import { Card, CardContent } from './ui/card';
 const { locale = 'en' } = Astro.props;
 const japanese = locale === 'ja';
+const hazards = [
+  ['tsunami', japanese ? '津波' : 'Tsunami'],
+  ['flooding', japanese ? '洪水' : 'Flooding'],
+  ['landslide', japanese ? '土砂災害' : 'Landslide'],
+];
 ---
 
 <Card className="gap-0 rounded-none border-0 bg-transparent py-0 shadow-none">
   <CardContent className="p-[18px]">
+    <fieldset class="mb-4 space-y-2">
+      <legend class="mb-2 font-semibold">
+        {japanese ? '災害の種類' : 'Hazards'}
+      </legend>
+      {hazards.map(([category, label]) => (
+        <label class="flex min-h-11 cursor-pointer items-center justify-between gap-3">
+          <span>{label}</span>
+          <input
+            type="checkbox"
+            role="switch"
+            data-hazard-category={category}
+            checked={category === 'tsunami'}
+            class="h-5 w-5 shrink-0 cursor-pointer accent-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+          />
+        </label>
+      ))}
+    </fieldset>
     <p class="mb-4 leading-normal text-muted-foreground">
       {japanese
         ? '選択した場所の周辺を地図で確認できます。色が付いていない場所も、安全とは限りません。'
@@ -13,3 +35,23 @@ const japanese = locale === 'ja';
     </p>
   </CardContent>
 </Card>
+
+<script is:inline>
+  (() => {
+    const switches = document.querySelectorAll('[data-hazard-category]');
+    for (const input of switches) {
+      input.addEventListener('change', () => {
+        document.dispatchEvent(
+          new CustomEvent('gensai:hazards-change', {
+            detail: Object.fromEntries(
+              [...switches].map((input) => [
+                input.dataset.hazardCategory,
+                input.checked,
+              ]),
+            ),
+          }),
+        );
+      });
+    }
+  })();
+</script>
