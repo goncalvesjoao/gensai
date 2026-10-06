@@ -160,9 +160,9 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0 0 0 12px;
   min-width: 0;
-  width: 280px;
+  width: 450px;
 }
 
 .map-search svg {
@@ -275,4 +275,39 @@ body {
 .maplibregl-canvas:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+
+.device-location {
+  width: auto;
+  padding: 0 10px;
+  gap: 6px;
+  box-shadow: none;
+  border-width: 0 0 0 1px;
+  border-radius: 0 10px 10px 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.device-location-progress {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 13px;
+}
+.device-location-progress:empty {
+  display: none;
+}
+@media (max-width: 600px) {
+  .device-location {
+    padding: 0 6px;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .map-search {
+    gap: 4px;
+    padding-left: 6px;
+  }
 }

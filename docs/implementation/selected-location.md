@@ -24,7 +24,7 @@ The selection exists only in the mounted map's memory. Theme, sidebar and resize
 
 ## Selection integration
 
-The visible map and coordinate form share the same flow used by later device/address methods. Dispatch `gensai:select-location` on `window` with `{ location: { lng, lat }, explanation?: string }` in `event.detail`. The map validates the point, updates the existing marker and label, and responds with `gensai:selection-result` containing `{ valid, location }`. Invalid locations leave the selected point intact and display a localized correction message. `TOKYO` and `isJapanLocation` live in `src/lib/selected-location.mjs`; acquisition can check a position before deciding whether to send Tokyo fallback. None of these methods modifies hazard-category state.
+The visible map and coordinate form share the same flow used by later device/address methods. Dispatch `gensai:select-location` on `window` with `{ location: { lng, lat }, explanation?: string, label?: string }` in `event.detail`. The map validates the point, updates the existing marker and label, and responds with `gensai:selection-result` containing `{ valid, location }`. Invalid locations leave the selected point intact and display a localized correction message. `TOKYO` and `isJapanLocation` live in `src/lib/selected-location.mjs`; acquisition can check a position before deciding whether to send Tokyo fallback. None of these methods modifies hazard-category state.
 
 ## Verification
 
