@@ -3,6 +3,8 @@ import { Search } from 'lucide-react';
 import UseMyLocation from './UseMyLocation.jsx';
 import { isJapanLocation } from '../lib/selected-location.mjs';
 
+const RESULT_LIMIT = 10;
+
 // eslint-disable-next-line react/prop-types
 export default function AddressSearch({ locale = 'en' }) {
   const [query, setQuery] = useState('');
@@ -74,8 +76,8 @@ export default function AddressSearch({ locale = 'en' }) {
 
   async function submit(event) {
     event.preventDefault();
-    window.dispatchEvent(new Event('gensai:selection-start'));
     if (!query.trim() || !available) return;
+    window.dispatchEvent(new Event('gensai:selection-start'));
     const active = ++request.current;
     const abort = new AbortController();
     controller.current = abort;
@@ -85,7 +87,7 @@ export default function AddressSearch({ locale = 'en' }) {
       url.search = new URLSearchParams({
         q: query.trim(),
         countrycode: 'JP',
-        limit: '10',
+        limit: String(RESULT_LIMIT),
         // Photon returns local names when the requested language is unavailable.
         lang: japanese ? 'default' : 'en',
       }).toString();
@@ -139,7 +141,7 @@ export default function AddressSearch({ locale = 'en' }) {
         setChoices(matches);
         setMessage(
           matches.length
-            ? data.features.length >= 10
+            ? data.features.length >= RESULT_LIMIT
               ? text.limited
               : text.multiple
             : text.empty,

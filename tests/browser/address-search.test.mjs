@@ -11,6 +11,52 @@ const match = (name, lng = 139.6917, lat = 35.6895, countrycode = 'JP') => ({
   geometry: { type: 'Point', coordinates: [lng, lat] },
 });
 
+test('empty address submission leaves pending device location usable', async () => {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+  });
+  try {
+    const page = await browser.newPage();
+    const queries = [];
+    await page.route('https://photon.komoot.io/api/**', (route) => {
+      queries.push(route.request().url());
+      return route.abort();
+    });
+    await page.addInitScript(() => {
+      navigator.geolocation.getCurrentPosition = (success) => {
+        window.finishDeviceLocation = success;
+      };
+    });
+    await page.goto(base);
+    await page.locator('canvas').waitFor();
+    const button = page.getByRole('button', {
+      name: 'Use my location',
+      exact: true,
+    });
+    const search = page.getByRole('searchbox');
+    for (const query of ['', '   ']) {
+      await search.fill(query);
+      await button.click();
+      await page.getByText('Finding your location…', { exact: true }).waitFor();
+      await search.press('Enter');
+      assert.equal(await button.getAttribute('aria-busy'), 'true');
+      await page.evaluate(() =>
+        window.finishDeviceLocation({
+          coords: { latitude: 26.2124, longitude: 127.6809 },
+        }),
+      );
+      await page
+        .locator('.map-selection [role=status]')
+        .filter({ hasText: '26.21240, 127.68090' })
+        .waitFor({ timeout: 3000 });
+    }
+    assert.deepEqual(queries, []);
+  } finally {
+    await browser.close();
+  }
+});
+
 test('Enter selects a Japan address, while typing and device activation do not submit', async () => {
   const browser = await chromium.launch({
     headless: true,
