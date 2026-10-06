@@ -246,7 +246,10 @@ export default function MapView({ locale = 'en' }) {
         map.jumpTo({ center });
     });
     window.__gensaiMapInstance = map;
-    map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+    map.addControl(
+      new maplibregl.NavigationControl({ showCompass: false }),
+      'bottom-right',
+    );
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     for (const [selector, label] of [
       ['.maplibregl-ctrl-zoom-in', japanese ? '拡大' : 'Zoom in'],
@@ -330,21 +333,8 @@ export default function MapView({ locale = 'en' }) {
     window.dispatchEvent(new Event('gensai:map-ready'));
     function resize() {
       map.resize();
-      const bounds = containerRef.current.getBoundingClientRect();
-      const sidebar = document.getElementById('map-sidebar');
-      const open =
-        sidebar.closest('.page-shell').dataset.sidebarOpen === 'true';
-      const overlap = open
-        ? Math.max(0, sidebar.getBoundingClientRect().right - bounds.left)
-        : 0;
-      map.setPadding({ left: overlap, right: 0, top: 0, bottom: 0 });
     }
     resize();
-    const sidebarObserver = new MutationObserver(resize);
-    sidebarObserver.observe(containerRef.current.closest('.page-shell'), {
-      attributes: true,
-      attributeFilter: ['data-sidebar-open'],
-    });
     const observer = new ResizeObserver(resize);
     observer.observe(containerRef.current);
 
@@ -353,7 +343,6 @@ export default function MapView({ locale = 'en' }) {
       selection++;
       document.removeEventListener('gensai:hazards-change', updateHazards);
       observer.disconnect();
-      sidebarObserver.disconnect();
       maplibregl.removeProtocol('gensai-raster');
       window.removeEventListener('gensai:select-location', receive);
       window.removeEventListener('gensai:selection-start', cancel);
