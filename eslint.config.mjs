@@ -7,7 +7,7 @@ import prettier from 'eslint-config-prettier';
 
 export default [
   {
-    ignores: ['node_modules/**', 'dist/**', '.astro/**'],
+    ignores: ['node_modules/**', 'dist/**', '.astro/**', '.delta/**'],
   },
   js.configs.recommended,
   {
