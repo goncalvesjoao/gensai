@@ -54,17 +54,22 @@ export default function MapView({ locale = 'en' }) {
         sources: {
           basemap: {
             type: 'raster',
-            tiles: ['https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png'],
+            tiles: [
+              'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',
+            ],
             tileSize: 256,
+            minzoom: 2,
+            maxzoom: 18,
             attribution:
-              '<a href="https://maps.gsi.go.jp/development/ichiran.html">GSI</a> | Shoreline: NIMA/USGS VMAP0 (1997)',
+              '<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル（国土地理院）</a>',
           },
         },
         layers: [{ id: 'basemap', type: 'raster', source: 'basemap' }],
       },
       bounds: JAPAN_BOUNDS,
       fitBoundsOptions: { padding: 30 },
-      maxZoom: 18,
+      // Stay within the shared native hazard range; pale tiles extend to 18.
+      maxZoom: 17,
       renderWorldCopies: false,
     });
     map.setMinZoom(map.getZoom());
