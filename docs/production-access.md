@@ -102,9 +102,40 @@ alternate targets. Local or preview success does not replace the production run.
 - Local Wrangler runtime with the middleware: English/Japanese entry-point
   requests and direct Japanese map request return 200 without Location headers,
   and their expected localized HTML.
-- **Production verification remains outstanding until this reviewed change is
-  deployed and the public browser suite passes.** Do not mark #28 complete based
-  on the local checks above.
+- These initial results preceded deployment. The corrected production evidence
+  below supersedes their outstanding deployment status.
+
+## Corrected production deployment
+
+On 2026-10-07 at 02:02 JST, Cloudflare Pages successfully deployed reviewed
+application commit `63c2bfbaf8af341467e3e067acf13f70b441124f`, deployment
+`3397d33c-9078-42ba-be5a-db11a1410b44`. The delivery parent verified the exact
+commit and successful build/Functions upload in Cloudflare. It temporarily set
+the production branch to `codex/release-12` to deploy the reviewed change, then
+restored `main` with automatic deployments enabled. Existing preview Access
+protection remained in place. Later evidence-only commits do not change this
+application artifact.
+
+Independent public DNS checks resolved both hosts to `104.21.0.75` and
+`172.67.128.124`. `curl` checks for `/` and `/ja` on both HTTPS hosts returned
+200, TLS certificate verification result 0 and no redirects. The production
+middleware now supplies the welcome on the entry-point host and the map on the
+map host in both languages.
+
+The eight deployed welcome screenshots (English/Japanese, light/dark,
+390/1280px width) were captured and visually inspected. Text wraps without
+horizontal clipping, the map action and its keyboard focus ring remain readable,
+and the preference controls remain exposed. A Japanese phone dark-theme
+home → map → home capture confirms the returned welcome and the visible Japan
+overview. Evidence directory: `/tmp/gensai-release12/final-screenshots`.
+
+The complete deployed browser suite passed 59/59 checks with zero failures and
+zero skips, including both production-access checks, all welcome checks and
+English/Japanese home → map → home navigation. Both actual Photon and official
+raster probes also passed. Full output:
+`/tmp/gensai-release12/final-deployed-browser.log`. This completes the required
+production verification for the named artifact; parent #12 stays open for its
+owner.
 
 Production access verifies this navigation experience. It does not establish
 completion of outstanding map features or comprehensive hazard coverage.
