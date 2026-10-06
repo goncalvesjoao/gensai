@@ -73,10 +73,13 @@ export default function MapView({ locale = 'en' }) {
     map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
     map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
     mapRef.current = map;
+    const resizeObserver = new ResizeObserver(() => map.resize());
+    resizeObserver.observe(containerRef.current);
 
     map.once('load', () => setIsReady(true));
 
     return () => {
+      resizeObserver.disconnect();
       map.remove();
       mapRef.current = null;
       if (typeof window !== 'undefined' && window.__gensaiMapInstance === map) {
@@ -88,7 +91,7 @@ export default function MapView({ locale = 'en' }) {
   return (
     <>
       {!isReady && (
-        <div className="absolute top-4 left-4 z-1 rounded-md bg-card px-3 py-2">
+        <div className="absolute top-20 left-4 z-1 rounded-md bg-card px-3 py-2">
           {locale === 'ja' ? '地図を読み込み中…' : 'Loading map…'}
         </div>
       )}

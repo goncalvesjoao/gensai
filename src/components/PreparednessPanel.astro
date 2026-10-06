@@ -1,16 +1,11 @@
 ---
-import { Card, CardHeader, CardContent } from './ui/card';
+import { Card, CardContent } from './ui/card';
 import CenterOnMe from './CenterOnMe';
 const { locale = 'en' } = Astro.props;
 const japanese = locale === 'ja';
 ---
 
 <Card className="gap-0 rounded-none border-0 bg-transparent py-0 shadow-none">
-  <CardHeader className="border-b border-border bg-linear-to-br from-primary/8 to-primary/2 px-[18px] py-3.5">
-    <h2 class="m-0 text-base font-bold text-primary-strong">
-      {japanese ? '防災マップ' : 'Preparedness map'}
-    </h2>
-  </CardHeader>
   <CardContent className="p-[18px]">
     <p class="mb-4 leading-normal text-muted-foreground">
       {japanese

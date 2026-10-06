@@ -1,19 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import MapView from '../components/MapView.jsx';
-import PreparednessPanel from '../components/PreparednessPanel.astro';
+import MapLayout from '../components/MapLayout.astro';
 ---
 
 <BaseLayout>
-  <main class="page-shell">
-    <div class="content-grid">
-      <aside class="sidebar">
-        <PreparednessPanel />
-      </aside>
-
-      <section class="map-panel" aria-label="Map of your selected location">
-        <MapView client:only="react" />
-      </section>
-    </div>
-  </main>
+  <MapLayout />
 </BaseLayout>
