@@ -228,6 +228,7 @@ body {
 
 .map-selection {
   position: absolute;
+  z-index: 2;
   bottom: 44px;
   left: 12px;
   right: 60px;
@@ -331,4 +332,32 @@ body {
 
 .address-search-panel a {
   text-decoration: underline;
+}
+
+.address-search-choices {
+  max-height: min(30vh, 240px);
+  overflow-y: auto;
+  margin: 6px 0;
+  padding: 2px;
+  list-style: none;
+}
+
+.address-search-choices button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  color: var(--ink);
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.address-search-choices button:hover {
+  background: var(--surface-hover);
+}
+
+.address-search-choices button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
 }

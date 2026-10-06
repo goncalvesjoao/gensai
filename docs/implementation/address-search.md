@@ -34,8 +34,16 @@ Both country codes and coordinates are validated. Even a provider result marked 
 
 ## Repeatable checks
 
-`tests/browser/address-search.test.mjs` uses controlled HTTP responses through the rendered map. It covers Enter-only submission, typing, independent device activation, single-match labels and markers, islands, unsupported results, ambiguity refinement, failure/malformed responses, keyboard focus, languages, themes, viewport sizes, sidebar states, correction and obsolete responses. Selection-start events invalidate requests at the start of any newer selection intent, including delayed Japan-boundary work.
+`tests/browser/address-search.test.mjs` uses controlled HTTP responses through the rendered map. It covers Enter-only submission, typing, independent device activation, single-match labels and markers, islands, unsupported results, explicit ambiguity choice, failure/malformed responses, keyboard focus, languages, themes, viewport sizes, sidebar states, correction and obsolete responses. Selection-start events invalidate requests at the start of any newer selection intent, including delayed Japan-boundary work.
 
 Run browser tests against a production preview with `TEST_URL`, `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` pointing to an existing runtime. `REAL_PROVIDER=1 node --test --test-name-pattern='real Photon' tests/browser/address-search.test.mjs` separately exercises actual requests from the browser, verifying CORS and Japanese/Latin/mainland/island result presence. These real checks are opt-in to avoid using the public service during routine tests.
 
 Hazard categories are not implemented in this baseline, so retained-category and final deployed acceptance belong to their later specs.
+
+## Ambiguity choice implementation
+
+[Ticket #18](https://github.com/goncalvesjoao/gensai/issues/18) replaces the refinement-only state with native result buttons. They have English/Japanese selection names, visible keyboard focus and wrapped address labels in a scrollable list. The map and selected-place summary remain usable with the phone hazard menu open. Choosing a result uses the same boundary validation, marker and map centering as a single supported match. A single supported match still selects automatically, including when rejected provider candidates fill the ten-result response.
+
+Typing a newer query clears choices and cancels obsolete responses without selecting a place or interrupting a device-location attempt. A new submission or map/device selection also clears choices. Ambiguous capped responses explain in both languages that the suggestions may omit further matches and offer query refinement. The cap does not establish exhaustive provider coverage or exact house-number precision.
+
+The integrated browser tests cover keyboard choice, unsupported candidates, malformed results, mainland and island correction, a home search from an overseas device, capped suggestions, delayed responses, and obsolete choices after typing/submission/map/device actions. Red-before-green checks failed for the absent chooser, missing typing cancellation and the phone sidebar covering the selected-place summary, then passed after their corresponding changes. Sixteen chooser screenshots cover both languages, themes, screen sizes and menu states. Real Photon checks separately find and choose Tokyo Metropolitan Government Office, Yonaguni and Chichijima results from the public map URLs. Run browser files with `node --test --test-concurrency=1 tests/browser/*.test.mjs` to avoid parallel headless WebGL resource contention.
