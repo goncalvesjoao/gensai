@@ -1,7 +1,7 @@
 ---
-import { Grip, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Grip, ChevronLeft, ChevronRight } from 'lucide-react';
 import MapView from './MapView.jsx';
-import UseMyLocation from './UseMyLocation.jsx';
+import AddressSearch from './AddressSearch.jsx';
 import PreparednessPanel from './PreparednessPanel.astro';
 const { locale = 'en' } = Astro.props;
 const japanese = locale === 'ja';
@@ -23,15 +23,7 @@ const closeLabel = japanese ? 'サイドバーを閉じる' : 'Close sidebar';
     >
       <Grip size={20} aria-hidden="true" />
     </button>
-    <div class="map-search">
-      <Search size={18} aria-hidden="true" />
-      <input
-        type="search"
-        aria-label={japanese ? '場所を検索' : 'Search for a location'}
-        placeholder={japanese ? '場所を検索' : 'Search for a location'}
-      />
-      <UseMyLocation client:load locale={locale} />
-    </div>
+    <AddressSearch client:load locale={locale} />
   </div>
   <div class="content-grid">
     <aside

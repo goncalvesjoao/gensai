@@ -51,6 +51,7 @@ export default function UseMyLocation({ locale = 'en' }) {
   }, []);
 
   function acquire() {
+    window.dispatchEvent(new Event('gensai:selection-start'));
     const active = ++request.current;
     setPending(true);
     function finish(location, cause) {
