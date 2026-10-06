@@ -8,6 +8,7 @@ export function startPreview(options = {}) {
   return preview({
     ...config.vite,
     configFile: false,
+    appType: 'mpa',
     build: { outDir: 'dist' },
     preview: { ...config.vite.preview, ...options },
   });

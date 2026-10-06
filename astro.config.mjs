@@ -34,7 +34,11 @@ export default defineConfig({
             const directWelcome =
               ['localhost', 'map.localhost', '127.0.0.1'].includes(host) &&
               /^\/(ja\/)?welcome\/?$/.test(url.pathname);
-            if (!homeRoot && !directWelcome) return next();
+            if (!homeRoot && !directWelcome) {
+              if (/^\/ja\/?$/.test(url.pathname))
+                req.url = '/ja/index.html' + url.search;
+              return next();
+            }
             const path = url.pathname.startsWith('/ja')
               ? 'ja/welcome'
               : 'welcome';
