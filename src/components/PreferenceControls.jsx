@@ -80,6 +80,21 @@ export default function PreferenceControls({ locale = 'en' }) {
     document.documentElement.lang = preferences.locale;
   }, [preferences]);
 
+  useEffect(() => {
+    if (mode !== 'system') return;
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    function applySystemAppearance() {
+      setPreferences((current) =>
+        current?.mode === 'system'
+          ? { ...current, theme: query.matches ? 'dark' : 'light' }
+          : current,
+      );
+    }
+    query.addEventListener('change', applySystemAppearance);
+    applySystemAppearance();
+    return () => query.removeEventListener('change', applySystemAppearance);
+  }, [mode]);
+
   function selectLocale(locale) {
     if (locale === preferences?.locale) return;
     window.location.assign(localeUrl(window.location.href, locale));
