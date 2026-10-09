@@ -1,10 +1,9 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
 import { selectThemeMode } from './helpers.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('address input waits for map selection readiness', async () => {
@@ -13,7 +12,7 @@ test('address input waits for map selection readiness', async () => {
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let release;
     const pending = new Promise((resolve) => (release = resolve));
     await page.route(/\/MapView\.[^/]+\.js$/, async (route) => {
@@ -44,7 +43,7 @@ test('empty address submission leaves pending device location usable', async () 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const queries = [];
     await page.route('https://photon.komoot.io/api/**', (route) => {
       queries.push(route.request().url());
@@ -90,7 +89,7 @@ test('Enter selects a Japan address, while typing and device activation do not s
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let queries = [];
     await page.route('https://photon.komoot.io/api/**', async (route) => {
       const url = new URL(route.request().url());
@@ -148,7 +147,7 @@ test('ambiguous Japan matches require an explicit keyboard choice', async () => 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     await page.route('https://photon.komoot.io/api/**', (route) =>
       route.fulfill({
         json: {
@@ -216,7 +215,7 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const requests = [];
     await page.route('https://photon.komoot.io/api/**', (route) =>
       requests.push(route),
@@ -285,7 +284,7 @@ for (const japanese of [false, true])
         executablePath: process.env.CHROMIUM_PATH,
       });
       try {
-        const page = await browser.newPage({
+        const page = await createFixturePage(browser, {
           viewport: mobile
             ? { width: 390, height: 844 }
             : { width: 1280, height: 800 },
@@ -550,7 +549,7 @@ test('capped suggestions remain explicit choices from an overseas device and loc
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let features = [
       match('Tokyo home'),
       ...Array.from({ length: 9 }, (_, i) =>
@@ -647,7 +646,7 @@ test('new searches and selection attempts supersede older provider and boundary 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const requests = [];
     await page.route('https://photon.komoot.io/api/**', (route) =>
       requests.push(route),

@@ -1,11 +1,10 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
-const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
+import { PNG } from 'pngjs';
 const fixture = new PNG({ width: 256, height: 256 });
 for (let pixel = 0; pixel < fixture.data.length; pixel += 4)
   fixture.data.set([240, 240, 240, 255], pixel);
@@ -17,7 +16,7 @@ test('muted official basemap loads, and unavailable basemap is explained', async
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let pale = false;
     await page.route('**/xyz/**', (route) => {
       pale ||= route.request().url().includes('/pale/');
@@ -48,7 +47,7 @@ test('tsunami switch exposes official legend, reports delayed and failed tiles, 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let release;
     const gate = new Promise((resolve) => {
       release = resolve;
@@ -93,7 +92,7 @@ test('landslide legend separates three types and explains partial failure withou
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     await page.route('**/xyz/**', (route) =>
       route.fulfill({ contentType: 'image/png', body: png }),
     );
@@ -135,7 +134,7 @@ test('flooding shows maximum-scale river depths and independent combined and nat
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     await page.route('**/xyz/**', (route) =>
       route.fulfill({ contentType: 'image/png', body: png }),
     );
@@ -251,7 +250,7 @@ test('turning all categories off explicitly avoids a safety verdict', async () =
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     await page.route('**/xyz/**', (route) =>
       route.fulfill({ contentType: 'image/png', body: png }),
     );
@@ -290,7 +289,7 @@ for (const status of [404, 500])
     });
     let release = () => {};
     try {
-      const page = await browser.newPage();
+      const page = await createFixturePage(browser);
       let requests = 0;
       let fail = true;
       let hold = false;
@@ -362,7 +361,7 @@ test('missing basemap tiles explain failure while hazard tiles remain usable', a
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     await page.route('**/xyz/**', (route) => route.fulfill({ status: 404 }));
     await page.route('**/raster/**', (route) =>
       route.fulfill({ contentType: 'image/png', body: png }),
