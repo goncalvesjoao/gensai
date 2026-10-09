@@ -1,0 +1,75 @@
+name: Verification
+
+on:
+  pull_request:
+  push:
+    branches: [main, 'implement/**']
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GENSAI_TEST_ARTIFACTS: ${{ runner.temp }}/verification/checks
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26.8.2'
+          cache: npm
+      - name: Prepare installation evidence
+        run: |
+          mkdir -p "$GENSAI_TEST_ARTIFACTS"
+          git rev-parse HEAD > "$GENSAI_TEST_ARTIFACTS/revision.txt"
+          git status --porcelain > "$GENSAI_TEST_ARTIFACTS/source-status.txt"
+          node --version > "$GENSAI_TEST_ARTIFACTS/node-version.txt"
+      - run: npm ci 2>&1 | tee "$GENSAI_TEST_ARTIFACTS/install.log"
+      - name: Lint
+        run: npm run verify -- npm run lint
+      - name: Formatting
+        if: ${{ !cancelled() }}
+        run: npm run verify -- npm run format:check
+      - name: Build and Node checks
+        if: ${{ !cancelled() }}
+        run: npm run verify -- npm test
+      - name: Retain verification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: checks-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/verification
+          if-no-files-found: error
+          retention-days: 14
+
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GENSAI_TEST_ARTIFACTS: ${{ runner.temp }}/verification/browser
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26.8.2'
+          cache: npm
+      - name: Prepare installation evidence
+        run: |
+          mkdir -p "$GENSAI_TEST_ARTIFACTS"
+          git rev-parse HEAD > "$GENSAI_TEST_ARTIFACTS/revision.txt"
+          git status --porcelain > "$GENSAI_TEST_ARTIFACTS/source-status.txt"
+          node --version > "$GENSAI_TEST_ARTIFACTS/node-version.txt"
+      - run: npm ci 2>&1 | tee "$GENSAI_TEST_ARTIFACTS/install.log"
+      - run: npx playwright install --with-deps chromium 2>&1 | tee "$GENSAI_TEST_ARTIFACTS/browser-install.log"
+      - name: Deterministic browser acceptance
+        run: npm run test:browser
+      - name: Retain browser evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/verification
+          if-no-files-found: error
+          retention-days: 14
