@@ -16,16 +16,21 @@ const { title = 'Gensai Map' } = Astro.props;
     <!-- Apply preferences synchronously before the body can paint. -->
     <script is:inline>
       (() => {
-        let theme = window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light';
+        let mode = 'system';
         try {
           const savedTheme = localStorage.getItem('gensai-theme');
-          if (savedTheme === 'light' || savedTheme === 'dark')
-            theme = savedTheme;
+          if (['light', 'dark', 'system'].includes(savedTheme))
+            mode = savedTheme;
         } catch {
-          // Storage is optional; retain the system theme.
+          // Storage is optional; retain System mode.
         }
+        const theme =
+          mode === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+            : mode;
+        document.documentElement.dataset.themeMode = mode;
         document.documentElement.dataset.theme = theme;
       })();
     </script>

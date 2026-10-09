@@ -176,7 +176,12 @@ for (const japanese of [false, true]) {
           },
         ];
         for (const theme of ['light', 'dark']) {
-          if (theme === 'dark') await page.locator('#theme-toggle').click();
+          while (
+            (await page.locator('html').getAttribute('data-theme-mode')) !==
+            theme
+          ) {
+            await page.locator('#theme-toggle').click();
+          }
           for (const [index, outcome] of outcomes.entries()) {
             const open =
               (await page

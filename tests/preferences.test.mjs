@@ -13,6 +13,18 @@ const scripts = [...head.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)]
   .map(([, , script]) => script);
 
 for (const scenario of [
+  {
+    name: 'saved System follows dark',
+    systemDark: true,
+    stored: { 'gensai-theme': 'system' },
+    expected: 'dark',
+  },
+  {
+    name: 'saved System follows light',
+    systemDark: false,
+    stored: { 'gensai-theme': 'system' },
+    expected: 'light',
+  },
   { name: 'system dark', systemDark: true, stored: {}, expected: 'dark' },
   {
     name: 'saved light overrides system dark',
@@ -75,6 +87,12 @@ for (const scenario of [
     };
     for (const script of scripts) runInNewContext(script, context);
     assert.equal(root.dataset.theme, scenario.expected);
+    assert.equal(
+      root.dataset.themeMode,
+      ['light', 'dark'].includes(scenario.stored?.['gensai-theme'])
+        ? scenario.stored['gensai-theme']
+        : 'system',
+    );
     assert.equal(root.lang, scenario.locale || 'en');
   });
 }

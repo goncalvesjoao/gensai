@@ -175,7 +175,12 @@ for (const japanese of [false, true])
           await page.screenshot({
             path: `${process.env.SCREENSHOT_DIR}/${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-light.png`,
           });
-        await page.locator('#theme-toggle').click();
+        while (
+          (await page.locator('html').getAttribute('data-theme-mode')) !==
+          'dark'
+        ) {
+          await page.locator('#theme-toggle').click();
+        }
         assert.equal(await status.textContent(), retained);
         await page.locator('[data-sidebar-opener]').click();
         await page.locator('[data-sidebar-close]').click();

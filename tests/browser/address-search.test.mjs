@@ -322,7 +322,12 @@ for (const japanese of [false, true])
           exact: true,
         });
         for (const theme of ['light', 'dark']) {
-          if (theme === 'dark') await page.locator('#theme-toggle').click();
+          while (
+            (await page.locator('html').getAttribute('data-theme-mode')) !==
+            theme
+          ) {
+            await page.locator('#theme-toggle').click();
+          }
           for (const open of [true, false]) {
             if (
               ((await page

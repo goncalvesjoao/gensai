@@ -105,7 +105,12 @@ for (const japanese of [false, true]) {
             .click();
           await page.locator('#theme-toggle').click();
           assert.equal(await opener.getAttribute('aria-expanded'), 'true');
-          await page.locator('#theme-toggle').click();
+          while (
+            (await page.locator('html').getAttribute('data-theme-mode')) !==
+            theme
+          ) {
+            await page.locator('#theme-toggle').click();
+          }
           await page
             .getByText(
               japanese

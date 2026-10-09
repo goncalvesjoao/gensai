@@ -33,7 +33,12 @@ for (const japanese of [false, true]) {
         assert.equal(await panel.evaluate((el) => el.inert), true);
         await opener.click();
         await opener.click();
-        await page.locator('#theme-toggle').click();
+        while (
+          (await page.locator('html').getAttribute('data-theme-mode')) !==
+          'dark'
+        ) {
+          await page.locator('#theme-toggle').click();
+        }
         await page
           .getByRole('button', {
             name: japanese ? '言語を選択' : 'Choose language',
