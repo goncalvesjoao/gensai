@@ -1,7 +1,8 @@
 # Browser verification
 
 Start with `package.json` for public verification commands and
-`tests/browser/helpers.mjs` for shared fixtures and synchronization helpers.
+`tests/browser/helpers.mjs` for shared synchronization helpers; controlled fixtures live in
+`tests/browser/fixtures.mjs`.
 Reuse `selectThemeMode` and `waitForScaleChange` when changing appearance or zoom.
 Wait for the rendered state asserted by the test, with a bounded timeout. For
 Node-side route counts or screenshot pixels, use the shared bounded condition
@@ -14,8 +15,8 @@ cover rendering and interaction; they do not establish provider availability
 or geographic coverage. Live-provider and deployed-site probes are opt-in.
 
 Use the browser runner's focused selection while changing a case, then run the
-full deterministic suite before publication. Inspect the runner's help for
-selection, probe and evidence options. Retain output from process start,
+full deterministic suite before publication. See [verification](testing.md) for
+selection, probe and evidence commands. Retain output from process start,
 including initial red tests, with the source revision, checkout, dirty state,
 build, command, elapsed time and exit status. Keep local logs outside tracked
 source. Compare runtimes only for equivalent scope and environments, and
