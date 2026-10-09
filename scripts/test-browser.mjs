@@ -71,7 +71,6 @@ function launch(command, argv, name, env = {}) {
   child.done = new Promise((resolveDone) => {
     child.on('error', (error) => {
       stream.write(`${error.stack}\n`);
-      resolveDone(1);
     });
     child.on('close', (code, signal) => {
       child.result = code ?? (signal ? 130 : 1);
