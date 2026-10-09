@@ -1,3 +1,4 @@
+import { waitForThemeReady } from './helpers.mjs';
 import { createFixturePage } from './fixtures.mjs';
 import assert from 'node:assert/strict';
 import process from 'node:process';
@@ -57,9 +58,7 @@ test('theme modes cycle, identify their selection and restore across reloads', a
             assert.ok(
               box.width >= 36 && box.x >= 0 && box.x + box.width <= width,
             );
-            await page.waitForFunction(
-              () => !document.querySelector('#theme-toggle').disabled,
-            );
+            await waitForThemeReady(page);
             await button.focus();
             await page.keyboard.press('Tab');
             await page.keyboard.press('Shift+Tab');
@@ -86,6 +85,7 @@ test('theme modes cycle, identify their selection and restore across reloads', a
               await page.locator('html').getAttribute('data-theme'),
               appearance,
             );
+            await waitForThemeReady(page);
             await button.focus();
             await button.press('Enter');
           }
@@ -121,9 +121,7 @@ test('saved explicit and invalid modes hydrate correctly and blocked storage per
         await page.goto(`${base}${route}`, { waitUntil: 'domcontentloaded' });
         const button = page.locator('#theme-toggle');
         await button.waitFor();
-        await page.waitForFunction(
-          () => !document.querySelector('#theme-toggle').disabled,
-        );
+        await waitForThemeReady(page);
         const initial = ['light', 'dark'].includes(saved) ? saved : 'system';
         assert.equal(
           await page.locator('html').getAttribute('data-theme-mode'),
@@ -188,9 +186,7 @@ test('System follows live appearance changes while explicit modes stay fixed', a
           }, storage);
           await page.goto(`${base}${route}`, { waitUntil: 'domcontentloaded' });
           const button = page.locator('#theme-toggle');
-          await page.waitForFunction(
-            () => !document.querySelector('#theme-toggle').disabled,
-          );
+          await waitForThemeReady(page);
           const systemLabel = route.startsWith('/ja')
             ? '現在のテーマ：システム。ライトテーマに切り替える'
             : 'Current theme: System. Switch to Light theme';

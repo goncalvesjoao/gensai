@@ -1,6 +1,14 @@
 import { scheduler } from 'node:timers/promises';
 import assert from 'node:assert/strict';
 
+export async function waitForThemeReady(page) {
+  await page.waitForFunction(
+    () => document.querySelector('#theme-toggle')?.disabled === false,
+    undefined,
+    { timeout: 10_000 },
+  );
+}
+
 export async function selectThemeMode(page, mode) {
   const document = page.locator('html');
   for (let attempts = 0; attempts < 3; attempts++) {
