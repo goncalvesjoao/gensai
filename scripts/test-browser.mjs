@@ -1,5 +1,6 @@
+import { createSupervisor } from './process-supervisor.mjs';
 import process from 'node:process';
-import { spawn, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createWriteStream } from 'node:fs';
 import { mkdir, mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
@@ -17,7 +18,7 @@ await mkdir(artifactRoot, { recursive: true });
 const artifacts = await mkdtemp(join(artifactRoot, 'run-'));
 const log = createWriteStream(join(artifacts, 'runner.log'));
 const git = (...argv) => execFileSync('git', argv, { encoding: 'utf8' }).trim();
-const children = new Set();
+const supervisor = createSupervisor();
 let interrupted = null;
 const metadata = {
   command: process.argv,
@@ -43,41 +44,13 @@ output(
 for (const signal of ['SIGINT', 'SIGTERM'])
   process.on(signal, () => {
     interrupted = signal;
-    for (const child of children) kill(child, 'SIGTERM');
+    supervisor.terminate();
   });
-function kill(child, signal) {
-  try {
-    process.kill(-child.pid, signal);
-  } catch (error) {
-    if (error.code !== 'ESRCH') throw error;
-  }
-}
 function launch(command, argv, name, env = {}) {
-  const stream = createWriteStream(join(artifacts, `${name}.log`));
-  const child = spawn(command, argv, {
-    detached: true,
-    env: { ...process.env, ...env },
-    stdio: ['ignore', 'pipe', 'pipe'],
+  return supervisor.launch(command, argv, {
+    stream: createWriteStream(join(artifacts, `${name}.log`)),
+    env,
   });
-  children.add(child);
-  child.stdout.on('data', (data) => {
-    stream.write(data);
-    process.stdout.write(data);
-  });
-  child.stderr.on('data', (data) => {
-    stream.write(data);
-    process.stderr.write(data);
-  });
-  child.done = new Promise((resolveDone) => {
-    child.on('error', (error) => {
-      stream.write(`${error.stack}\n`);
-    });
-    child.on('close', (code, signal) => {
-      child.result = code ?? (signal ? 130 : 1);
-      stream.end(() => resolveDone(child.result));
-    });
-  });
-  return child;
 }
 async function fingerprint(paths) {
   const hash = createHash('sha256');
@@ -225,12 +198,7 @@ try {
   output(`${error.stack}\n`);
   status = 1;
 } finally {
-  for (const child of children) kill(child, 'SIGTERM');
-  await Promise.race([
-    Promise.all([...children].map((c) => c.done)),
-    new Promise((r) => setTimeout(r, 1000)),
-  ]);
-  for (const child of children) kill(child, 'SIGKILL');
+  await supervisor.cleanup();
   try {
     const testOutput = await readFile(join(artifacts, 'tests.log'), 'utf8');
     metadata.skippedTests = [
@@ -300,6 +268,6 @@ try {
     join(artifacts, 'metadata.json'),
     `${JSON.stringify(metadata, null, 2)}\n`,
   );
-  log.end();
+  await new Promise((resolve) => log.end(resolve));
   process.exitCode = metadata.exitStatus;
 }

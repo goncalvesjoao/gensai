@@ -1,4 +1,5 @@
-import { spawn, execFileSync } from 'node:child_process';
+import { createSupervisor } from './process-supervisor.mjs';
+import { execFileSync } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
 import {
   mkdtemp,
@@ -33,43 +34,23 @@ const metadata = {
 };
 const log = createWriteStream(join(setupArtifacts, 'setup.log'));
 log.write(`Baseline setup started: ${JSON.stringify(process.argv)}\n`);
-let active;
+const supervisor = createSupervisor();
 let signal;
 let added = false;
-function kill(child, value) {
-  try {
-    process.kill(-child.pid, value);
-  } catch (error) {
-    if (error.code !== 'ESRCH') throw error;
-  }
-}
 for (const value of ['SIGINT', 'SIGTERM'])
   process.on(value, () => {
     signal = value;
-    if (active) kill(active, value);
+    supervisor.terminate(value);
   });
 async function run(command, argv, cwd, env = {}) {
-  active = spawn(command, argv, {
+  const child = supervisor.launch(command, argv, {
     cwd,
-    detached: true,
-    stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, ...env },
+    env,
+    stream: log,
+    endStream: false,
   });
-  for (const pipe of [active.stdout, active.stderr])
-    pipe.on('data', (data) => {
-      log.write(data);
-      process.stdout.write(data);
-    });
-  const child = active;
-  const code = await new Promise((resolveDone) => {
-    child.on('error', (error) => {
-      log.write(`${error.stack}\n`);
-      resolveDone(1);
-    });
-    child.on('close', (code) => resolveDone(code ?? 130));
-  });
-  kill(child, 'SIGKILL');
-  active = null;
+  const code = await child.done;
+  supervisor.kill(child, 'SIGKILL');
   return code;
 }
 let code = 1;
@@ -91,6 +72,10 @@ try {
   // Orchestration and current locked tooling stay outside historical tracked source.
   const runner = join(directory, 'test-browser.mjs');
   await copyFile(new URL('./test-browser.mjs', import.meta.url), runner);
+  await copyFile(
+    new URL('./process-supervisor.mjs', import.meta.url),
+    join(directory, 'process-supervisor.mjs'),
+  );
   const tooling = join(directory, 'tooling');
   await mkdir(tooling);
   for (const file of ['package.json', 'package-lock.json'])
@@ -128,6 +113,7 @@ try {
   console.error(error);
   code = 1;
 } finally {
+  await supervisor.cleanup();
   if (added)
     execFileSync('git', ['worktree', 'remove', '--force', checkout], {
       stdio: 'pipe',
