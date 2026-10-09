@@ -1,0 +1,8 @@
+.github/workflows/verification.yml:16:34: context "runner" is not allowed here. available contexts are "github", "inputs", "matrix", "needs", "secrets", "strategy", "vars". see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details [expression]
+   |
+16 |       GENSAI_TEST_ARTIFACTS: ${{ runner.temp }}/verification/checks
+   |                                  ^~~~~~~~~~~
+.github/workflows/verification.yml:51:34: context "runner" is not allowed here. available contexts are "github", "inputs", "matrix", "needs", "secrets", "strategy", "vars". see https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability for more details [expression]
+   |
+51 |       GENSAI_TEST_ARTIFACTS: ${{ runner.temp }}/verification/browser
+   |                                  ^~~~~~~~~~~

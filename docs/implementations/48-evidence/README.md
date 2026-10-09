@@ -43,3 +43,26 @@ route/language/viewport/storage/theme/location/hazard coverage remain inventorie
 Single observed browser durations were 639.014s before and 595.188s after; wrappers
 including build/previews were 644.351s and 599.272s. Installation is excluded. This
 observation is not a statistical benchmark or a guaranteed performance improvement.
+
+## Hosted workflow validation correction
+
+The first hosted push run at published head
+`e4d0a8a2c96b684121d357e5a65551ab927ef743` failed before jobs were created:
+[run 37947114260](https://github.com/goncalvesjoao/gensai/actions/runs/37947114260).
+There are no job logs or acceptance results for that run.
+
+`actionlint-red.log` is copied verbatim from the one-off command
+`actionlint .github/workflows/verification.yml` against that workflow (also unchanged
+at report-only revision `5fb5ceefb7525a09160728cb2206cf564b0cf625`). It detects
+both invalid job-level `runner.temp` references. actionlint 1.7.12 was downloaded
+from its [official release](https://github.com/rhysd/actionlint/releases/tag/v1.7.12),
+reports Go 1.26.1/linux/amd64, and is temporary validation tooling rather than a new
+repository dependency or mandatory gate. GitHub's
+[context availability reference](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability)
+confirms `runner` is unavailable in `jobs.<job_id>.env`.
+
+The same validator exits 0 with no diagnostics after artifact paths are exported
+from `RUNNER_TEMP` through `GITHUB_ENV` in each job's first step. Artifacts remain
+outside the source checkout, with the same commands and 14-day retention. This
+correction changes no application, verification runner or browser tests, so the
+previous full browser evidence remains applicable to their identical source.
