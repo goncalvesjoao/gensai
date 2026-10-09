@@ -1,3 +1,4 @@
+import { waitForCondition } from './helpers.mjs';
 import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
@@ -25,7 +26,7 @@ test('muted official basemap loads, and unavailable basemap is explained', async
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-sidebar-opener]').click();
     await page.locator('canvas').waitFor();
-    await page.waitForTimeout(1500);
+    await waitForCondition(() => pale, 'pale basemap request');
     assert.equal(pale, true);
     await page.unroute('**/xyz/**');
     await page.route('**/xyz/**', (route) => route.abort());
@@ -314,7 +315,7 @@ for (const status of [404, 500])
           : 'Tile request failed';
       const source = page.locator('[data-hazard-source="tsunami"]');
       await source.filter({ hasText: explanation }).waitFor();
-      await page.waitForTimeout(800);
+      await page.waitForLoadState('networkidle', { timeout: 10_000 });
       const before = requests;
       hold = true;
       const canvas = await page.locator('canvas').boundingBox();
@@ -328,8 +329,8 @@ for (const status of [404, 500])
         canvas.y + canvas.height / 2,
         { steps: 4 },
       );
-      await page.waitForTimeout(400);
       await page.mouse.up();
+      // eslint-disable-next-line no-restricted-syntax -- Observe cached tiles and retained failure during the delayed retry window after a small pan.
       await page.waitForTimeout(600);
       // A 500 can trigger a new parent-tile retry on pan. Hold that response
       // so it cannot hide loss of the existing failed viewport tile.

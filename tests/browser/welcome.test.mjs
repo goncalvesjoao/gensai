@@ -132,6 +132,7 @@ test('visitors can return from the map and reopen it in the same language', asyn
         .click({ timeout: 2000 });
       await page.getByRole('link', { name: label }).waitFor();
       assert.equal(page.url(), `${base}${path}`);
+      // eslint-disable-next-line no-restricted-syntax -- Elapsed time verifies canceled map navigation does not replace the returned entry point.
       await page.waitForTimeout(150);
       assert.equal(page.url(), `${base}${path}`);
       await page.getByRole('link', { name: label }).click();

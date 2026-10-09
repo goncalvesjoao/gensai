@@ -2,7 +2,11 @@ import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { selectThemeMode } from './helpers.mjs';
+import {
+  selectThemeMode,
+  waitForCondition,
+  waitForMarkerMovement,
+} from './helpers.mjs';
 import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
@@ -170,7 +174,7 @@ test('ambiguous Japan matches require an explicit keyboard choice', async () => 
       name: 'Select Yonaguni home',
       exact: true,
     });
-    await choice.waitFor({ timeout: 2000 });
+    await choice.waitFor({ timeout: 10_000 });
     assert.equal(await page.locator('.maplibregl-marker').count(), 0);
     assert.equal(
       await page
@@ -225,13 +229,14 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
     const search = page.getByRole('searchbox');
     await search.fill('old');
     await search.press('Enter');
-    while (!requests.length) await page.waitForTimeout(10);
+    await waitForCondition(() => requests.length > 0, 'first search request');
     await search.fill('new unfinished input');
     await requests[0]
       .fulfill({
         json: { type: 'FeatureCollection', features: [match('Obsolete')] },
       })
       .catch(() => {});
+    // eslint-disable-next-line no-restricted-syntax -- Observe that a canceled response causes no selection or feedback during this window.
     await page.waitForTimeout(200);
     assert.equal(await page.locator('.maplibregl-marker').count(), 0);
     assert.equal(
@@ -239,7 +244,7 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
       '',
     );
     await search.press('Enter');
-    while (requests.length < 2) await page.waitForTimeout(10);
+    await waitForCondition(() => requests.length >= 2, 'second search request');
     await requests[1].fulfill({
       json: {
         type: 'FeatureCollection',
@@ -263,6 +268,24 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
 });
 
 async function assertVisibleSelectedLocation(page, open) {
+  await page.waitForFunction(
+    (expected) => {
+      const shell = document.querySelector('.page-shell');
+      const marker = document
+        .querySelector('.maplibregl-marker')
+        ?.getBoundingClientRect();
+      const canvas = document.querySelector('canvas')?.getBoundingClientRect();
+      return (
+        shell?.dataset.sidebarOpen === String(expected) &&
+        marker &&
+        canvas &&
+        Math.abs(marker.x + marker.width / 2 - (canvas.x + canvas.width / 2)) <
+          2
+      );
+    },
+    open,
+    { timeout: 10_000 },
+  );
   assert.equal(
     await page.locator('.page-shell').getAttribute('data-sidebar-open'),
     String(open),
@@ -449,23 +472,18 @@ for (const japanese of [false, true])
                 .waitFor();
               await assertVisibleSelectedLocation(page, open);
               await page.setViewportSize({ width: 430, height: 844 });
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, true);
               await page.locator('[data-sidebar-close]').click();
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               assert.match(
                 await selection.textContent(),
                 /35\.68900, 139\.69200/,
               );
               await page.setViewportSize({ width: 1280, height: 800 });
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               await page.setViewportSize({ width: 390, height: 844 });
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               await page.locator('[data-sidebar-opener]').click();
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, true);
               await page
                 .getByText(
@@ -521,7 +539,7 @@ for (const japanese of [false, true])
             // Correct the address through the map's public keyboard controls.
             await page.locator('canvas').focus();
             await page.keyboard.press('ArrowRight');
-            await page.waitForTimeout(400);
+            await waitForMarkerMovement(page);
             await page.keyboard.press('Enter');
             await selection
               .filter({ hasNotText: japanese ? '確認中' : 'Checking' })
@@ -600,7 +618,7 @@ test('capped suggestions remain explicit choices from an overseas device and loc
     await selection.filter({ hasText: '24.46700, 122.99800' }).waitFor();
     await page.locator('canvas').focus();
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(400);
+    await waitForMarkerMovement(page);
     await page.keyboard.press('Enter');
     await selection.filter({ hasNotText: 'Checking' }).waitFor();
     assert.doesNotMatch(await selection.textContent(), /Home candidate 9/);
@@ -670,7 +688,10 @@ test('new searches and selection attempts supersede older provider and boundary 
           .querySelector('#address-search-feedback')
           .textContent.includes('Searching'),
       );
-      while (requests.length === count) await page.waitForTimeout(10);
+      await waitForCondition(
+        () => requests.length > count,
+        'submitted search request',
+      );
     }
     async function respond(route, name, lng = 139.6917, lat = 35.6895) {
       await route

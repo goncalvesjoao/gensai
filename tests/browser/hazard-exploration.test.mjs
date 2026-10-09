@@ -2,7 +2,12 @@ import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { selectThemeMode, waitForScaleChange } from './helpers.mjs';
+import {
+  selectThemeMode,
+  waitForScaleChange,
+  waitForMarkerMovement,
+  waitForCondition,
+} from './helpers.mjs';
 import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 import { PNG } from 'pngjs';
@@ -148,7 +153,7 @@ for (const japanese of [false, true]) {
             .waitFor();
           await page.locator('canvas').focus();
           await page.keyboard.press('ArrowRight');
-          await page.waitForTimeout(400);
+          await waitForMarkerMovement(page);
           await page.keyboard.press('Enter');
           await page
             .locator('.map-selection [role=status]')
@@ -329,7 +334,7 @@ test('all eight category combinations preserve source colours and drawing order'
             ? [255, 183, 183]
             : [240, 240, 240];
       let actual;
-      for (let attempt = 0; attempt < 30; attempt++) {
+      await waitForCondition(async () => {
         const screenshot = PNG.sync.read(
           await page.locator('canvas').screenshot(),
         );
@@ -338,9 +343,8 @@ test('all eight category combinations preserve source colours and drawing order'
             Math.floor(screenshot.width * 0.8)) *
           4;
         actual = [...screenshot.data.subarray(offset, offset + 3)];
-        if (actual.every((channel, i) => channel === expected[i])) break;
-        await page.waitForTimeout(100);
-      }
+        return actual.every((channel, i) => channel === expected[i]);
+      }, 'rendered hazard pixel');
       assert.deepEqual(
         actual,
         expected,

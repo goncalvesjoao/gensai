@@ -14,3 +14,8 @@ read `docs/agents/triage-labels.md`.
 
 Use a single-context layout. Before exploring the codebase,
 read `docs/agents/domain.md`.
+
+### Browser tests
+
+Before changing browser tests or running browser verification, read
+`docs/testing-sync.md` for shared helpers, test selection and evidence guidance.

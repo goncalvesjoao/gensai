@@ -2,7 +2,7 @@ import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { selectThemeMode } from './helpers.mjs';
+import { selectThemeMode, waitForMarkerMovement } from './helpers.mjs';
 import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
@@ -166,7 +166,7 @@ for (const japanese of [false, true])
         const pointerSelection = await status.textContent();
         await canvas.focus();
         await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(400);
+        await waitForMarkerMovement(page);
         await page.keyboard.press('Enter');
         await status.filter({ hasNotText: checking }).waitFor();
         const retained = await status.textContent();

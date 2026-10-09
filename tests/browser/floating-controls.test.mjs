@@ -5,7 +5,8 @@ import test from 'node:test';
 import { selectThemeMode, waitForScaleChange } from './helpers.mjs';
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
-const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
+const base =
+  process.env.MAP_TEST_URL || process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('floating controls offer independent search, device and horizontal zoom', async () => {
   const browser = await chromium.launch({
