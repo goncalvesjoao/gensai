@@ -1,10 +1,9 @@
+import { createFixturePage } from './fixtures.mjs';
 import assert from 'node:assert/strict';
 import process from 'node:process';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
+import { chromium } from 'playwright';
+import { PNG } from 'pngjs';
 const tile = new PNG({ width: 256, height: 256 });
 for (let pixel = 0; pixel < tile.data.length; pixel += 4)
   tile.data.set([240, 240, 240, 255], pixel);
@@ -25,7 +24,7 @@ test('theme modes cycle, identify their selection and restore across reloads', a
     for (const route of ['/', '/ja', '/welcome', '/ja/welcome']) {
       for (const width of [390, 1440]) {
         for (const scheme of ['light', 'dark']) {
-          const page = await browser.newPage({
+          const page = await createFixturePage(browser, {
             viewport: { width, height: 900 },
             colorScheme: scheme,
           });
@@ -107,7 +106,7 @@ test('saved explicit and invalid modes hydrate correctly and blocked storage per
   try {
     for (const route of ['/', '/ja', '/welcome', '/ja/welcome']) {
       for (const saved of ['light', 'dark', 'system', 'invalid', 'blocked']) {
-        const page = await browser.newPage({ colorScheme: 'dark' });
+        const page = await createFixturePage(browser, { colorScheme: 'dark' });
         await page.addInitScript((saved) => {
           if (saved === 'blocked') {
             Object.defineProperty(window, 'localStorage', {
@@ -168,7 +167,7 @@ test('System follows live appearance changes while explicit modes stay fixed', a
     for (const route of ['/', '/ja', '/welcome', '/ja/welcome']) {
       for (const width of [390, 1440]) {
         for (const storage of ['available', 'blocked']) {
-          const page = await browser.newPage({
+          const page = await createFixturePage(browser, {
             viewport: { width, height: 900 },
             colorScheme: 'light',
           });

@@ -1,10 +1,13 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-import { selectThemeMode } from './helpers.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import {
+  selectThemeMode,
+  waitForCondition,
+  waitForMarkerMovement,
+} from './helpers.mjs';
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('address input waits for map selection readiness', async () => {
@@ -13,7 +16,7 @@ test('address input waits for map selection readiness', async () => {
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let release;
     const pending = new Promise((resolve) => (release = resolve));
     await page.route(/\/MapView\.[^/]+\.js$/, async (route) => {
@@ -44,7 +47,7 @@ test('empty address submission leaves pending device location usable', async () 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const queries = [];
     await page.route('https://photon.komoot.io/api/**', (route) => {
       queries.push(route.request().url());
@@ -90,7 +93,7 @@ test('Enter selects a Japan address, while typing and device activation do not s
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let queries = [];
     await page.route('https://photon.komoot.io/api/**', async (route) => {
       const url = new URL(route.request().url());
@@ -148,7 +151,7 @@ test('ambiguous Japan matches require an explicit keyboard choice', async () => 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     await page.route('https://photon.komoot.io/api/**', (route) =>
       route.fulfill({
         json: {
@@ -171,7 +174,7 @@ test('ambiguous Japan matches require an explicit keyboard choice', async () => 
       name: 'Select Yonaguni home',
       exact: true,
     });
-    await choice.waitFor({ timeout: 2000 });
+    await choice.waitFor({ timeout: 10_000 });
     assert.equal(await page.locator('.maplibregl-marker').count(), 0);
     assert.equal(
       await page
@@ -216,7 +219,7 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const requests = [];
     await page.route('https://photon.komoot.io/api/**', (route) =>
       requests.push(route),
@@ -226,13 +229,14 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
     const search = page.getByRole('searchbox');
     await search.fill('old');
     await search.press('Enter');
-    while (!requests.length) await page.waitForTimeout(10);
+    await waitForCondition(() => requests.length > 0, 'first search request');
     await search.fill('new unfinished input');
     await requests[0]
       .fulfill({
         json: { type: 'FeatureCollection', features: [match('Obsolete')] },
       })
       .catch(() => {});
+    // eslint-disable-next-line no-restricted-syntax -- Observe that a canceled response causes no selection or feedback during this window.
     await page.waitForTimeout(200);
     assert.equal(await page.locator('.maplibregl-marker').count(), 0);
     assert.equal(
@@ -240,7 +244,7 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
       '',
     );
     await search.press('Enter');
-    while (requests.length < 2) await page.waitForTimeout(10);
+    await waitForCondition(() => requests.length >= 2, 'second search request');
     await requests[1].fulfill({
       json: {
         type: 'FeatureCollection',
@@ -264,6 +268,24 @@ test('typing a newer query dismisses choices and prevents an earlier response fr
 });
 
 async function assertVisibleSelectedLocation(page, open) {
+  await page.waitForFunction(
+    (expected) => {
+      const shell = document.querySelector('.page-shell');
+      const marker = document
+        .querySelector('.maplibregl-marker')
+        ?.getBoundingClientRect();
+      const canvas = document.querySelector('canvas')?.getBoundingClientRect();
+      return (
+        shell?.dataset.sidebarOpen === String(expected) &&
+        marker &&
+        canvas &&
+        Math.abs(marker.x + marker.width / 2 - (canvas.x + canvas.width / 2)) <
+          2
+      );
+    },
+    open,
+    { timeout: 10_000 },
+  );
   assert.equal(
     await page.locator('.page-shell').getAttribute('data-sidebar-open'),
     String(open),
@@ -285,7 +307,7 @@ for (const japanese of [false, true])
         executablePath: process.env.CHROMIUM_PATH,
       });
       try {
-        const page = await browser.newPage({
+        const page = await createFixturePage(browser, {
           viewport: mobile
             ? { width: 390, height: 844 }
             : { width: 1280, height: 800 },
@@ -450,23 +472,18 @@ for (const japanese of [false, true])
                 .waitFor();
               await assertVisibleSelectedLocation(page, open);
               await page.setViewportSize({ width: 430, height: 844 });
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, true);
               await page.locator('[data-sidebar-close]').click();
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               assert.match(
                 await selection.textContent(),
                 /35\.68900, 139\.69200/,
               );
               await page.setViewportSize({ width: 1280, height: 800 });
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               await page.setViewportSize({ width: 390, height: 844 });
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, false);
               await page.locator('[data-sidebar-opener]').click();
-              await page.waitForTimeout(100);
               await assertVisibleSelectedLocation(page, true);
               await page
                 .getByText(
@@ -522,7 +539,7 @@ for (const japanese of [false, true])
             // Correct the address through the map's public keyboard controls.
             await page.locator('canvas').focus();
             await page.keyboard.press('ArrowRight');
-            await page.waitForTimeout(400);
+            await waitForMarkerMovement(page);
             await page.keyboard.press('Enter');
             await selection
               .filter({ hasNotText: japanese ? '確認中' : 'Checking' })
@@ -550,7 +567,7 @@ test('capped suggestions remain explicit choices from an overseas device and loc
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let features = [
       match('Tokyo home'),
       ...Array.from({ length: 9 }, (_, i) =>
@@ -601,7 +618,7 @@ test('capped suggestions remain explicit choices from an overseas device and loc
     await selection.filter({ hasText: '24.46700, 122.99800' }).waitFor();
     await page.locator('canvas').focus();
     await page.keyboard.press('ArrowRight');
-    await page.waitForTimeout(400);
+    await waitForMarkerMovement(page);
     await page.keyboard.press('Enter');
     await selection.filter({ hasNotText: 'Checking' }).waitFor();
     assert.doesNotMatch(await selection.textContent(), /Home candidate 9/);
@@ -647,7 +664,7 @@ test('new searches and selection attempts supersede older provider and boundary 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const requests = [];
     await page.route('https://photon.komoot.io/api/**', (route) =>
       requests.push(route),
@@ -671,7 +688,10 @@ test('new searches and selection attempts supersede older provider and boundary 
           .querySelector('#address-search-feedback')
           .textContent.includes('Searching'),
       );
-      while (requests.length === count) await page.waitForTimeout(10);
+      await waitForCondition(
+        () => requests.length > count,
+        'submitted search request',
+      );
     }
     async function respond(route, name, lng = 139.6917, lat = 35.6895) {
       await route

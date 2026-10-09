@@ -1,10 +1,9 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
 import { selectThemeMode } from './helpers.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('device location is explicitly acquired and fresh on later activation', async () => {
@@ -13,7 +12,7 @@ test('device location is explicitly acquired and fresh on later activation', asy
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     const boundaryRequests = [];
     page.on('request', (request) => {
       if (/\/japan-boundary\.[^/]+\.js/.test(request.url()))
@@ -91,7 +90,7 @@ for (const japanese of [false, true]) {
         executablePath: process.env.CHROMIUM_PATH,
       });
       try {
-        const page = await browser.newPage({
+        const page = await createFixturePage(browser, {
           viewport: mobile
             ? { width: 390, height: 844 }
             : { width: 1280, height: 800 },

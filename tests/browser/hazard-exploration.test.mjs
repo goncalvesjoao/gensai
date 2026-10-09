@@ -1,12 +1,16 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-import { selectThemeMode, waitForScaleChange } from './helpers.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import {
+  selectThemeMode,
+  waitForScaleChange,
+  waitForMarkerMovement,
+  waitForCondition,
+} from './helpers.mjs';
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
-const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
+import { PNG } from 'pngjs';
 const fixture = new PNG({ width: 256, height: 256 });
 for (let pixel = 0; pixel < fixture.data.length; pixel += 4)
   fixture.data.set([240, 240, 240, 255], pixel);
@@ -21,7 +25,7 @@ for (const japanese of [false, true]) {
           executablePath: process.env.CHROMIUM_PATH,
         });
         try {
-          const page = await browser.newPage({
+          const page = await createFixturePage(browser, {
             viewport: {
               width: mobile ? 390 : 1280,
               height: mobile ? 844 : 900,
@@ -149,7 +153,7 @@ for (const japanese of [false, true]) {
             .waitFor();
           await page.locator('canvas').focus();
           await page.keyboard.press('ArrowRight');
-          await page.waitForTimeout(400);
+          await waitForMarkerMovement(page);
           await page.keyboard.press('Enter');
           await page
             .locator('.map-selection [role=status]')
@@ -260,7 +264,6 @@ for (const japanese of [false, true]) {
 
 // Test rendered pixels against fixed official palette colours, independent of map internals.
 test('all eight category combinations preserve source colours and drawing order', async () => {
-  const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
   const colours = {
     '01_flood_l2_shinsuishin_data': [255, 216, 192],
     '01_flood_l2_shinsuishin_kuni_data': [255, 183, 183],
@@ -280,7 +283,7 @@ test('all eight category combinations preserve source colours and drawing order'
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage({
+    const page = await createFixturePage(browser, {
       viewport: { width: 1280, height: 900 },
     });
     await page.route('**/xyz/**', (route) =>
@@ -331,7 +334,7 @@ test('all eight category combinations preserve source colours and drawing order'
             ? [255, 183, 183]
             : [240, 240, 240];
       let actual;
-      for (let attempt = 0; attempt < 30; attempt++) {
+      await waitForCondition(async () => {
         const screenshot = PNG.sync.read(
           await page.locator('canvas').screenshot(),
         );
@@ -340,9 +343,8 @@ test('all eight category combinations preserve source colours and drawing order'
             Math.floor(screenshot.width * 0.8)) *
           4;
         actual = [...screenshot.data.subarray(offset, offset + 3)];
-        if (actual.every((channel, i) => channel === expected[i])) break;
-        await page.waitForTimeout(100);
-      }
+        return actual.every((channel, i) => channel === expected[i]);
+      }, 'rendered hazard pixel');
       assert.deepEqual(
         actual,
         expected,

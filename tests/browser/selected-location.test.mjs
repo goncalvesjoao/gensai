@@ -1,10 +1,9 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-import { selectThemeMode } from './helpers.mjs';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { selectThemeMode, waitForMarkerMovement } from './helpers.mjs';
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('delayed boundary loading keeps the latest selection and explains load failures', async () => {
@@ -13,7 +12,7 @@ test('delayed boundary loading keeps the latest selection and explains load fail
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage();
+    const page = await createFixturePage(browser);
     let release;
     const gate = new Promise((resolve) => {
       release = resolve;
@@ -77,7 +76,7 @@ for (const japanese of [false, true])
         executablePath: process.env.CHROMIUM_PATH,
       });
       try {
-        const page = await browser.newPage({
+        const page = await createFixturePage(browser, {
           viewport: mobile
             ? { width: 390, height: 844 }
             : { width: 1280, height: 800 },
@@ -167,7 +166,7 @@ for (const japanese of [false, true])
         const pointerSelection = await status.textContent();
         await canvas.focus();
         await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(400);
+        await waitForMarkerMovement(page);
         await page.keyboard.press('Enter');
         await status.filter({ hasNotText: checking }).waitFor();
         const retained = await status.textContent();
