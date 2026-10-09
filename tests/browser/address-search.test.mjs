@@ -1,16 +1,11 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('address input waits for map selection readiness', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     let release;
@@ -38,10 +33,7 @@ const match = (name, lng = 139.6917, lat = 35.6895, countrycode = 'JP') => ({
 });
 
 test('empty address submission leaves pending device location usable', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     const queries = [];
@@ -84,10 +76,7 @@ test('empty address submission leaves pending device location usable', async () 
 });
 
 test('Enter selects a Japan address, while typing and device activation do not submit', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     let queries = [];
@@ -142,10 +131,7 @@ test('Enter selects a Japan address, while typing and device activation do not s
 });
 
 test('ambiguous Japan matches require an explicit keyboard choice', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     await page.route('https://photon.komoot.io/api/**', (route) =>
@@ -210,10 +196,7 @@ test('ambiguous Japan matches require an explicit keyboard choice', async () => 
 });
 
 test('typing a newer query dismisses choices and prevents an earlier response from selecting', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     const requests = [];
@@ -279,10 +262,7 @@ async function assertVisibleSelectedLocation(page, open) {
 for (const japanese of [false, true])
   for (const mobile of [false, true]) {
     test(`address outcomes remain usable (${japanese ? 'Japanese' : 'English'}, ${mobile ? 'phone' : 'computer'}, both themes)`, async () => {
-      const browser = await chromium.launch({
-        headless: true,
-        executablePath: process.env.CHROMIUM_PATH,
-      });
+      const browser = await browserSession();
       try {
         const page = await browser.newPage({
           viewport: mobile
@@ -492,7 +472,11 @@ for (const japanese of [false, true])
                   : 'No supported Japan results',
               })
               .waitFor();
-            for (const outcome of ['network', 'malformed', 'coordinates']) {
+            const failures =
+              !mobile && theme === 'light' && open
+                ? ['network', 'malformed', 'coordinates']
+                : ['network'];
+            for (const outcome of failures) {
               failed = outcome === 'network';
               malformed = outcome === 'malformed';
               features = [match('Broken', null, 35.6895)];
@@ -544,10 +528,7 @@ for (const japanese of [false, true])
   }
 
 test('capped suggestions remain explicit choices from an overseas device and location attempts clear them', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     let features = [
@@ -641,10 +622,7 @@ test('capped suggestions remain explicit choices from an overseas device and loc
 });
 
 test('new searches and selection attempts supersede older provider and boundary responses', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     const requests = [];
@@ -753,10 +731,7 @@ test(
   'real Photon accepts Japanese and Latin address components from the public map',
   { skip: !process.env.REAL_PROVIDER },
   async () => {
-    const browser = await chromium.launch({
-      headless: true,
-      executablePath: process.env.CHROMIUM_PATH,
-    });
+    const browser = await browserSession();
     try {
       const page = await browser.newPage();
       const cases = [

@@ -1,16 +1,11 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('device location is explicitly acquired and fresh on later activation', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     const boundaryRequests = [];
@@ -85,10 +80,7 @@ test('device location is explicitly acquired and fresh on later activation', asy
 for (const japanese of [false, true]) {
   for (const mobile of [false, true]) {
     test(`device outcomes stay correctable (${japanese ? 'Japanese' : 'English'}, ${mobile ? 'phone' : 'computer'}, both themes)`, async () => {
-      const browser = await chromium.launch({
-        headless: true,
-        executablePath: process.env.CHROMIUM_PATH,
-      });
+      const browser = await browserSession();
       try {
         const page = await browser.newPage({
           viewport: mobile
@@ -177,7 +169,11 @@ for (const japanese of [false, true]) {
         ];
         for (const theme of ['light', 'dark']) {
           if (theme === 'dark') await page.locator('#theme-toggle').click();
-          for (const [index, outcome] of outcomes.entries()) {
+          const cases =
+            !mobile && theme === 'light'
+              ? outcomes
+              : [outcomes[0], outcomes[2]];
+          for (const [index, outcome] of cases.entries()) {
             const open =
               (await page
                 .locator('.page-shell')

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
 const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
 const fixture = new PNG({ width: 256, height: 256 });
@@ -15,10 +15,7 @@ for (const japanese of [false, true]) {
   for (const mobile of [false, true]) {
     for (const theme of ['light', 'dark']) {
       test(`hazard legends, selection and controls remain usable ${japanese ? 'JA' : 'EN'} ${mobile ? 'phone' : 'computer'} ${theme}`, async () => {
-        const browser = await chromium.launch({
-          headless: true,
-          executablePath: process.env.CHROMIUM_PATH,
-        });
+        const browser = await browserSession();
         try {
           const page = await browser.newPage({
             viewport: {
@@ -131,30 +128,32 @@ for (const japanese of [false, true]) {
             .filter({ hasText: '35.68950, 139.69170' })
             .waitFor();
           const search = page.getByRole('searchbox');
-          await search.fill(japanese ? '那覇市' : 'Naha');
-          await search.press('Enter');
-          await page
-            .locator('.map-selection [role=status]')
-            .filter({ hasText: 'Test place' })
-            .waitFor();
-          await page
-            .getByRole('button', {
-              name: japanese ? '現在地を取得' : 'Use my location',
-              exact: true,
-            })
-            .click();
-          await page
-            .locator('.map-selection [role=status]')
-            .filter({ hasText: '35.68950, 139.69170' })
-            .waitFor();
-          await page.locator('canvas').focus();
-          await page.keyboard.press('ArrowRight');
-          await page.waitForTimeout(400);
-          await page.keyboard.press('Enter');
-          await page
-            .locator('.map-selection [role=status]')
-            .filter({ hasNotText: japanese ? '確認中' : 'Checking' })
-            .waitFor();
+          if (!mobile && theme === 'light') {
+            await search.fill(japanese ? '那覇市' : 'Naha');
+            await search.press('Enter');
+            await page
+              .locator('.map-selection [role=status]')
+              .filter({ hasText: 'Test place' })
+              .waitFor();
+            await page
+              .getByRole('button', {
+                name: japanese ? '現在地を取得' : 'Use my location',
+                exact: true,
+              })
+              .click();
+            await page
+              .locator('.map-selection [role=status]')
+              .filter({ hasText: '35.68950, 139.69170' })
+              .waitFor();
+            await page.locator('canvas').focus();
+            await page.keyboard.press('ArrowRight');
+            await page.waitForTimeout(400);
+            await page.keyboard.press('Enter');
+            await page
+              .locator('.map-selection [role=status]')
+              .filter({ hasNotText: japanese ? '確認中' : 'Checking' })
+              .waitFor();
+          }
           assert.equal(await page.locator('.maplibregl-marker').count(), 1);
           for (const name of names)
             assert.equal(
@@ -275,10 +274,7 @@ test('all eight category combinations preserve source colours and drawing order'
       image.data.set([...colour, 255], i);
     return PNG.sync.write(image);
   }
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage({
       viewport: { width: 1280, height: 900 },

@@ -4,14 +4,19 @@
   "description": "Gensai is a practical guide for disaster preparedness in Japan.",
   "main": "index.js",
   "scripts": {
-    "test": "npm run build && node --test tests/*.test.mjs",
+    "test": "npm run test:fast && node scripts/test-browser.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "node scripts/preview.mjs",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "test:fast": "npm run build && node --test tests/*.test.mjs",
+    "test:browser": "npm run build && node scripts/test-browser.mjs",
+    "test:production": "node --test tests/browser/production-access.test.mjs",
+    "test:live": "npm run build && node scripts/test-browser.mjs --live",
+    "test:setup": "playwright install chromium"
   },
   "repository": {
     "type": "git",
@@ -45,6 +50,8 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.13.0",
+    "playwright": "^1.64.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",
     "tailwindcss": "^4.3.3"

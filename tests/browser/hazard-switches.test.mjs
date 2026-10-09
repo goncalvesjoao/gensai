@@ -1,17 +1,12 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 for (const japanese of [false, true]) {
   test(`hazard switches are independent and keep their state (${japanese ? 'Japanese' : 'English'})`, async () => {
-    const browser = await chromium.launch({
-      headless: true,
-      executablePath: process.env.CHROMIUM_PATH,
-    });
+    const browser = await browserSession();
     try {
       const page = await browser.newPage({
         viewport: { width: 1280, height: 800 },

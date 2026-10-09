@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
 const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 const { PNG } = require(process.env.PNG_MODULE || 'pngjs');
 const fixture = new PNG({ width: 256, height: 256 });
@@ -12,10 +12,7 @@ for (let pixel = 0; pixel < fixture.data.length; pixel += 4)
 const png = PNG.sync.write(fixture);
 
 test('muted official basemap loads, and unavailable basemap is explained', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     let pale = false;
@@ -43,10 +40,7 @@ test('muted official basemap loads, and unavailable basemap is explained', async
 });
 
 test('tsunami switch exposes official legend, reports delayed and failed tiles, and hides immediately', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     let release;
@@ -88,10 +82,7 @@ test('tsunami switch exposes official legend, reports delayed and failed tiles, 
 });
 
 test('landslide legend separates three types and explains partial failure without losing other tiles', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     await page.route('**/xyz/**', (route) =>
@@ -130,10 +121,7 @@ test('landslide legend separates three types and explains partial failure withou
 });
 
 test('flooding shows maximum-scale river depths and independent combined and national availability', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     await page.route('**/xyz/**', (route) =>
@@ -168,10 +156,7 @@ test(
   'live official rasters render around river, coastal and slope locations',
   { skip: process.env.REAL_HAZARDS !== '1' },
   async () => {
-    const browser = await chromium.launch({
-      headless: true,
-      executablePath: process.env.CHROMIUM_PATH,
-    });
+    const browser = await browserSession();
     try {
       const page = await browser.newPage({
         viewport: { width: 1280, height: 800 },
@@ -246,10 +231,7 @@ test(
 );
 
 test('turning all categories off explicitly avoids a safety verdict', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     await page.route('**/xyz/**', (route) =>
@@ -284,10 +266,7 @@ test('turning all categories off explicitly avoids a safety verdict', async () =
 
 for (const status of [404, 500])
   test(`cached pan preserves ${status} hazard failures, and successful new tiles recover`, async () => {
-    const browser = await chromium.launch({
-      headless: true,
-      executablePath: process.env.CHROMIUM_PATH,
-    });
+    const browser = await browserSession();
     let release = () => {};
     try {
       const page = await browser.newPage();
@@ -357,10 +336,7 @@ for (const status of [404, 500])
   });
 
 test('missing basemap tiles explain failure while hazard tiles remain usable', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     await page.route('**/xyz/**', (route) => route.fulfill({ status: 404 }));

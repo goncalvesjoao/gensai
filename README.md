@@ -146,21 +146,36 @@ shim is needed.
 
 ### Available commands
 
-| Command                | Purpose                                                             |
-| ---------------------- | ------------------------------------------------------------------- |
-| `npm run dev`          | Start the development server.                                       |
-| `npm run build`        | Create a production build.                                          |
-| `npm run preview`      | Preview the production build locally after running `npm run build`. |
-| `npm test`             | Build and check routing, locales, themes, sidebar and map worker.   |
-| `npm run lint`         | Check JavaScript, JSX, and Astro files with ESLint.                 |
-| `npm run lint:fix`     | Apply automatic ESLint fixes.                                       |
-| `npm run format`       | Format the project with Prettier, including Astro files.            |
-| `npm run format:check` | Check formatting without changing files.                            |
+| Command                   | Purpose                                                             |
+| ------------------------- | ------------------------------------------------------------------- |
+| `npm run dev`             | Start the development server.                                       |
+| `npm run build`           | Create a production build.                                          |
+| `npm run preview`         | Preview the production build locally after running `npm run build`. |
+| `npm test`                | Build and run all deterministic local Node and browser checks.      |
+| `npm run test:fast`       | Build and run the fast Node checks.                                 |
+| `npm run test:browser`    | Build and run local browser checks with managed preview.            |
+| `npm run test:setup`      | Install the Chromium runtime for browser checks.                    |
+| `npm run test:production` | Check the deployed public HTTPS hosts.                              |
+| `npm run test:live`       | Build and run opt-in live Photon and hazard-provider probes.        |
+| `npm run lint`            | Check JavaScript, JSX, and Astro files with ESLint.                 |
+| `npm run lint:fix`        | Apply automatic ESLint fixes.                                       |
+| `npm run format`          | Format the project with Prettier, including Astro files.            |
+| `npm run format:check`    | Check formatting without changing files.                            |
 
 ESLint checks code correctness and React Hooks; Prettier handles formatting.
 Generated files and the dependency lockfile are excluded from formatting.
-The Node.js test suite checks built-page language output, locale navigation,
-entry-point redirects, pre-paint themes, sidebar interactions and theme tokens.
+Run `npm ci` and `npm run test:setup` before the first browser run. Linux hosts
+may also need `npx playwright install-deps chromium`. `PLAYWRIGHT_MODULE`,
+`PNG_MODULE` and `CHROMIUM_PATH` can override the installed runtimes.
+
+The local browser runner starts and closes a preview on an available port, sets
+the welcome and map host URLs, and runs browser files serially. Each file shares
+a Chromium process; each page gets an isolated context. Default provider responses
+are fixtures; scenario overrides exercise failures and rendering. `npm test`
+never enables live probes, even if their environment flags are set.
+
+The fast Node checks cover built-page language output, locale navigation,
+static welcome links, pre-paint themes, Japan geography and theme tokens.
 It also checks that the emitted MapLibre worker and its relative
 static imports are served successfully with JavaScript MIME types by Astro preview.
 MapLibre 6's worker imports a shared module, so its Vite import must use
@@ -187,8 +202,11 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `tsconfig.json`: Astro configuration and `@/*` source alias for registry installs.
 - `astro.config.mjs`: Astro, React, Tailwind Vite plugin, and server configuration.
 - `tests/map-worker.test.mjs`: production worker request regression test.
-- `tests/map-routing.test.mjs`: entry-point redirect checks.
-- `tests/map-sidebar.test.mjs`: sidebar state, controls, focus and breakpoint checks.
+- `tests/map-routing.test.mjs`: static welcome link and redirect checks.
+- `tests/browser/`: map interaction, layout, focus, rendering and hosting checks.
+- `tests/support/browser.mjs`: shared Chromium lifecycle and isolated provider fixtures.
+- `scripts/test-browser.mjs`: local preview and browser execution.
+- `docs/test-coverage.md`: assertion coverage and browser-matrix reductions.
 - `tests/locale.test.mjs`: route language and locale navigation checks.
 - `tests/preferences.test.mjs`: pre-paint theme checks.
 - `tests/theme-styles.test.mjs`: runtime theme-token regression checks.

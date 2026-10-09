@@ -1,20 +1,15 @@
 import assert from 'node:assert/strict';
 import process from 'node:process';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
-const base = process.env.HOME_TEST_URL || 'http://localhost:4337';
+import { browserSession } from '../support/browser.mjs';
+const base = process.env.HOME_TEST_URL || 'http://localhost:4321';
 const mapBase =
   process.env.MAP_TEST_URL ||
   process.env.TEST_URL ||
   base.replace('localhost', 'map.localhost');
 
 test('entry point welcomes visitors without scripting and opens the corresponding map', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const [path, heading, statement, label] of [
       [
@@ -60,10 +55,7 @@ test('entry point welcomes visitors without scripting and opens the correspondin
 });
 
 test('welcome remains readable in both languages, themes and viewport sizes without requesting location', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const [path, label] of [
       ['/', 'Open the Gensai map'],
@@ -114,10 +106,7 @@ test('welcome remains readable in both languages, themes and viewport sizes with
 });
 
 test('visitors can return from the map and reopen it in the same language', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const [path, label, home] of [
       ['/', 'Open the Gensai map', 'Home'],

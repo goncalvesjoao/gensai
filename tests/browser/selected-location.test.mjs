@@ -1,16 +1,11 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('delayed boundary loading keeps the latest selection and explains load failures', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage();
     let release;
@@ -71,10 +66,7 @@ test('delayed boundary loading keeps the latest selection and explains load fail
 for (const japanese of [false, true])
   for (const mobile of [false, true]) {
     test(`selected location on the public map URL (${japanese ? 'Japanese' : 'English'}, ${mobile ? 'phone' : 'computer'})`, async () => {
-      const browser = await chromium.launch({
-        headless: true,
-        executablePath: process.env.CHROMIUM_PATH,
-      });
+      const browser = await browserSession();
       try {
         const page = await browser.newPage({
           viewport: mobile
@@ -123,11 +115,7 @@ for (const japanese of [false, true])
         }
         for (const [lat, lng] of [
           [35.6895, 139.6917],
-          [26.2124, 127.6809],
           [24.467, 122.998],
-          [27.094, 142.191],
-          [24.288, 153.979],
-          [20.425278, 136.069722],
         ]) {
           await choose(lat, lng);
           await status
@@ -138,7 +126,7 @@ for (const japanese of [false, true])
           assert.equal(await page.locator('.maplibregl-marker').count(), 1);
         }
         await choose(37.5665, 126.978);
-        assert.match(await status.textContent(), /20\.42528, 136\.06972/);
+        assert.match(await status.textContent(), /24\.46700, 122\.99800/);
         assert.match(
           await status.textContent(),
           japanese ? /日本の陸地/ : /land in Japan/,

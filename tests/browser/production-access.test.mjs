@@ -1,17 +1,13 @@
 import assert from 'node:assert/strict';
 import process from 'node:process';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const home = process.env.HOME_TEST_URL || 'https://gensai.help';
 const map = process.env.MAP_TEST_URL || 'https://map.gensai.help';
 
 // Public HTTPS hosts are the seam: local preview cannot prove DNS or hosting rules.
 test('production entry points welcome visitors without redirects or location requests', async () => {
-  const browser = await chromium.launch({
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const javaScriptEnabled of [false, true]) {
       for (const [path, heading, statement, label, locale] of [
@@ -63,9 +59,7 @@ test('production entry points welcome visitors without redirects or location req
 });
 
 test('production navigation retains the language across home and map hosts', async () => {
-  const browser = await chromium.launch({
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const [path, locale, label, homeLabel] of [
       ['/', 'en', 'Open the Gensai map', 'Home'],

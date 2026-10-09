@@ -15,11 +15,20 @@ Configure host-specific internal rewrites, not entry-point-to-map redirects.
 Deployment and verification of these hosting rules remain ticket #28; emitting
 the static pages does not establish that production serves them.
 
-Run the welcome navigation checks against local development or preview:
+Run all local browser checks, including welcome navigation, with managed preview:
 
 ```sh
-HOME_TEST_URL=http://localhost:4321 node --test tests/browser/welcome.test.mjs
+npm run test:setup
+npm run test:browser
 ```
 
-As with the other browser checks, `PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may
-point to an existing Playwright installation and Chromium executable.
+The runner sets `TEST_URL`, `HOME_TEST_URL` and `MAP_TEST_URL` to the same available
+preview port, using `map.localhost` for the map and `localhost` for welcome. For an already running
+preview, a single file can still be run directly:
+
+```sh
+HOME_TEST_URL=http://localhost:4321 MAP_TEST_URL=http://map.localhost:4321 node --test tests/browser/welcome.test.mjs
+```
+
+`PLAYWRIGHT_MODULE`, `PNG_MODULE` and `CHROMIUM_PATH` can override the installed
+browser-test runtimes. See [test coverage](test-coverage.md) for retained checks.

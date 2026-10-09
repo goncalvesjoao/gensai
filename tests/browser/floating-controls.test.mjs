@@ -1,17 +1,12 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
 import { mkdir } from 'node:fs/promises';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('floating controls offer independent search, device and horizontal zoom', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const page = await browser.newPage({
       viewport: { width: 390, height: 844 },
@@ -62,10 +57,7 @@ test('floating controls offer independent search, device and horizontal zoom', a
 });
 
 test('preferences retain localized public URLs and visible controls at phone and computer widths', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const width of [390, 1440]) {
       for (const locale of ['en', 'ja']) {
@@ -158,10 +150,7 @@ test('preferences retain localized public URLs and visible controls at phone and
 });
 
 test('theme remains usable with unavailable storage and respects saved explicit choice', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     const saved = await browser.newPage({ colorScheme: 'dark' });
     await saved.addInitScript(() =>
@@ -201,10 +190,7 @@ test('theme remains usable with unavailable storage and respects saved explicit 
 });
 
 test('home destination follows active language and preserves a separate search group', async () => {
-  const browser = await chromium.launch({
-    headless: true,
-    executablePath: process.env.CHROMIUM_PATH,
-  });
+  const browser = await browserSession();
   try {
     for (const locale of ['en', 'ja']) {
       const page = await browser.newPage({

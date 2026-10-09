@@ -72,15 +72,16 @@ curl -I https://map.gensai.help/ja
 Each HTTPS URL must return HTTP 200 directly with no Location header. Do not use
 `curl -k` or follow redirects to hide a failed route.
 
-Run the browser check against the real public hosts using an available Playwright
-installation and Chromium executable (the existing browser suites use this same
-runtime; no browser dependency is added here):
+Run the browser check against the real public hosts using the repository's
+Playwright dependency and installed Chromium:
 
 ```sh
-PLAYWRIGHT_MODULE=/absolute/path/to/playwright \
-CHROMIUM_PATH=/absolute/path/to/chromium \
-node --test tests/browser/production-access.test.mjs
+npm run test:setup
+npm run test:production
 ```
+
+`PLAYWRIGHT_MODULE` and `CHROMIUM_PATH` may override those runtimes.
+This command is separate from `npm test`; it does not start local preview.
 
 The test checks both localized entry points with JavaScript enabled and disabled,
 no initial HTTP redirect, readable welcome content, equivalent ordinary map links,
