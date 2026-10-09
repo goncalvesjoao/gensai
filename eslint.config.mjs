@@ -42,5 +42,21 @@ export default [
     },
   },
   ...astro.configs['flat/recommended'],
+  {
+    files: ['tests/browser/**/*.mjs'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='waitForTimeout']",
+          message: 'Wait for bounded observable behavior; justify deliberate elapsed-time checks locally.',
+        },
+        {
+          selector: "CallExpression[callee.name='setTimeout'], CallExpression[callee.property.name='setTimeout']",
+          message: 'Wait for bounded observable behavior; justify deliberate elapsed-time checks locally.',
+        },
+      ],
+    },
+  },
   prettier,
 ];
