@@ -1,0 +1,55 @@
+{
+  "command": [
+    "/home/goncalvesjoao/.local/share/mise/installs/node/26.8.2/bin/node",
+    "/tmp/gensai-48-fix/scripts/test-browser.mjs"
+  ],
+  "checkout": "/tmp/gensai-48-fix",
+  "revision": "7a6ef555b3ec2881aaa4cb180da352894127a3f5",
+  "dirty": false,
+  "kind": "implementation",
+  "baselineRef": null,
+  "baselineToolingRevision": null,
+  "baselineToolingFingerprint": null,
+  "startedAt": "2026-10-09T14:14:47.894Z",
+  "checks": {
+    "build": "passed",
+    "previews": "passed",
+    "tests": "canceled"
+  },
+  "artifacts": "/tmp/gensai-48-evidence/implementation-full/run-UbULpl",
+  "sourceFingerprint": "0cc7e0ffe7f95b221b7afc3ad7a9981d51cb252844a1e65f4b44513dfd2a713a",
+  "excludedLiveProbes": [
+    "tests/browser/production-access.test.mjs"
+  ],
+  "buildFingerprint": "71cb2cfe15aa5aaf9e8afcf0adf55ff13d6910d8cc790ddab8391ece5616533e",
+  "buildSourceFingerprint": "0cc7e0ffe7f95b221b7afc3ad7a9981d51cb252844a1e65f4b44513dfd2a713a",
+  "previewPids": [
+    119535,
+    119536
+  ],
+  "addresses": {
+    "HOME_TEST_URL": "http://localhost:37981",
+    "MAP_TEST_URL": "http://map.localhost:37981",
+    "TEST_URL": "http://127.0.0.1:38817",
+    "TEST_ARTIFACT_DIR": "/tmp/gensai-48-evidence/implementation-full/run-UbULpl"
+  },
+  "skippedTests": [
+    "real Photon accepts Japanese and Latin address components from the public map"
+  ],
+  "intentionalLiveSkips": 1,
+  "testSummary": {
+    "tests": 0,
+    "pass": 0,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "finishedAt": "2026-10-09T14:17:03.853Z",
+  "durationMs": 135959,
+  "interrupted": "SIGTERM",
+  "changed": true,
+  "sourceBuildMismatch": false,
+  "buildChanged": false,
+  "exitStatus": 130,
+  "completedEvidence": false
+}

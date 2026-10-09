@@ -1,0 +1,56 @@
+{
+  "command": [
+    "/home/goncalvesjoao/.local/share/mise/installs/node/26.8.2/bin/node",
+    "/tmp/gensai-48-fix/scripts/test-browser.mjs"
+  ],
+  "checkout": "/tmp/gensai-48-fix",
+  "revision": "04fdeb38c3079d89ec99e6c34d05b85abf2522b6",
+  "dirty": false,
+  "kind": "implementation",
+  "baselineRef": null,
+  "baselineToolingRevision": null,
+  "baselineToolingFingerprint": null,
+  "startedAt": "2026-10-09T14:21:09.131Z",
+  "checks": {
+    "build": "passed",
+    "previews": "passed",
+    "tests": "failed"
+  },
+  "artifacts": "/tmp/gensai-48-evidence/implementation-final/run-cPgXnl",
+  "sourceFingerprint": "296978e650a0464bfac1dac5c51004f563c604eed1e1eb2bcbd426ab281d1ced",
+  "excludedLiveProbes": [
+    "tests/browser/production-access.test.mjs"
+  ],
+  "buildFingerprint": "71cb2cfe15aa5aaf9e8afcf0adf55ff13d6910d8cc790ddab8391ece5616533e",
+  "buildSourceFingerprint": "296978e650a0464bfac1dac5c51004f563c604eed1e1eb2bcbd426ab281d1ced",
+  "previewPids": [
+    123800,
+    123801
+  ],
+  "addresses": {
+    "HOME_TEST_URL": "http://localhost:36325",
+    "MAP_TEST_URL": "http://map.localhost:36325",
+    "TEST_URL": "http://127.0.0.1:39365",
+    "TEST_ARTIFACT_DIR": "/tmp/gensai-48-evidence/implementation-final/run-cPgXnl"
+  },
+  "skippedTests": [
+    "real Photon accepts Japanese and Latin address components from the public map",
+    "live official rasters render around river, coastal and slope locations"
+  ],
+  "intentionalLiveSkips": 2,
+  "testSummary": {
+    "tests": 60,
+    "pass": 57,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 2
+  },
+  "finishedAt": "2026-10-09T14:31:02.866Z",
+  "durationMs": 593735,
+  "interrupted": null,
+  "changed": false,
+  "sourceBuildMismatch": false,
+  "buildChanged": false,
+  "exitStatus": 1,
+  "completedEvidence": false
+}

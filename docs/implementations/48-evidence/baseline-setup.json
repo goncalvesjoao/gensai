@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/home/goncalvesjoao/.local/share/mise/installs/node/26.8.2/bin/node",
+    "/home/goncalvesjoao/Projects/gensai/scripts/test-baseline.mjs",
+    "cfa3b44470e4f204fb76ad803501b16c11bd5b74"
+  ],
+  "checkout": "/tmp/gensai-baseline-6uiynK/checkout",
+  "kind": "baseline-setup",
+  "startedAt": "2026-10-09T14:03:33.938Z",
+  "checks": {
+    "toolingInstall": "passed",
+    "baselineInstall": "passed",
+    "browser": "passed"
+  },
+  "revision": "cfa3b44470e4f204fb76ad803501b16c11bd5b74",
+  "toolingRevision": "f3ffa246da6f2104180b4da012dee507cd277905",
+  "toolingLockFingerprint": "683e46bcda83db853c3ed8b11266f185846505f3b1ae2d776094c7259c7527e7",
+  "exitStatus": 0,
+  "interrupted": null,
+  "finishedAt": "2026-10-09T14:14:36.390Z"
+}

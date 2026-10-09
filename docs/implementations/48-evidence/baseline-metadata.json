@@ -1,0 +1,56 @@
+{
+  "command": [
+    "/home/goncalvesjoao/.local/share/mise/installs/node/26.8.2/bin/node",
+    "/tmp/gensai-baseline-6uiynK/test-browser.mjs"
+  ],
+  "checkout": "/tmp/gensai-baseline-6uiynK/checkout",
+  "revision": "cfa3b44470e4f204fb76ad803501b16c11bd5b74",
+  "dirty": false,
+  "kind": "baseline",
+  "baselineRef": "cfa3b44470e4f204fb76ad803501b16c11bd5b74",
+  "baselineToolingRevision": "f3ffa246da6f2104180b4da012dee507cd277905",
+  "baselineToolingFingerprint": "683e46bcda83db853c3ed8b11266f185846505f3b1ae2d776094c7259c7527e7",
+  "startedAt": "2026-10-09T14:03:50.814Z",
+  "checks": {
+    "build": "passed",
+    "previews": "passed",
+    "tests": "passed"
+  },
+  "artifacts": "/tmp/gensai-48-evidence/baseline-full/run-2Dp7nJ",
+  "sourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
+  "excludedLiveProbes": [
+    "tests/browser/production-access.test.mjs"
+  ],
+  "buildFingerprint": "5917f105b6a2a041434b6e65c18e02635439a0db2bb02dde40deeaaaed6b22d9",
+  "buildSourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
+  "previewPids": [
+    111130,
+    111131
+  ],
+  "addresses": {
+    "HOME_TEST_URL": "http://localhost:46449",
+    "MAP_TEST_URL": "http://map.localhost:46449",
+    "TEST_URL": "http://map.localhost:46449",
+    "TEST_ARTIFACT_DIR": "/tmp/gensai-48-evidence/baseline-full/run-2Dp7nJ"
+  },
+  "skippedTests": [
+    "real Photon accepts Japanese and Latin address components from the public map",
+    "live official rasters render around river, coastal and slope locations"
+  ],
+  "intentionalLiveSkips": 2,
+  "testSummary": {
+    "tests": 60,
+    "pass": 58,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 2
+  },
+  "finishedAt": "2026-10-09T14:14:35.165Z",
+  "durationMs": 644351,
+  "interrupted": null,
+  "changed": false,
+  "sourceBuildMismatch": false,
+  "buildChanged": false,
+  "exitStatus": 0,
+  "completedEvidence": true
+}

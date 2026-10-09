@@ -1,0 +1,27 @@
+✖ browser command retains early output and attributes invalid selections as skipped (43.813644ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 109.666315
+
+✖ failing tests:
+
+test at tests/browser-runner.test.mjs:8:1
+✖ browser command retains early output and attributes invalid selections as skipped (43.813644ms)
+  Error: ENOENT: no such file or directory, open '/tmp/gensai-command-rNJd48/metadata.json'
+      at Object.openSync (node:fs:779:18)
+      at readFileSync (node:fs:625:35)
+      at TestContext.<anonymous> (file:///tmp/gensai-48-runner/tests/browser-runner.test.mjs:14:31)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/tmp/gensai-command-rNJd48/metadata.json'
+  }

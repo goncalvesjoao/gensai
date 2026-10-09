@@ -1,0 +1,52 @@
+{
+  "command": [
+    "/home/goncalvesjoao/.local/share/mise/installs/node/26.8.2/bin/node",
+    "/tmp/gensai-baseline-y0ftek/test-browser.mjs",
+    "tests/browser/welcome.test.mjs"
+  ],
+  "checkout": "/tmp/gensai-baseline-y0ftek/checkout",
+  "revision": "cfa3b44470e4f204fb76ad803501b16c11bd5b74",
+  "dirty": false,
+  "kind": "baseline",
+  "baselineRef": "cfa3b44470e4f204fb76ad803501b16c11bd5b74",
+  "baselineToolingRevision": "cf33c08ac10463ecdaee79a10fd68f68dc1765ce",
+  "baselineToolingFingerprint": "683e46bcda83db853c3ed8b11266f185846505f3b1ae2d776094c7259c7527e7",
+  "startedAt": "2026-10-09T14:44:25.561Z",
+  "checks": {
+    "build": "passed",
+    "previews": "passed",
+    "tests": "passed"
+  },
+  "artifacts": "/tmp/gensai-48-evidence/baseline-supervision-green/run-QUTEMd",
+  "sourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
+  "excludedLiveProbes": [],
+  "buildFingerprint": "8bc3a1ebbced6cf5ce28974e44f6166a4ddc8be0574e75c3cab086b464d8bdee",
+  "buildSourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
+  "previewPids": [
+    138172,
+    138173
+  ],
+  "addresses": {
+    "HOME_TEST_URL": "http://localhost:39627",
+    "MAP_TEST_URL": "http://map.localhost:39627",
+    "TEST_URL": "http://map.localhost:39627",
+    "TEST_ARTIFACT_DIR": "/tmp/gensai-48-evidence/baseline-supervision-green/run-QUTEMd"
+  },
+  "skippedTests": [],
+  "intentionalLiveSkips": 0,
+  "testSummary": {
+    "tests": 3,
+    "pass": 3,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "finishedAt": "2026-10-09T14:44:35.778Z",
+  "durationMs": 10217,
+  "interrupted": null,
+  "changed": false,
+  "sourceBuildMismatch": false,
+  "buildChanged": false,
+  "exitStatus": 0,
+  "completedEvidence": true
+}

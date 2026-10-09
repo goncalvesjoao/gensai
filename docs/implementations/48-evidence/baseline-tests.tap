@@ -1,0 +1,370 @@
+TAP version 13
+# Subtest: address input waits for map selection readiness
+ok 1 - address input waits for map selection readiness
+  ---
+  duration_ms: 716.997096
+  type: 'test'
+  ...
+# Subtest: empty address submission leaves pending device location usable
+ok 2 - empty address submission leaves pending device location usable
+  ---
+  duration_ms: 4410.900595
+  type: 'test'
+  ...
+# Subtest: Enter selects a Japan address, while typing and device activation do not submit
+ok 3 - Enter selects a Japan address, while typing and device activation do not submit
+  ---
+  duration_ms: 5044.692324
+  type: 'test'
+  ...
+# Subtest: ambiguous Japan matches require an explicit keyboard choice
+ok 4 - ambiguous Japan matches require an explicit keyboard choice
+  ---
+  duration_ms: 4988.81411
+  type: 'test'
+  ...
+# Subtest: typing a newer query dismisses choices and prevents an earlier response from selecting
+ok 5 - typing a newer query dismisses choices and prevents an earlier response from selecting
+  ---
+  duration_ms: 3137.086725
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (English, computer, both themes)
+ok 6 - address outcomes remain usable (English, computer, both themes)
+  ---
+  duration_ms: 12796.711879
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (English, phone, both themes)
+ok 7 - address outcomes remain usable (English, phone, both themes)
+  ---
+  duration_ms: 12653.200315
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (Japanese, computer, both themes)
+ok 8 - address outcomes remain usable (Japanese, computer, both themes)
+  ---
+  duration_ms: 12355.951744
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (Japanese, phone, both themes)
+ok 9 - address outcomes remain usable (Japanese, phone, both themes)
+  ---
+  duration_ms: 12508.461287
+  type: 'test'
+  ...
+# Subtest: capped suggestions remain explicit choices from an overseas device and location attempts clear them
+ok 10 - capped suggestions remain explicit choices from an overseas device and location attempts clear them
+  ---
+  duration_ms: 7221.885357
+  type: 'test'
+  ...
+# Subtest: new searches and selection attempts supersede older provider and boundary responses
+ok 11 - new searches and selection attempts supersede older provider and boundary responses
+  ---
+  duration_ms: 7957.669941
+  type: 'test'
+  ...
+# Subtest: real Photon accepts Japanese and Latin address components from the public map
+ok 12 - real Photon accepts Japanese and Latin address components from the public map # SKIP
+  ---
+  duration_ms: 0.218886
+  type: 'test'
+  ...
+# Subtest: device location is explicitly acquired and fresh on later activation
+ok 13 - device location is explicitly acquired and fresh on later activation
+  ---
+  duration_ms: 3861.809993
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (English, computer, both themes)
+ok 14 - device outcomes stay correctable (English, computer, both themes)
+  ---
+  duration_ms: 18027.03178
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (English, phone, both themes)
+ok 15 - device outcomes stay correctable (English, phone, both themes)
+  ---
+  duration_ms: 13331.301387
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (Japanese, computer, both themes)
+ok 16 - device outcomes stay correctable (Japanese, computer, both themes)
+  ---
+  duration_ms: 18051.047208
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (Japanese, phone, both themes)
+ok 17 - device outcomes stay correctable (Japanese, phone, both themes)
+  ---
+  duration_ms: 12933.087048
+  type: 'test'
+  ...
+# Subtest: floating controls offer independent search, device and horizontal zoom
+ok 18 - floating controls offer independent search, device and horizontal zoom
+  ---
+  duration_ms: 1878.419047
+  type: 'test'
+  ...
+# Subtest: preferences retain localized public URLs and visible controls at phone and computer widths
+ok 19 - preferences retain localized public URLs and visible controls at phone and computer widths
+  ---
+  duration_ms: 37128.964936
+  type: 'test'
+  ...
+# Subtest: theme remains usable with unavailable storage and respects saved explicit choice
+ok 20 - theme remains usable with unavailable storage and respects saved explicit choice
+  ---
+  duration_ms: 2417.300183
+  type: 'test'
+  ...
+# Subtest: home destination follows active language and preserves a separate search group
+ok 21 - home destination follows active language and preserves a separate search group
+  ---
+  duration_ms: 1434.930947
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable EN computer light
+ok 22 - hazard legends, selection and controls remain usable EN computer light
+  ---
+  duration_ms: 24093.360797
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable EN computer dark
+ok 23 - hazard legends, selection and controls remain usable EN computer dark
+  ---
+  duration_ms: 26244.074236
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable EN phone light
+ok 24 - hazard legends, selection and controls remain usable EN phone light
+  ---
+  duration_ms: 12351.16594
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable EN phone dark
+ok 25 - hazard legends, selection and controls remain usable EN phone dark
+  ---
+  duration_ms: 8284.147853
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable JA computer light
+ok 26 - hazard legends, selection and controls remain usable JA computer light
+  ---
+  duration_ms: 24335.769226
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable JA computer dark
+ok 27 - hazard legends, selection and controls remain usable JA computer dark
+  ---
+  duration_ms: 25600.645586
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable JA phone light
+ok 28 - hazard legends, selection and controls remain usable JA phone light
+  ---
+  duration_ms: 9938.884993
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable JA phone dark
+ok 29 - hazard legends, selection and controls remain usable JA phone dark
+  ---
+  duration_ms: 11708.12862
+  type: 'test'
+  ...
+# Subtest: all eight category combinations preserve source colours and drawing order
+ok 30 - all eight category combinations preserve source colours and drawing order
+  ---
+  duration_ms: 21563.359184
+  type: 'test'
+  ...
+# Subtest: muted official basemap loads, and unavailable basemap is explained
+ok 31 - muted official basemap loads, and unavailable basemap is explained
+  ---
+  duration_ms: 3040.877256
+  type: 'test'
+  ...
+# Subtest: tsunami switch exposes official legend, reports delayed and failed tiles, and hides immediately
+ok 32 - tsunami switch exposes official legend, reports delayed and failed tiles, and hides immediately
+  ---
+  duration_ms: 1754.376295
+  type: 'test'
+  ...
+# Subtest: landslide legend separates three types and explains partial failure without losing other tiles
+ok 33 - landslide legend separates three types and explains partial failure without losing other tiles
+  ---
+  duration_ms: 2839.259806
+  type: 'test'
+  ...
+# Subtest: flooding shows maximum-scale river depths and independent combined and national availability
+ok 34 - flooding shows maximum-scale river depths and independent combined and national availability
+  ---
+  duration_ms: 1764.272102
+  type: 'test'
+  ...
+# Subtest: live official rasters render around river, coastal and slope locations
+ok 35 - live official rasters render around river, coastal and slope locations # SKIP
+  ---
+  duration_ms: 0.256821
+  type: 'test'
+  ...
+# Subtest: turning all categories off explicitly avoids a safety verdict
+ok 36 - turning all categories off explicitly avoids a safety verdict
+  ---
+  duration_ms: 3143.226187
+  type: 'test'
+  ...
+# Subtest: cached pan preserves 404 hazard failures, and successful new tiles recover
+ok 37 - cached pan preserves 404 hazard failures, and successful new tiles recover
+  ---
+  duration_ms: 5910.799704
+  type: 'test'
+  ...
+# Subtest: cached pan preserves 500 hazard failures, and successful new tiles recover
+ok 38 - cached pan preserves 500 hazard failures, and successful new tiles recover
+  ---
+  duration_ms: 7014.722603
+  type: 'test'
+  ...
+# Subtest: missing basemap tiles explain failure while hazard tiles remain usable
+ok 39 - missing basemap tiles explain failure while hazard tiles remain usable
+  ---
+  duration_ms: 1241.341111
+  type: 'test'
+  ...
+# Subtest: hazard menu preserves explicit visibility and choices (English, 1280)
+ok 40 - hazard menu preserves explicit visibility and choices (English, 1280)
+  ---
+  duration_ms: 9256.573267
+  type: 'test'
+  ...
+# Subtest: hazard menu preserves explicit visibility and choices (English, 390)
+ok 41 - hazard menu preserves explicit visibility and choices (English, 390)
+  ---
+  duration_ms: 5456.595399
+  type: 'test'
+  ...
+# Subtest: hazard menu preserves explicit visibility and choices (Japanese, 1280)
+ok 42 - hazard menu preserves explicit visibility and choices (Japanese, 1280)
+  ---
+  duration_ms: 6674.026467
+  type: 'test'
+  ...
+# Subtest: hazard menu preserves explicit visibility and choices (Japanese, 390)
+ok 43 - hazard menu preserves explicit visibility and choices (Japanese, 390)
+  ---
+  duration_ms: 5641.603663
+  type: 'test'
+  ...
+# Subtest: phone search choices do not cover hazard controls (English, 844)
+ok 44 - phone search choices do not cover hazard controls (English, 844)
+  ---
+  duration_ms: 2181.549163
+  type: 'test'
+  ...
+# Subtest: phone search choices do not cover hazard controls (English, 640)
+ok 45 - phone search choices do not cover hazard controls (English, 640)
+  ---
+  duration_ms: 1902.197202
+  type: 'test'
+  ...
+# Subtest: phone search choices do not cover hazard controls (Japanese, 844)
+ok 46 - phone search choices do not cover hazard controls (Japanese, 844)
+  ---
+  duration_ms: 2308.725715
+  type: 'test'
+  ...
+# Subtest: phone search choices do not cover hazard controls (Japanese, 640)
+ok 47 - phone search choices do not cover hazard controls (Japanese, 640)
+  ---
+  duration_ms: 2010.223821
+  type: 'test'
+  ...
+# Subtest: hazard switches are independent and keep their state (English)
+ok 48 - hazard switches are independent and keep their state (English)
+  ---
+  duration_ms: 12123.296458
+  type: 'test'
+  ...
+# Subtest: hazard switches are independent and keep their state (Japanese)
+ok 49 - hazard switches are independent and keep their state (Japanese)
+  ---
+  duration_ms: 11940.632903
+  type: 'test'
+  ...
+# Subtest: delayed boundary loading keeps the latest selection and explains load failures
+ok 50 - delayed boundary loading keeps the latest selection and explains load failures
+  ---
+  duration_ms: 4471.361887
+  type: 'test'
+  ...
+# Subtest: selected location on the public map URL (English, computer)
+ok 51 - selected location on the public map URL (English, computer)
+  ---
+  duration_ms: 15079.173161
+  type: 'test'
+  ...
+# Subtest: selected location on the public map URL (English, phone)
+ok 52 - selected location on the public map URL (English, phone)
+  ---
+  duration_ms: 8892.754694
+  type: 'test'
+  ...
+# Subtest: selected location on the public map URL (Japanese, computer)
+ok 53 - selected location on the public map URL (Japanese, computer)
+  ---
+  duration_ms: 13241.051302
+  type: 'test'
+  ...
+# Subtest: selected location on the public map URL (Japanese, phone)
+ok 54 - selected location on the public map URL (Japanese, phone)
+  ---
+  duration_ms: 10208.957386
+  type: 'test'
+  ...
+# Subtest: theme modes cycle, identify their selection and restore across reloads
+ok 55 - theme modes cycle, identify their selection and restore across reloads
+  ---
+  duration_ms: 71355.939429
+  type: 'test'
+  ...
+# Subtest: saved explicit and invalid modes hydrate correctly and blocked storage permits the whole cycle
+ok 56 - saved explicit and invalid modes hydrate correctly and blocked storage permits the whole cycle
+  ---
+  duration_ms: 9409.056594
+  type: 'test'
+  ...
+# Subtest: System follows live appearance changes while explicit modes stay fixed
+ok 57 - System follows live appearance changes while explicit modes stay fixed
+  ---
+  duration_ms: 54327.011758
+  type: 'test'
+  ...
+# Subtest: entry point welcomes visitors without scripting and opens the corresponding map
+ok 58 - entry point welcomes visitors without scripting and opens the corresponding map
+  ---
+  duration_ms: 512.419037
+  type: 'test'
+  ...
+# Subtest: welcome remains readable in both languages, themes and viewport sizes without requesting location
+ok 59 - welcome remains readable in both languages, themes and viewport sizes without requesting location
+  ---
+  duration_ms: 1799.77309
+  type: 'test'
+  ...
+# Subtest: visitors can return from the map and reopen it in the same language
+ok 60 - visitors can return from the map and reopen it in the same language
+  ---
+  duration_ms: 1596.690839
+  type: 'test'
+  ...
+1..60
+# tests 60
+# suites 0
+# pass 58
+# fail 0
+# cancelled 0
+# skipped 2
+# todo 0
+# duration_ms 639013.832389

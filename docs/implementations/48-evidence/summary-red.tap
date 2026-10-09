@@ -1,0 +1,37 @@
+✖ verification interruption records cancellation and stops the owned command (182.646148ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 265.118802
+
+✖ failing tests:
+
+test at tests/browser-runner.test.mjs:83:1
+✖ verification interruption records cancellation and stops the owned command (182.646148ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + {
+  +   cancelled: 0,
+  +   fail: 0,
+  +   pass: 0,
+  +   skipped: 0,
+  +   tests: 0
+  + }
+  - null
+  
+      at TestContext.<anonymous> (file:///tmp/gensai-48-fix/tests/browser-runner.test.mjs:128:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { tests: 0, pass: 0, fail: 0, cancelled: 0, skipped: 0 },
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,12 @@
+✔ browser command retains early output and attributes invalid selections as skipped (141.287199ms)
+✔ verification command retains output produced before an intentional failure (177.055618ms)
+✔ verification command flushes successful output before returning (182.191973ms)
+✔ verification interruption records cancellation and stops the owned command (182.977077ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 765.757427

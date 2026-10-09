@@ -1,0 +1,41 @@
+{
+  "command": [
+    "/home/goncalvesjoao/.local/share/mise/installs/node/26.8.2/bin/node",
+    "/tmp/gensai-48-fix/scripts/test-browser.mjs",
+    "--command",
+    "npm",
+    "test"
+  ],
+  "checkout": "/tmp/gensai-48-fix",
+  "revision": "cf33c08ac10463ecdaee79a10fd68f68dc1765ce",
+  "dirty": false,
+  "kind": "implementation",
+  "baselineRef": null,
+  "baselineToolingRevision": null,
+  "baselineToolingFingerprint": null,
+  "startedAt": "2026-10-09T14:44:11.106Z",
+  "checks": {
+    "build": "skipped",
+    "previews": "skipped",
+    "tests": "passed"
+  },
+  "artifacts": "/tmp/gensai-48-evidence/final-checks/run-36PXxn",
+  "sourceFingerprint": "134272987fa4961f52dedeee921872fde74b6b255c9847836ac79d81f343ebbb",
+  "skippedTests": [],
+  "intentionalLiveSkips": 0,
+  "testSummary": {
+    "tests": 24,
+    "pass": 24,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "finishedAt": "2026-10-09T14:44:21.382Z",
+  "durationMs": 10276,
+  "interrupted": null,
+  "changed": false,
+  "sourceBuildMismatch": false,
+  "buildChanged": false,
+  "exitStatus": 0,
+  "completedEvidence": true
+}

@@ -1,0 +1,123 @@
+TAP version 13
+# Subtest: address input waits for map selection readiness
+ok 1 - address input waits for map selection readiness
+  ---
+  duration_ms: 1379.409544
+  type: 'test'
+  ...
+# Subtest: empty address submission leaves pending device location usable
+ok 2 - empty address submission leaves pending device location usable
+  ---
+  duration_ms: 4290.095385
+  type: 'test'
+  ...
+# Subtest: Enter selects a Japan address, while typing and device activation do not submit
+ok 3 - Enter selects a Japan address, while typing and device activation do not submit
+  ---
+  duration_ms: 3698.906769
+  type: 'test'
+  ...
+# Subtest: ambiguous Japan matches require an explicit keyboard choice
+ok 4 - ambiguous Japan matches require an explicit keyboard choice
+  ---
+  duration_ms: 2860.483929
+  type: 'test'
+  ...
+# Subtest: typing a newer query dismisses choices and prevents an earlier response from selecting
+ok 5 - typing a newer query dismisses choices and prevents an earlier response from selecting
+  ---
+  duration_ms: 2420.293337
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (English, computer, both themes)
+ok 6 - address outcomes remain usable (English, computer, both themes)
+  ---
+  duration_ms: 10380.990058
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (English, phone, both themes)
+ok 7 - address outcomes remain usable (English, phone, both themes)
+  ---
+  duration_ms: 10685.172688
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (Japanese, computer, both themes)
+ok 8 - address outcomes remain usable (Japanese, computer, both themes)
+  ---
+  duration_ms: 11550.90724
+  type: 'test'
+  ...
+# Subtest: address outcomes remain usable (Japanese, phone, both themes)
+not ok 9 - address outcomes remain usable (Japanese, phone, both themes)
+  ---
+  duration_ms: 3679.743808
+  type: 'test'
+  location: '/tmp/gensai-48-fix/tests/browser/address-search.test.mjs:304:5'
+  failureType: 'testCodeFailure'
+  error: 'Selected location remains centered in the map viewport'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    assertVisibleSelectedLocation (file:///tmp/gensai-48-fix/tests/browser/address-search.test.mjs:296:10)
+    async TestContext.<anonymous> (file:///tmp/gensai-48-fix/tests/browser/address-search.test.mjs:475:15)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: capped suggestions remain explicit choices from an overseas device and location attempts clear them
+ok 10 - capped suggestions remain explicit choices from an overseas device and location attempts clear them
+  ---
+  duration_ms: 5706.161623
+  type: 'test'
+  ...
+# Subtest: new searches and selection attempts supersede older provider and boundary responses
+ok 11 - new searches and selection attempts supersede older provider and boundary responses
+  ---
+  duration_ms: 6431.208873
+  type: 'test'
+  ...
+# Subtest: real Photon accepts Japanese and Latin address components from the public map
+ok 12 - real Photon accepts Japanese and Latin address components from the public map # SKIP
+  ---
+  duration_ms: 0.234519
+  type: 'test'
+  ...
+# Subtest: device location is explicitly acquired and fresh on later activation
+ok 13 - device location is explicitly acquired and fresh on later activation
+  ---
+  duration_ms: 4679.000213
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (English, computer, both themes)
+ok 14 - device outcomes stay correctable (English, computer, both themes)
+  ---
+  duration_ms: 17769.276398
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (English, phone, both themes)
+ok 15 - device outcomes stay correctable (English, phone, both themes)
+  ---
+  duration_ms: 12682.87188
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (Japanese, computer, both themes)
+ok 16 - device outcomes stay correctable (Japanese, computer, both themes)
+  ---
+  duration_ms: 17129.436803
+  type: 'test'
+  ...
+# Subtest: device outcomes stay correctable (Japanese, phone, both themes)
+ok 17 - device outcomes stay correctable (Japanese, phone, both themes)
+  ---
+  duration_ms: 12835.055524
+  type: 'test'
+  ...
+# Subtest: floating controls offer independent search, device and horizontal zoom
+ok 18 - floating controls offer independent search, device and horizontal zoom
+  ---
+  duration_ms: 1345.945875
+  type: 'test'
+  ...
+# Interrupted while running: tests/browser/floating-controls.test.mjs at /tmp/gensai-48-fix/tests/browser/floating-controls.test.mjs:1:1
