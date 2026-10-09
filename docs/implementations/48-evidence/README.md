@@ -1,6 +1,7 @@
 # Spec #48 verification evidence
 
-Curated output is copied verbatim from public commands. Original transient paths
+Curated logs are copied verbatim from public commands; JSON metadata is formatted
+without changing its values. Original transient paths
 remain in metadata for diagnosis; durable filenames in this directory are the
 review pointers. Source/build fingerprints and revision attribution are retained.
 

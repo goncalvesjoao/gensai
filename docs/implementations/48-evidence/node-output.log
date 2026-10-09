@@ -1,0 +1,66 @@
+
+> gensai@1.0.0 test
+> npm run build && node --test tests/*.test.mjs
+
+
+> gensai@1.0.0 build
+> astro build
+
+23:44:13 [types] Generated 58ms
+23:44:13 [build] output: "static"
+23:44:13 [build] mode: "static"
+23:44:13 [build] directory: /tmp/gensai-48-fix/dist/
+23:44:13 [build] Collecting build info...
+23:44:13 [build] ✓ Completed in 491ms.
+23:44:13 [build] Building static entrypoints...
+23:44:13 [vite] ✓ built in 487ms
+23:44:15 [WARN] [vite] [plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+23:44:15 [vite] ✓ built in 1.85s
+23:44:15 [build] Rearranging server assets...
+
+ generating static routes 
+23:44:15   ├─ /ja/welcome/index.html (+404ms) 
+23:44:16   ├─ /ja/index.html (+17ms) 
+23:44:16   ├─ /welcome/index.html (+8ms) 
+23:44:16   ├─ /index.html (+10ms) 
+23:44:16 ✓ Completed in 460ms.
+
+23:44:16 [build] ✓ Completed in 2.85s.
+23:44:16 [build] 4 page(s) built in 3.34s
+23:44:16 [build] Complete!
+✔ browser command retains early output and attributes invalid selections as skipped (323.521007ms)
+✔ verification command retains output produced before an intentional failure (722.192569ms)
+✔ verification command flushes successful output before returning (289.229607ms)
+✔ verification interruption records cancellation and stops the owned command (695.516696ms)
+✔ browser lint rejects fixed readiness sleeps (1920.914232ms)
+✔ browser lint permits a locally justified elapsed-time assertion (1379.584751ms)
+✔ browser lint also rejects timer-based fixed sleeps (1247.39952ms)
+✔ locale matches a complete path prefix (4.756416ms)
+✔ locale navigation preserves origin and URL details (0.463541ms)
+✔ built pages render only their selected language (5.133797ms)
+✔ entry-point welcome is static and never redirects automatically (2.174207ms)
+✔ production map worker and its static imports are served as JavaScript (199.406081ms)
+✔ preferences applied before body renders: saved System follows dark (5.388703ms)
+✔ preferences applied before body renders: saved System follows light (1.15525ms)
+✔ preferences applied before body renders: system dark (1.160167ms)
+✔ preferences applied before body renders: saved light overrides system dark (1.477018ms)
+✔ preferences applied before body renders: saved dark overrides system light (1.335976ms)
+✔ preferences applied before body renders: Japanese route retains its language (1.238694ms)
+✔ preferences applied before body renders: English route retains its language (1.100304ms)
+✔ preferences applied before body renders: blocked storage retains system dark (1.075837ms)
+✔ preferences applied before body renders: invalid preference falls back to system (4.19373ms)
+✔ Japan boundary accepts mainland and islands, including Okinotorishima (247.507135ms)
+✔ Japan boundary rejects overseas, ocean, polygon holes and invalid coordinates (6.534571ms)
+✔ primary-strong utilities retain the runtime theme variable (3.520701ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4885.22823

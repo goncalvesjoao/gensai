@@ -18,15 +18,10 @@
   },
   "artifacts": "/tmp/gensai-48-evidence/implementation-complete/run-FfUnzv",
   "sourceFingerprint": "134272987fa4961f52dedeee921872fde74b6b255c9847836ac79d81f343ebbb",
-  "excludedLiveProbes": [
-    "tests/browser/production-access.test.mjs"
-  ],
+  "excludedLiveProbes": ["tests/browser/production-access.test.mjs"],
   "buildFingerprint": "71cb2cfe15aa5aaf9e8afcf0adf55ff13d6910d8cc790ddab8391ece5616533e",
   "buildSourceFingerprint": "134272987fa4961f52dedeee921872fde74b6b255c9847836ac79d81f343ebbb",
-  "previewPids": [
-    131203,
-    131204
-  ],
+  "previewPids": [131203, 131204],
   "addresses": {
     "HOME_TEST_URL": "http://localhost:36825",
     "MAP_TEST_URL": "http://map.localhost:36825",

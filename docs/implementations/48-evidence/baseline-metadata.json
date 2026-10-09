@@ -18,15 +18,10 @@
   },
   "artifacts": "/tmp/gensai-48-evidence/baseline-full/run-2Dp7nJ",
   "sourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
-  "excludedLiveProbes": [
-    "tests/browser/production-access.test.mjs"
-  ],
+  "excludedLiveProbes": ["tests/browser/production-access.test.mjs"],
   "buildFingerprint": "5917f105b6a2a041434b6e65c18e02635439a0db2bb02dde40deeaaaed6b22d9",
   "buildSourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
-  "previewPids": [
-    111130,
-    111131
-  ],
+  "previewPids": [111130, 111131],
   "addresses": {
     "HOME_TEST_URL": "http://localhost:46449",
     "MAP_TEST_URL": "http://map.localhost:46449",

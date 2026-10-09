@@ -18,15 +18,10 @@
   },
   "artifacts": "/tmp/gensai-48-evidence/implementation-final/run-cPgXnl",
   "sourceFingerprint": "296978e650a0464bfac1dac5c51004f563c604eed1e1eb2bcbd426ab281d1ced",
-  "excludedLiveProbes": [
-    "tests/browser/production-access.test.mjs"
-  ],
+  "excludedLiveProbes": ["tests/browser/production-access.test.mjs"],
   "buildFingerprint": "71cb2cfe15aa5aaf9e8afcf0adf55ff13d6910d8cc790ddab8391ece5616533e",
   "buildSourceFingerprint": "296978e650a0464bfac1dac5c51004f563c604eed1e1eb2bcbd426ab281d1ced",
-  "previewPids": [
-    123800,
-    123801
-  ],
+  "previewPids": [123800, 123801],
   "addresses": {
     "HOME_TEST_URL": "http://localhost:36325",
     "MAP_TEST_URL": "http://map.localhost:36325",

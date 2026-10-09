@@ -18,15 +18,10 @@
   },
   "artifacts": "/tmp/gensai-48-evidence/implementation-full/run-UbULpl",
   "sourceFingerprint": "0cc7e0ffe7f95b221b7afc3ad7a9981d51cb252844a1e65f4b44513dfd2a713a",
-  "excludedLiveProbes": [
-    "tests/browser/production-access.test.mjs"
-  ],
+  "excludedLiveProbes": ["tests/browser/production-access.test.mjs"],
   "buildFingerprint": "71cb2cfe15aa5aaf9e8afcf0adf55ff13d6910d8cc790ddab8391ece5616533e",
   "buildSourceFingerprint": "0cc7e0ffe7f95b221b7afc3ad7a9981d51cb252844a1e65f4b44513dfd2a713a",
-  "previewPids": [
-    119535,
-    119536
-  ],
+  "previewPids": [119535, 119536],
   "addresses": {
     "HOME_TEST_URL": "http://localhost:37981",
     "MAP_TEST_URL": "http://map.localhost:37981",

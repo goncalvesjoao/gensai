@@ -22,10 +22,7 @@
   "excludedLiveProbes": [],
   "buildFingerprint": "8bc3a1ebbced6cf5ce28974e44f6166a4ddc8be0574e75c3cab086b464d8bdee",
   "buildSourceFingerprint": "ea9c97e1574020a7f6ce44501ef386b41a0e4a1728420c2bb808f539bb76a00e",
-  "previewPids": [
-    138172,
-    138173
-  ],
+  "previewPids": [138172, 138173],
   "addresses": {
     "HOME_TEST_URL": "http://localhost:39627",
     "MAP_TEST_URL": "http://map.localhost:39627",
