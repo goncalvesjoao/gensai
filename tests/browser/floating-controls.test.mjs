@@ -1,11 +1,10 @@
+import { createFixturePage } from './fixtures.mjs';
 import process from 'node:process';
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
 import test from 'node:test';
 import { selectThemeMode, waitForScaleChange } from './helpers.mjs';
 import { mkdir } from 'node:fs/promises';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { chromium } from 'playwright';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 test('floating controls offer independent search, device and horizontal zoom', async () => {
@@ -14,7 +13,7 @@ test('floating controls offer independent search, device and horizontal zoom', a
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const page = await browser.newPage({
+    const page = await createFixturePage(browser, {
       viewport: { width: 390, height: 844 },
     });
     let searches = 0;
@@ -71,7 +70,7 @@ test('preferences retain localized public URLs and visible controls at phone and
     for (const width of [390, 1440]) {
       for (const locale of ['en', 'ja']) {
         for (const theme of ['light', 'dark']) {
-          const page = await browser.newPage({
+          const page = await createFixturePage(browser, {
             viewport: { width, height: 900 },
             colorScheme: theme,
           });
@@ -163,7 +162,7 @@ test('theme remains usable with unavailable storage and respects saved explicit 
     executablePath: process.env.CHROMIUM_PATH,
   });
   try {
-    const saved = await browser.newPage({ colorScheme: 'dark' });
+    const saved = await createFixturePage(browser, { colorScheme: 'dark' });
     await saved.addInitScript(() =>
       localStorage.setItem('gensai-theme', 'light'),
     );
@@ -177,7 +176,9 @@ test('theme remains usable with unavailable storage and respects saved explicit 
       await saved.locator('html').getAttribute('data-theme'),
       'dark',
     );
-    const unavailable = await browser.newPage({ colorScheme: 'dark' });
+    const unavailable = await createFixturePage(browser, {
+      colorScheme: 'dark',
+    });
     await unavailable.addInitScript(() => {
       Object.defineProperty(window, 'localStorage', {
         get() {
@@ -207,7 +208,7 @@ test('home destination follows active language and preserves a separate search g
   });
   try {
     for (const locale of ['en', 'ja']) {
-      const page = await browser.newPage({
+      const page = await createFixturePage(browser, {
         viewport: { width: 390, height: 844 },
       });
       await page.goto(`${base}${locale === 'ja' ? '/ja' : '/'}`);

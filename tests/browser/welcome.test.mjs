@@ -1,9 +1,8 @@
+import { createFixturePage } from './fixtures.mjs';
 import assert from 'node:assert/strict';
 import process from 'node:process';
-import { createRequire } from 'node:module';
 import test from 'node:test';
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { chromium } from 'playwright';
 const base = process.env.HOME_TEST_URL || 'http://localhost:4337';
 const mapBase =
   process.env.MAP_TEST_URL ||
@@ -30,7 +29,9 @@ test('entry point welcomes visitors without scripting and opens the correspondin
         'Gensaiの地図を開く',
       ],
     ]) {
-      const page = await browser.newPage({ javaScriptEnabled: false });
+      const page = await createFixturePage(browser, {
+        javaScriptEnabled: false,
+      });
       await page.goto(`${base}${path}`);
       await page
         .getByRole('heading', { name: heading })
@@ -71,7 +72,7 @@ test('welcome remains readable in both languages, themes and viewport sizes with
     ]) {
       for (const theme of ['light', 'dark']) {
         for (const width of [390, 1280]) {
-          const page = await browser.newPage({
+          const page = await createFixturePage(browser, {
             viewport: { width, height: 844 },
             colorScheme: theme,
           });
@@ -123,7 +124,7 @@ test('visitors can return from the map and reopen it in the same language', asyn
       ['/', 'Open the Gensai map', 'Home'],
       ['/ja', 'Gensaiの地図を開く', 'ホーム'],
     ]) {
-      const page = await browser.newPage();
+      const page = await createFixturePage(browser);
       await page.goto(`${base}${path}`);
       await page.getByRole('link', { name: label }).click();
       await page
