@@ -2,7 +2,7 @@ import process from 'node:process';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
-import { selectThemeMode } from './helpers.mjs';
+import { selectThemeMode, waitForScaleChange } from './helpers.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
@@ -96,14 +96,7 @@ for (const japanese of [false, true]) {
               exact: true,
             })
             .click();
-          await page.waitForFunction(
-            (previous) =>
-              document.querySelector('.maplibregl-ctrl-scale')?.textContent !==
-              previous,
-            beforeZoom,
-            { timeout: 10_000 },
-          );
-          assert.notEqual(await scale.textContent(), beforeZoom);
+          await waitForScaleChange(page, beforeZoom);
           await page
             .getByRole('button', {
               name: japanese ? '縮小' : 'Zoom out',

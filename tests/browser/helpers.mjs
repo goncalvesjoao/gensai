@@ -12,3 +12,17 @@ export async function selectThemeMode(page, mode) {
     `Theme control did not select ${mode} after a complete cycle`,
   );
 }
+
+export async function waitForScaleChange(page, previousScale) {
+  await page.waitForFunction(
+    (previous) =>
+      document.querySelector('.maplibregl-ctrl-scale')?.textContent !==
+      previous,
+    previousScale,
+    { timeout: 10_000 },
+  );
+  assert.notEqual(
+    await page.locator('.maplibregl-ctrl-scale').textContent(),
+    previousScale,
+  );
+}

@@ -2,7 +2,7 @@ import process from 'node:process';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
-import { selectThemeMode } from './helpers.mjs';
+import { selectThemeMode, waitForScaleChange } from './helpers.mjs';
 import { mkdir } from 'node:fs/promises';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -117,14 +117,7 @@ test('preferences retain localized public URLs and visible controls at phone and
               exact: true,
             })
             .click();
-          await page.waitForFunction(
-            (previous) =>
-              document.querySelector('.maplibregl-ctrl-scale')?.textContent !==
-              previous,
-            originalScale,
-            { timeout: 10_000 },
-          );
-          assert.notEqual(await scale.textContent(), originalScale);
+          await waitForScaleChange(page, originalScale);
           await page
             .getByRole('button', {
               name: locale === 'ja' ? '縮小' : 'Zoom out',
