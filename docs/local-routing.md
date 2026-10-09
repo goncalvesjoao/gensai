@@ -15,7 +15,7 @@ Configure host-specific internal rewrites, not entry-point-to-map redirects.
 Deployment and verification of these hosting rules remain ticket #28; emitting
 the static pages does not establish that production serves them.
 
-Run all local browser checks, including welcome navigation, with managed preview:
+Run local browser integration checks, including welcome navigation, with managed preview:
 
 ```sh
 npm run test:setup
@@ -32,3 +32,6 @@ HOME_TEST_URL=http://localhost:4321 MAP_TEST_URL=http://map.localhost:4321 node 
 
 `PLAYWRIGHT_MODULE`, `PNG_MODULE` and `CHROMIUM_PATH` can override the installed
 browser-test runtimes. See [test coverage](test-coverage.md) for retained checks.
+
+Use `npm run test:visual` for the layout matrices or `npm run test:all` for all
+deterministic local checks.

@@ -151,9 +151,12 @@ shim is needed.
 | `npm run dev`             | Start the development server.                                       |
 | `npm run build`           | Create a production build.                                          |
 | `npm run preview`         | Preview the production build locally after running `npm run build`. |
-| `npm test`                | Build and run all deterministic local Node and browser checks.      |
-| `npm run test:fast`       | Build and run the fast Node checks.                                 |
-| `npm run test:browser`    | Build and run local browser checks with managed preview.            |
+| `npm test`                | Run React, built-output and browser integration checks.             |
+| `npm run test:fast`       | Run React tests, build and run Node checks.                         |
+| `npm run test:browser`    | Build and run browser integration checks with managed preview.      |
+| `npm run test:react`      | Run React behavior checks without a build or browser.               |
+| `npm run test:visual`     | Build and run focused browser layout checks.                        |
+| `npm run test:all`        | Run the default suite and every visual check.                       |
 | `npm run test:setup`      | Install the Chromium runtime for browser checks.                    |
 | `npm run test:production` | Check the deployed public HTTPS hosts.                              |
 | `npm run test:live`       | Build and run opt-in live Photon and hazard-provider probes.        |
@@ -169,10 +172,16 @@ may also need `npx playwright install-deps chromium`. `PLAYWRIGHT_MODULE`,
 `PNG_MODULE` and `CHROMIUM_PATH` can override the installed runtimes.
 
 The local browser runner starts and closes a preview on an available port, sets
-the welcome and map host URLs, and runs browser files serially. Each file shares
+the welcome and map host URLs, and runs up to three browser files concurrently. Each file shares
 a Chromium process; each page gets an isolated context. Default provider responses
 are fixtures; scenario overrides exercise failures and rendering. `npm test`
 never enables live probes, even if their environment flags are set.
+
+React Testing Library exercises address/device outcomes and cancellation against
+the actual React modules in jsdom. These checks do not load MapLibre. Browser
+integration retains map event coordination, native keyboard behavior, tile failures
+and rendered-colour checks. Layout combinations run separately with `test:visual`;
+`test:all` includes them. Diagnostic screenshots are opt-in via `SCREENSHOT_DIR`.
 
 The fast Node checks cover built-page language output, locale navigation,
 static welcome links, pre-paint themes, Japan geography and theme tokens.
@@ -203,7 +212,9 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `astro.config.mjs`: Astro, React, Tailwind Vite plugin, and server configuration.
 - `tests/map-worker.test.mjs`: production worker request regression test.
 - `tests/map-routing.test.mjs`: static welcome link and redirect checks.
-- `tests/browser/`: map interaction, layout, focus, rendering and hosting checks.
+- `tests/react/`: simulated-DOM address and device behavior checks.
+- `tests/browser/`: map interaction, focus, rendering and hosting checks.
+- `tests/browser/visual/`: focused language, theme and viewport layout checks.
 - `tests/support/browser.mjs`: shared Chromium lifecycle and isolated provider fixtures.
 - `scripts/test-browser.mjs`: local preview and browser execution.
 - `docs/test-coverage.md`: assertion coverage and browser-matrix reductions.

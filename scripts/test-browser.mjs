@@ -4,13 +4,15 @@ import process from 'node:process';
 import { startPreview } from './preview.mjs';
 
 const live = process.argv.includes('--live');
-const files = (await readdir(new URL('../tests/browser/', import.meta.url)))
+const visual = process.argv.includes('--visual');
+const directory = visual ? 'tests/browser/visual' : 'tests/browser';
+const files = (await readdir(new URL(`../${directory}/`, import.meta.url)))
   .filter(
     (file) =>
       file.endsWith('.test.mjs') && file !== 'production-access.test.mjs',
   )
   .sort()
-  .map((file) => `tests/browser/${file}`);
+  .map((file) => `${directory}/${file}`);
 const server = await startPreview({ host: '0.0.0.0', port: 0 });
 const port = server.httpServer.address().port;
 try {
@@ -18,7 +20,7 @@ try {
     process.execPath,
     [
       '--test',
-      '--test-concurrency=1',
+      '--test-concurrency=3',
       ...(live
         ? ['--test-name-pattern=^(live official rasters|real Photon)']
         : []),

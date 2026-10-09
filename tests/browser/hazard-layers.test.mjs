@@ -23,7 +23,11 @@ test('muted official basemap loads, and unavailable basemap is explained', async
     await page.goto(base, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-sidebar-opener]').click();
     await page.locator('canvas').waitFor();
-    await page.waitForTimeout(1500);
+    await page.waitForFunction(
+      () =>
+        window.__gensaiMapInstance.isStyleLoaded() &&
+        window.__gensaiMapInstance.areTilesLoaded(),
+    );
     assert.equal(pale, true);
     await page.unroute('**/xyz/**');
     await page.route('**/xyz/**', (route) => route.abort());

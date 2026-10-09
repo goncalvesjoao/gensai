@@ -1,7 +1,7 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { browserSession } from '../support/browser.mjs';
+import { browserSession } from '../../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
 for (const japanese of [false, true]) {
@@ -157,9 +157,10 @@ for (const japanese of [false, true]) {
             .getAttribute('aria-expanded'),
           'true',
         );
-        await page.screenshot({
-          path: `/tmp/gensai-controls-search-${japanese ? 'ja' : 'en'}-phone.png`,
-        });
+        if (process.env.SCREENSHOT_DIR)
+          await page.screenshot({
+            path: `${process.env.SCREENSHOT_DIR}/gensai-controls-search-${japanese ? 'ja' : 'en'}-phone.png`,
+          });
       } finally {
         await browser.close();
       }

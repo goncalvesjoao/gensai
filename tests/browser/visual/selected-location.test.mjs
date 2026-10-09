@@ -1,70 +1,11 @@
 import process from 'node:process';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { browserSession } from '../support/browser.mjs';
+import { browserSession } from '../../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
-test('delayed boundary loading keeps the latest selection and explains load failures', async () => {
-  const browser = await browserSession();
-  try {
-    const page = await browser.newPage();
-    let release;
-    const gate = new Promise((resolve) => {
-      release = resolve;
-    });
-    let requested;
-    const download = new Promise((resolve) => {
-      requested = resolve;
-    });
-    await page.route('**/japan-boundary.*.js', async (route) => {
-      requested();
-      await gate;
-      await route.continue();
-    });
-    await page.goto(base);
-    await page
-      .getByText('Choose or correct coordinates', { exact: true })
-      .click();
-    async function choose(lat, lng) {
-      await page.getByLabel('Latitude', { exact: true }).fill(String(lat));
-      await page.getByLabel('Longitude', { exact: true }).fill(String(lng));
-      await page
-        .getByRole('button', { name: 'Select coordinates', exact: true })
-        .click();
-    }
-    await choose(35.6895, 139.6917);
-    await download;
-    await page
-      .getByRole('status')
-      .filter({ hasText: 'Checking selected location' })
-      .waitFor();
-    await choose(26.2124, 127.6809);
-    release();
-    await page
-      .getByRole('status')
-      .filter({ hasText: '26.21240, 127.68090' })
-      .waitFor();
-    assert.equal(await page.locator('.maplibregl-marker').count(), 1);
-
-    await page.unroute('**/japan-boundary.*.js');
-    await page.route('**/japan-boundary.*.js', (route) => route.abort());
-    await page.reload();
-    await page
-      .getByText('Choose or correct coordinates', { exact: true })
-      .click();
-    await choose(35.6895, 139.6917);
-    await page
-      .getByRole('status')
-      .filter({ hasText: 'Could not load the Japan boundary' })
-      .waitFor();
-    assert.equal(await page.locator('.maplibregl-marker').count(), 0);
-  } finally {
-    await browser.close();
-  }
-});
-
-for (const japanese of [false])
-  for (const mobile of [false]) {
+for (const japanese of [false, true])
+  for (const mobile of [false, true]) {
     test(`selected location on the public map URL (${japanese ? 'Japanese' : 'English'}, ${mobile ? 'phone' : 'computer'})`, async () => {
       const browser = await browserSession();
       try {
