@@ -2,6 +2,7 @@ import process from 'node:process';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
+import { selectThemeMode } from './helpers.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
@@ -95,7 +96,13 @@ for (const japanese of [false, true]) {
               exact: true,
             })
             .click();
-          await page.waitForTimeout(500);
+          await page.waitForFunction(
+            (previous) =>
+              document.querySelector('.maplibregl-ctrl-scale')?.textContent !==
+              previous,
+            beforeZoom,
+            { timeout: 10_000 },
+          );
           assert.notEqual(await scale.textContent(), beforeZoom);
           await page
             .getByRole('button', {
@@ -105,12 +112,7 @@ for (const japanese of [false, true]) {
             .click();
           await page.locator('#theme-toggle').click();
           assert.equal(await opener.getAttribute('aria-expanded'), 'true');
-          while (
-            (await page.locator('html').getAttribute('data-theme-mode')) !==
-            theme
-          ) {
-            await page.locator('#theme-toggle').click();
-          }
+          await selectThemeMode(page, theme);
           await page
             .getByText(
               japanese

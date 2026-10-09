@@ -2,6 +2,7 @@ import process from 'node:process';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
+import { selectThemeMode } from './helpers.mjs';
 import { mkdir } from 'node:fs/promises';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -77,9 +78,8 @@ test('preferences retain localized public URLs and visible controls at phone and
           await page.goto(
             `${base}${locale === 'ja' ? '/ja' : '/'}?view=hazards#map`,
           );
-          const themeButton = page.locator('#theme-toggle');
           for (const mode of ['light', 'dark', 'system']) {
-            await themeButton.click();
+            await selectThemeMode(page, mode);
             assert.equal(
               await page.locator('html').getAttribute('data-theme-mode'),
               mode,
@@ -117,7 +117,13 @@ test('preferences retain localized public URLs and visible controls at phone and
               exact: true,
             })
             .click();
-          await page.waitForTimeout(500);
+          await page.waitForFunction(
+            (previous) =>
+              document.querySelector('.maplibregl-ctrl-scale')?.textContent !==
+              previous,
+            originalScale,
+            { timeout: 10_000 },
+          );
           assert.notEqual(await scale.textContent(), originalScale);
           await page
             .getByRole('button', {

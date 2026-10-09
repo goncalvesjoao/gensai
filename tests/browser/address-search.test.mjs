@@ -2,6 +2,7 @@ import process from 'node:process';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
+import { selectThemeMode } from './helpers.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
@@ -322,12 +323,7 @@ for (const japanese of [false, true])
           exact: true,
         });
         for (const theme of ['light', 'dark']) {
-          while (
-            (await page.locator('html').getAttribute('data-theme-mode')) !==
-            theme
-          ) {
-            await page.locator('#theme-toggle').click();
-          }
+          await selectThemeMode(page, theme);
           for (const open of [true, false]) {
             if (
               ((await page

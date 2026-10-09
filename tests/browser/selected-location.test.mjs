@@ -2,6 +2,7 @@ import process from 'node:process';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import test from 'node:test';
+import { selectThemeMode } from './helpers.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
@@ -175,12 +176,7 @@ for (const japanese of [false, true])
           await page.screenshot({
             path: `${process.env.SCREENSHOT_DIR}/${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-light.png`,
           });
-        while (
-          (await page.locator('html').getAttribute('data-theme-mode')) !==
-          'dark'
-        ) {
-          await page.locator('#theme-toggle').click();
-        }
+        await selectThemeMode(page, 'dark');
         assert.equal(await status.textContent(), retained);
         await page.locator('[data-sidebar-opener]').click();
         await page.locator('[data-sidebar-close]').click();
