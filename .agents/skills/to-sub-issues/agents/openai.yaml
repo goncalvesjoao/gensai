@@ -1,5 +1,0 @@
-interface:
-  display_name: 'To Sub-Issues'
-  short_description: 'Split a spec into GitHub sub-issues'
-policy:
-  allow_implicit_invocation: false
