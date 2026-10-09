@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: preferences retain localized public URLs and visible controls at phone and computer widths
+ok 1 - preferences retain localized public URLs and visible controls at phone and computer widths
+  ---
+  duration_ms: 126032.977518
+  type: 'test'
+  ...
+# Subtest: hazard legends, selection and controls remain usable EN phone light
+ok 2 - hazard legends, selection and controls remain usable EN phone light
+  ---
+  duration_ms: 27605.211599
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 158357.738164
