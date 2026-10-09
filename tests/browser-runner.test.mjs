@@ -125,6 +125,7 @@ test('verification interruption records cancellation and stops the owned command
     assert.equal(metadata.interrupted, 'SIGTERM');
     assert.equal(metadata.checks.tests, 'canceled');
     assert.equal(metadata.completedEvidence, false);
+    assert.equal(metadata.testSummary, null);
     assert.match(readFileSync(join(run, 'tests.log'), 'utf8'), /ready pid=/);
   } finally {
     runner.kill('SIGKILL');

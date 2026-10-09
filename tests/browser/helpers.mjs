@@ -60,3 +60,50 @@ export async function waitForMarkerMovement(page) {
     { timeout: 10_000 },
   );
 }
+
+export async function waitForCenteredMarker(page, sidebarOpen) {
+  // Read both rectangles in one frame; separate protocol reads can straddle a resize.
+  const observation = await page.waitForFunction(
+    (expected) => {
+      const shell = document.querySelector('.page-shell');
+      const marker = document
+        .querySelector('.maplibregl-marker')
+        ?.getBoundingClientRect();
+      const canvas = document.querySelector('canvas')?.getBoundingClientRect();
+      const map = document.querySelector('.map-shell')?.getBoundingClientRect();
+      if (
+        !marker ||
+        !canvas ||
+        !map ||
+        Math.abs(canvas.width - map.width) >= 1 ||
+        Math.abs(canvas.height - map.height) >= 1
+      )
+        return false;
+      const offset = Math.abs(
+        marker.x + marker.width / 2 - (canvas.x + canvas.width / 2),
+      );
+      return (expected === undefined ||
+        shell?.dataset.sidebarOpen === String(expected)) &&
+        offset < 2
+        ? {
+            sidebarOpen: shell.dataset.sidebarOpen,
+            offset,
+            verticalOffset: Math.abs(
+              marker.y + marker.height - (canvas.y + canvas.height / 2),
+            ),
+          }
+        : false;
+    },
+    sidebarOpen,
+    { timeout: 10_000 },
+  );
+  const snapshot = await observation.jsonValue();
+  await observation.dispose();
+  assert.ok(
+    snapshot.offset < 2,
+    'Selected location remains centered in the map viewport',
+  );
+  if (sidebarOpen !== undefined)
+    assert.equal(snapshot.sidebarOpen, String(sidebarOpen));
+  return snapshot;
+}

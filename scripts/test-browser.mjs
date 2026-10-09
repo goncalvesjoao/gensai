@@ -211,14 +211,15 @@ try {
     metadata.intentionalLiveSkips = metadata.skippedTests.filter((name) =>
       liveProbes.includes(name),
     ).length;
-    metadata.testSummary = Object.fromEntries(
-      ['tests', 'pass', 'fail', 'cancelled', 'skipped'].map((name) => [
+    const counts = ['tests', 'pass', 'fail', 'cancelled', 'skipped'].map(
+      (name) => [
         name,
-        Number(
-          testOutput.match(new RegExp(`(?:#|ℹ) ${name} (\\d+)`))?.[1] || 0,
-        ),
-      ]),
+        testOutput.match(new RegExp(`^(?:#|ℹ) ${name} (\\d+)$`, 'm'))?.[1],
+      ],
     );
+    metadata.testSummary = counts.every(([, count]) => count !== undefined)
+      ? Object.fromEntries(counts.map(([name, count]) => [name, Number(count)]))
+      : null;
   } catch {
     metadata.testSummary = null;
   }
