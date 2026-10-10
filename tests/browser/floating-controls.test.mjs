@@ -55,46 +55,6 @@ test('floating controls offer independent search, device and horizontal zoom', a
   }
 });
 
-test('theme remains usable with unavailable storage and respects saved explicit choice', async () => {
-  const browser = await browserSession();
-  try {
-    const saved = await browser.newPage({ colorScheme: 'dark' });
-    await saved.addInitScript(() =>
-      localStorage.setItem('gensai-theme', 'light'),
-    );
-    await saved.goto(base);
-    assert.equal(
-      await saved.locator('html').getAttribute('data-theme'),
-      'light',
-    );
-    await saved.locator('#theme-toggle').click();
-    assert.equal(
-      await saved.locator('html').getAttribute('data-theme'),
-      'dark',
-    );
-    const unavailable = await browser.newPage({ colorScheme: 'dark' });
-    await unavailable.addInitScript(() => {
-      Object.defineProperty(window, 'localStorage', {
-        get() {
-          throw new Error('Storage unavailable');
-        },
-      });
-    });
-    await unavailable.goto(base);
-    assert.equal(
-      await unavailable.locator('html').getAttribute('data-theme'),
-      'dark',
-    );
-    await unavailable.locator('#theme-toggle').click();
-    assert.equal(
-      await unavailable.locator('html').getAttribute('data-theme'),
-      'light',
-    );
-  } finally {
-    await browser.close();
-  }
-});
-
 test('home destination follows active language and preserves a separate search group', async () => {
   const browser = await browserSession();
   try {

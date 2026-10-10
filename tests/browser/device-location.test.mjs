@@ -4,7 +4,8 @@ import test from 'node:test';
 import { browserSession } from '../support/browser.mjs';
 const base = process.env.TEST_URL || 'http://127.0.0.1:4321';
 
-test('device location is explicitly acquired and fresh on later activation', async () => {
+// Built chunk requests verify lazy loading that jsdom cannot exercise.
+test('boundary geometry loads only after the first device selection', async () => {
   const browser = await browserSession();
   try {
     const page = await browser.newPage();
@@ -46,32 +47,6 @@ test('device location is explicitly acquired and fresh on later activation', asy
       1,
       'First selection loads boundary geometry',
     );
-    await button.click();
-    assert.equal(await page.evaluate(() => window.locationRequests.length), 2);
-    assert.equal(
-      await page.evaluate(() => window.locationRequests[1].options.maximumAge),
-      0,
-    );
-    await button.click();
-    await page.evaluate(() =>
-      window.locationRequests[1].success({
-        coords: { latitude: 26.2124, longitude: 127.6809 },
-      }),
-    );
-    assert.match(
-      await page.getByRole('status').textContent(),
-      /35\.68950, 139\.69170/,
-    );
-    await page.evaluate(() =>
-      window.locationRequests[2].success({
-        coords: { latitude: 24.467, longitude: 122.998 },
-      }),
-    );
-    await page
-      .getByRole('status')
-      .filter({ hasText: '24.46700, 122.99800' })
-      .waitFor();
-    assert.equal(await button.getAttribute('aria-busy'), 'false');
   } finally {
     await browser.close();
   }

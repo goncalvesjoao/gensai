@@ -32,49 +32,6 @@ const match = (name, lng = 139.6917, lat = 35.6895, countrycode = 'JP') => ({
   geometry: { type: 'Point', coordinates: [lng, lat] },
 });
 
-test('empty address submission leaves pending device location usable', async () => {
-  const browser = await browserSession();
-  try {
-    const page = await browser.newPage();
-    const queries = [];
-    await page.route('https://photon.komoot.io/api/**', (route) => {
-      queries.push(route.request().url());
-      return route.abort();
-    });
-    await page.addInitScript(() => {
-      navigator.geolocation.getCurrentPosition = (success) => {
-        window.finishDeviceLocation = success;
-      };
-    });
-    await page.goto(base);
-    await page.locator('canvas').waitFor();
-    const button = page.getByRole('button', {
-      name: 'Use my location',
-      exact: true,
-    });
-    const search = page.getByRole('searchbox');
-    for (const query of ['', '   ']) {
-      await search.fill(query);
-      await button.click();
-      await page.getByText('Finding your location…', { exact: true }).waitFor();
-      await search.press('Enter');
-      assert.equal(await button.getAttribute('aria-busy'), 'true');
-      await page.evaluate(() =>
-        window.finishDeviceLocation({
-          coords: { latitude: 26.2124, longitude: 127.6809 },
-        }),
-      );
-      await page
-        .locator('.map-selection [role=status]')
-        .filter({ hasText: '26.21240, 127.68090' })
-        .waitFor({ timeout: 3000 });
-    }
-    assert.deepEqual(queries, []);
-  } finally {
-    await browser.close();
-  }
-});
-
 test('Enter selects a Japan address, while typing and device activation do not submit', async () => {
   const browser = await browserSession();
   try {
@@ -190,56 +147,6 @@ test('ambiguous Japan matches require an explicit keyboard choice', async () => 
       await search.evaluate((el) => el === document.activeElement),
       true,
     );
-  } finally {
-    await browser.close();
-  }
-});
-
-test('typing a newer query dismisses choices and prevents an earlier response from selecting', async () => {
-  const browser = await browserSession();
-  try {
-    const page = await browser.newPage();
-    const requests = [];
-    await page.route('https://photon.komoot.io/api/**', (route) =>
-      requests.push(route),
-    );
-    await page.goto(base);
-    await page.locator('canvas').waitFor();
-    const search = page.getByRole('searchbox');
-    await search.fill('old');
-    await search.press('Enter');
-    while (!requests.length) await page.waitForTimeout(10);
-    await search.fill('new unfinished input');
-    await requests[0]
-      .fulfill({
-        json: { type: 'FeatureCollection', features: [match('Obsolete')] },
-      })
-      .catch(() => {});
-    await page.waitForTimeout(200);
-    assert.equal(await page.locator('.maplibregl-marker').count(), 0);
-    assert.equal(
-      await page.locator('#address-search-feedback').textContent(),
-      '',
-    );
-    await search.press('Enter');
-    while (requests.length < 2) await page.waitForTimeout(10);
-    await requests[1].fulfill({
-      json: {
-        type: 'FeatureCollection',
-        features: [match('Tokyo'), match('Yonaguni', 122.998, 24.467)],
-      },
-    });
-    await page
-      .getByRole('button', { name: 'Select Tokyo', exact: true })
-      .waitFor();
-    await search.fill('another unfinished input');
-    assert.equal(
-      await page
-        .getByRole('button', { name: 'Select Tokyo', exact: true })
-        .count(),
-      0,
-    );
-    assert.equal(await page.locator('.maplibregl-marker').count(), 0);
   } finally {
     await browser.close();
   }
