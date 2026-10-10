@@ -257,24 +257,29 @@ for (const locale of ['en', 'ja']) {
   });
 }
 
-test('map readiness gates both controls and empty submission preserves a pending device request', async () => {
-  delete window.__gensaiMapInstance;
-  const fetch = provider();
-  render(<AddressSearch />);
-  const input = screen.getByRole('searchbox');
-  const device = screen.getByRole('button', { name: 'Use my location' });
-  expect(input.disabled).toBe(true);
-  expect(device.disabled).toBe(true);
-  act(() => window.dispatchEvent(new Event('gensai:map-ready')));
-  fireEvent.click(device);
-  submit('   ');
-  expect(device.getAttribute('aria-busy')).toBe('true');
-  expect(fetch).not.toHaveBeenCalled();
-  await act(async () =>
-    requests[0].success({ coords: { latitude: 26.2124, longitude: 127.6809 } }),
-  );
-  expect(selected[0].location).toEqual({ lat: 26.2124, lng: 127.6809 });
-});
+test.each(['', '   '])(
+  'map readiness gates both controls and query %j preserves a pending device request',
+  async (query) => {
+    delete window.__gensaiMapInstance;
+    const fetch = provider();
+    render(<AddressSearch />);
+    const input = screen.getByRole('searchbox');
+    const device = screen.getByRole('button', { name: 'Use my location' });
+    expect(input.disabled).toBe(true);
+    expect(device.disabled).toBe(true);
+    act(() => window.dispatchEvent(new Event('gensai:map-ready')));
+    fireEvent.click(device);
+    submit(query);
+    expect(device.getAttribute('aria-busy')).toBe('true');
+    expect(fetch).not.toHaveBeenCalled();
+    await act(async () =>
+      requests[0].success({
+        coords: { latitude: 26.2124, longitude: 127.6809 },
+      }),
+    );
+    expect(selected[0].location).toEqual({ lat: 26.2124, lng: 127.6809 });
+  },
+);
 
 test('a newer query cancels the older response and selection attempts cancel late device callbacks', async () => {
   let release;
@@ -345,4 +350,42 @@ test('provider labels preserve address details without duplicate or non-text fie
   submit();
   await waitFor(() => expect(selected).toHaveLength(1));
   expect(selected[0].label).toBe('Selected location: Tokyo, Street, 123');
+});
+
+test('editing a query removes existing choices without selecting a place', async () => {
+  provider([match('Tokyo'), match('Yonaguni', 122.998, 24.467)]);
+  render(<AddressSearch />);
+  submit();
+  await screen.findByRole('button', { name: 'Select Tokyo' });
+  fireEvent.change(screen.getByRole('searchbox'), {
+    target: { value: 'unfinished' },
+  });
+  expect(screen.queryByRole('list')).toBeNull();
+  expect(selected).toHaveLength(0);
+  expect(document.querySelector('#address-search-feedback').textContent).toBe(
+    '',
+  );
+});
+
+test('later device activations request fresh positions and ignore older callbacks', async () => {
+  render(<AddressSearch />);
+  const device = screen.getByRole('button', { name: 'Use my location' });
+  fireEvent.click(device);
+  await act(async () =>
+    requests[0].success({ coords: { latitude: 35.6895, longitude: 139.6917 } }),
+  );
+  fireEvent.click(device);
+  fireEvent.click(device);
+  expect(requests).toHaveLength(3);
+  expect(requests.every(({ options }) => options.maximumAge === 0)).toBe(true);
+  await act(async () =>
+    requests[1].success({ coords: { latitude: 26.2124, longitude: 127.6809 } }),
+  );
+  expect(selected).toHaveLength(1);
+  await act(async () =>
+    requests[2].success({ coords: { latitude: 24.467, longitude: 122.998 } }),
+  );
+  expect(selected).toHaveLength(2);
+  expect(selected[1].location).toEqual({ lat: 24.467, lng: 122.998 });
+  expect(device.getAttribute('aria-busy')).toBe('false');
 });

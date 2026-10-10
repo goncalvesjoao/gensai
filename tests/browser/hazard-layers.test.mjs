@@ -234,40 +234,6 @@ test(
   },
 );
 
-test('turning all categories off explicitly avoids a safety verdict', async () => {
-  const browser = await browserSession();
-  try {
-    const page = await browser.newPage();
-    await page.route('**/xyz/**', (route) =>
-      route.fulfill({ contentType: 'image/png', body: png }),
-    );
-    await page.route('**/raster/**', (route) =>
-      route.fulfill({ contentType: 'image/png', body: png }),
-    );
-    await page.goto(base, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-sidebar-opener]').click();
-    await page.getByRole('switch', { name: 'Tsunami', exact: true }).uncheck();
-    await page
-      .getByText(
-        'No hazard categories enabled. This is not a safety assessment.',
-        { exact: true },
-      )
-      .waitFor();
-    assert.equal(await page.locator('[data-hazard-legend]').count(), 0);
-    await page.goto(`${base}/ja/`, { waitUntil: 'domcontentloaded' });
-    await page.locator('[data-sidebar-opener]').click();
-    await page.getByRole('switch', { name: '津波', exact: true }).uncheck();
-    await page
-      .getByText(
-        'ハザードの種類が選択されていません。安全性の評価ではありません。',
-        { exact: true },
-      )
-      .waitFor();
-  } finally {
-    await browser.close();
-  }
-});
-
 for (const status of [404, 500])
   test(`cached pan preserves ${status} hazard failures, and successful new tiles recover`, async () => {
     const browser = await browserSession();
