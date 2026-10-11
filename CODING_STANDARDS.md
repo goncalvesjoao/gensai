@@ -2,14 +2,20 @@
 
 ## Tests
 
-- Add or update automated tests for new or changed behavior. Bug fixes must
-  include a regression test that fails with the bug and passes with the fix.
+- New or changed behavior must have automated test coverage. Bug fixes must
+  have regression coverage that detects the bug. Add or update tests when
+  existing coverage is insufficient.
   Documentation-only and formatting-only changes need no tests.
+- Each test must protect a current requirement or meaningful failure risk.
+  For added or modified tests, reviewers must check whether existing coverage
+  already protects that behavior and whether a cheaper test provides equivalent
+  confidence. A past bug alone does not justify retaining a redundant test.
+  Preserve unique coverage when removing tests.
 - Choose the fastest test that can reliably verify the behavior. Use the
   Vitest Node environment for logic and integration checks, and Vitest with
   React Testing Library and jsdom for component interactions. Standardize
-  unit and component tests on Vitest. Cover relevant edge
-  cases at these levels whenever possible.
+  unit and component tests on Vitest. Cover relevant edge cases at these levels
+  whenever possible.
 - Use Playwright only when verification requires a real browser, such as
   layout, browser-native behavior, MapLibre rendering, or a critical journey
   across the running application. Keep browser coverage focused on those
