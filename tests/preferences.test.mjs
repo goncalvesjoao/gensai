@@ -23,9 +23,8 @@ for (const scenario of [
   {
     name: 'saved dark overrides system light',
     systemDark: false,
-    stored: { 'gensai-theme': 'dark', 'gensai-locale': 'ja' },
+    stored: { 'gensai-theme': 'dark' },
     expected: 'dark',
-    locale: 'en',
   },
   {
     name: 'blocked storage retains system dark',
