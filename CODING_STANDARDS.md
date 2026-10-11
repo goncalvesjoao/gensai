@@ -6,8 +6,9 @@
   include a regression test that fails with the bug and passes with the fix.
   Documentation-only and formatting-only changes need no tests.
 - Choose the fastest test that can reliably verify the behavior. Use the
-  existing Node tests for logic and integration checks, and Vitest with React
-  Testing Library and jsdom for component interactions. Cover relevant edge
+  Vitest Node environment for logic and integration checks, and Vitest with
+  React Testing Library and jsdom for component interactions. Standardize
+  unit and component tests on Vitest. Cover relevant edge
   cases at these levels whenever possible.
 - Use Playwright only when verification requires a real browser, such as
   layout, browser-native behavior, MapLibre rendering, or a critical journey

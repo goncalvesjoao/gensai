@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { afterEach, expect, test } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import HazardLegend from '../../src/components/HazardLegend.jsx';

@@ -1,7 +1,7 @@
 # Test execution and coverage
 
-`npm test` runs React behavior checks, builds once, checks built output with
-Node, then runs a small browser integration suite against managed preview.
+`npm test` builds once, runs Vitest checks in Node and jsdom environments,
+then runs a small browser integration suite against managed preview.
 `npm run test:react` provides the shortest behavior-test loop without a build.
 
 `npm run test:visual` runs the language/theme/viewport layout checks separately.
@@ -11,7 +11,7 @@ verification and live Photon/hazard-provider probes remain separate commands.
 
 The default suite targets 30 seconds on the development machine. Measure the
 whole command before adding more full-map journeys. Exhaustive outcome tables
-belong in React or Node tests; browser tests prove integration and rendering.
+belong in Vitest Node or jsdom tests; browser tests prove integration and rendering.
 This is a planning budget, not a hardware-dependent timing assertion.
 
 ## Execution

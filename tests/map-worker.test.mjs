@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
-import test from 'node:test';
+import { test } from 'vitest';
 import { startPreview } from '../scripts/preview.mjs';
 
 test('production map worker and its static imports are served as JavaScript', async () => {

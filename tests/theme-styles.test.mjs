@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import test from 'node:test';
+import { test } from 'vitest';
 
 test('primary-strong utilities retain the runtime theme variable', () => {
   const directory = new URL('../dist/_astro/', import.meta.url);

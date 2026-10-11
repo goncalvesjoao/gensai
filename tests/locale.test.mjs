@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import test from 'node:test';
+import { test } from 'vitest';
 import { localeUrl, localeFromPath } from '../src/lib/locale.mjs';
 
 test('locale matches a complete path prefix', () => {
