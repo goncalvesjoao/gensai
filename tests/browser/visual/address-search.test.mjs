@@ -98,15 +98,6 @@ for (const japanese of [false, true])
                   ) < 2
                 );
               });
-              const marker = await page
-                .locator('.maplibregl-marker')
-                .boundingBox();
-              const canvas = await page.locator('canvas').boundingBox();
-              assert.ok(
-                Math.abs(
-                  marker.x + marker.width / 2 - (canvas.x + canvas.width / 2),
-                ) < 2,
-              );
               assert.equal(
                 await page
                   .locator('.page-shell')

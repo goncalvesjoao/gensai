@@ -16,10 +16,14 @@ test('all eight category combinations preserve source colours and drawing order'
     '05_dosekiryukeikaikuiki': [230, 200, 50],
     '05_kyukeishakeikaikuiki': [250, 230, 0],
   };
-  function tile(colour) {
+  const sources = Object.keys(colours);
+  function tile(colour, layer = 0) {
     const image = new PNG({ width: 256, height: 256 });
     for (let i = 0; i < image.data.length; i += 4)
-      image.data.set([...colour, 255], i);
+      image.data.set(
+        [...colour, (i / 4) % 256 >= (layer * 256) / 6 ? 255 : 0],
+        i,
+      );
     return PNG.sync.write(image);
   }
   const browser = await browserSession();
@@ -38,11 +42,26 @@ test('all eight category combinations preserve source colours and drawing order'
       );
       return route.fulfill({
         contentType: 'image/png',
-        body: tile(colours[name]),
+        body: tile(colours[name], sources.indexOf(name)),
       });
     });
     await page.goto(base);
     await page.locator('canvas').waitFor();
+    // Six tile stripes expose every layer, including otherwise hidden sources.
+    const samples = await page.evaluate(() => {
+      const map = window.__gensaiMapInstance;
+      const lat =
+        (Math.atan(Math.sinh(Math.PI * (1 - (2 * 101.5) / 256))) * 180) /
+        Math.PI;
+      map.jumpTo({ center: [(455.5 / 512) * 360 - 180, lat], zoom: 8 });
+      return Array.from({ length: 6 }, (_, stripe) => {
+        const point = map.project([
+          ((455 + (stripe + 0.5) / 6) / 512) * 360 - 180,
+          lat,
+        ]);
+        return { x: Math.floor(point.x), y: Math.floor(point.y) };
+      });
+    });
     await page.locator('[data-sidebar-opener]').click();
     const switches = ['Tsunami', 'Flooding', 'Landslide'].map((name) =>
       page.getByRole('switch', { name, exact: true }),
@@ -67,24 +86,29 @@ test('all eight category combinations preserve source colours and drawing order'
             { exact: true },
           )
           .waitFor();
-      const expected = enabled[2]
-        ? [250, 230, 0]
-        : enabled[0]
-          ? [242, 133, 201]
-          : enabled[1]
-            ? [255, 183, 183]
-            : [240, 240, 240];
+      const expected = sources.map((_, stripe) => {
+        const visible = sources
+          .slice(0, stripe + 1)
+          .filter(
+            (name, layer) => enabled[layer < 2 ? 1 : layer === 2 ? 0 : 2],
+          );
+        return visible.length ? colours[visible.at(-1)] : [240, 240, 240];
+      });
       let actual;
       for (let attempt = 0; attempt < 30; attempt++) {
         const screenshot = PNG.sync.read(
           await page.locator('canvas').screenshot(),
         );
-        const offset =
-          (Math.floor(screenshot.height * 0.3) * screenshot.width +
-            Math.floor(screenshot.width * 0.8)) *
-          4;
-        actual = [...screenshot.data.subarray(offset, offset + 3)];
-        if (actual.every((channel, i) => channel === expected[i])) break;
+        actual = samples.map(({ x, y }) => {
+          const offset = (y * screenshot.width + x) * 4;
+          return [...screenshot.data.subarray(offset, offset + 3)];
+        });
+        if (
+          actual.every((colour, stripe) =>
+            colour.every((channel, i) => channel === expected[stripe][i]),
+          )
+        )
+          break;
         await page.waitForTimeout(100);
       }
       assert.deepEqual(

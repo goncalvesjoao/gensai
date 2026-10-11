@@ -54,25 +54,11 @@ for (const japanese of [false, true])
             .click();
           await status.filter({ hasNotText: checking }).waitFor();
         }
-        for (const [lat, lng] of [
-          [35.6895, 139.6917],
-          [24.467, 122.998],
-        ]) {
-          await choose(lat, lng);
-          await status
-            .filter({
-              hasText: `${selectedLabel}: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-            })
-            .waitFor();
-          assert.equal(await page.locator('.maplibregl-marker').count(), 1);
-        }
-        await choose(37.5665, 126.978);
-        assert.match(await status.textContent(), /24\.46700, 122\.99800/);
-        assert.match(
-          await status.textContent(),
-          japanese ? /日本の陸地/ : /land in Japan/,
-        );
+        // Integration and geography cases live in the default suite.
         await choose(35.6895, 139.6917);
+        await status
+          .filter({ hasText: `${selectedLabel}: 35.68950, 139.69170` })
+          .waitFor();
         await page
           .getByText(
             japanese
@@ -81,31 +67,7 @@ for (const japanese of [false, true])
             { exact: true },
           )
           .click();
-        // Actual pointer selection and keyboard correction on the rendered map.
-        const box = await canvas.boundingBox();
-        await page.mouse.click(
-          box.x + box.width / 2 + 45,
-          box.y + box.height / 2 + 45,
-        );
-        await status.filter({ hasNotText: checking }).waitFor();
-        assert.doesNotMatch(
-          await status.textContent(),
-          /35\.68950, 139\.69170/,
-        );
-        const pointerSelection = await status.textContent();
-        await canvas.focus();
-        await page.keyboard.press('ArrowRight');
-        await page.waitForFunction(
-          () => !window.__gensaiMapInstance.isMoving(),
-        );
-        await page.keyboard.press('Enter');
-        await status.filter({ hasNotText: checking }).waitFor();
         const retained = await status.textContent();
-        assert.notEqual(retained, pointerSelection);
-        if (process.env.SCREENSHOT_DIR)
-          await page.screenshot({
-            path: `${process.env.SCREENSHOT_DIR}/${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-light.png`,
-          });
         await page.locator('#theme-toggle').click();
         assert.equal(await status.textContent(), retained);
         await page.locator('[data-sidebar-opener]').click();
@@ -120,26 +82,39 @@ for (const japanese of [false, true])
           await page.screenshot({
             path: `${process.env.SCREENSHOT_DIR}/${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-dark.png`,
           });
+        const markerBox = await page
+          .locator('.maplibregl-marker')
+          .boundingBox();
+        const canvasBox = await canvas.boundingBox();
+        assert.ok(
+          Math.abs(
+            markerBox.x +
+              markerBox.width / 2 -
+              (canvasBox.x + canvasBox.width / 2),
+          ) < 2,
+        );
+        assert.ok(
+          Math.abs(
+            markerBox.y +
+              markerBox.height -
+              (canvasBox.y + canvasBox.height / 2),
+          ) < 12,
+        );
+        const statusBox = await status.boundingBox();
+        assert.ok(statusBox.width > 0 && statusBox.height > 0);
+        assert.ok(
+          statusBox.x >= 0 &&
+            statusBox.x + statusBox.width <= (mobile ? 430 : 1100),
+        );
         assert.equal(
-          await page.evaluate(() => location.search + location.hash),
-          '',
+          await status.evaluate(
+            (el, box) =>
+              el.contains(document.elementFromPoint(box.x + 10, box.y + 10)),
+            statusBox,
+          ),
+          true,
         );
         assert.deepEqual(errors, []);
-        await page.locator('#locale-toggle').click();
-        await page
-          .getByRole('menuitemradio', {
-            name: japanese ? 'English' : '日本語',
-            exact: true,
-          })
-          .click();
-        await page.waitForURL((url) =>
-          japanese ? url.pathname === '/' : /^\/ja\/?$/.test(url.pathname),
-        );
-        await page.reload();
-        await canvas.waitFor();
-        assert.equal(await status.textContent(), '');
-        assert.equal(await page.locator('.maplibregl-marker').count(), 0);
-        assert.equal(await page.evaluate(() => window.locationRequests), 0);
       } finally {
         await browser.close();
       }

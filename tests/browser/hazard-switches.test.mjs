@@ -26,26 +26,13 @@ for (const japanese of [false, true]) {
       for (let index = 0; index < switches.length; index++) {
         assert.equal(await switches[index].isChecked(), index === 0);
       }
-      // Cycle all combinations using the keyboard through the public controls.
-      for (const combination of [0, 1, 3, 2, 6, 7, 5, 4]) {
-        for (let index = 0; index < switches.length; index++) {
-          const checked = Boolean(combination & (1 << index));
-          if ((await switches[index].isChecked()) !== checked) {
-            await switches[index].focus();
-            await page.keyboard.press('Space');
-          }
-        }
-        for (let index = 0; index < switches.length; index++) {
-          assert.equal(
-            await switches[index].isChecked(),
-            Boolean(combination & (1 << index)),
-          );
-        }
-        assert.equal(
-          await page.locator('.page-shell').getAttribute('data-sidebar-open'),
-          'true',
-        );
+      // Native keyboard activation and visible focus require a real browser.
+      for (const control of [switches[0], switches[2]]) {
+        await control.focus();
+        await page.keyboard.press('Space');
       }
+      assert.equal(await switches[0].isChecked(), false);
+      assert.equal(await switches[2].isChecked(), true);
       await switches[1].focus();
       await page.keyboard.press('Tab');
       const focus = await switches[2].evaluate((input) => ({

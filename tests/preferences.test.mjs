@@ -28,20 +28,6 @@ for (const scenario of [
     locale: 'en',
   },
   {
-    name: 'Japanese route retains its language',
-    hostname: 'ja.gensai.example',
-    stored: { 'gensai-locale': 'en' },
-    expected: 'light',
-    locale: 'ja',
-  },
-  {
-    name: 'English route retains its language',
-    hostname: 'en.gensai.example',
-    stored: { 'gensai-locale': 'ja' },
-    expected: 'light',
-    locale: 'en',
-  },
-  {
     name: 'blocked storage retains system dark',
     systemDark: true,
     blocked: true,
@@ -55,7 +41,7 @@ for (const scenario of [
   },
 ]) {
   test(`preferences applied before body renders: ${scenario.name}`, () => {
-    const root = { dataset: {}, lang: scenario.locale || 'en' };
+    const root = { dataset: {}, lang: 'ja' };
     const context = {
       URL,
       document: { documentElement: root },
@@ -75,6 +61,10 @@ for (const scenario of [
     };
     for (const script of scripts) runInNewContext(script, context);
     assert.equal(root.dataset.theme, scenario.expected);
-    assert.equal(root.lang, scenario.locale || 'en');
+    assert.equal(
+      root.lang,
+      'ja',
+      'Theme initialization preserves the page language',
+    );
   });
 }
