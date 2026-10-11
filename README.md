@@ -152,7 +152,7 @@ shim is needed.
 | `npm run build`           | Create a production build.                                          |
 | `npm run preview`         | Preview the production build locally after running `npm run build`. |
 | `npm test`                | Run React, built-output and browser integration checks.             |
-| `npm run test:fast`       | Run React tests, build and run Node checks.                         |
+| `npm run test:fast`       | Build once and run all Vitest checks.                               |
 | `npm run test:browser`    | Build and run browser integration checks with managed preview.      |
 | `npm run test:react`      | Run React behavior checks without a build or browser.               |
 | `npm run test:visual`     | Build and run focused browser layout checks.                        |

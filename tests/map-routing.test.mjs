@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import test from 'node:test';
+import { test } from 'vitest';
 
 test('entry-point welcome is static and never redirects automatically', () => {
   for (const route of ['welcome/', 'ja/welcome/']) {

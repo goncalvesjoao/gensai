@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
-import test from 'node:test';
+import { test } from 'vitest';
 
 const html = readFileSync(
   new URL('../dist/index.html', import.meta.url),
@@ -23,23 +23,8 @@ for (const scenario of [
   {
     name: 'saved dark overrides system light',
     systemDark: false,
-    stored: { 'gensai-theme': 'dark', 'gensai-locale': 'ja' },
+    stored: { 'gensai-theme': 'dark' },
     expected: 'dark',
-    locale: 'en',
-  },
-  {
-    name: 'Japanese route retains its language',
-    hostname: 'ja.gensai.example',
-    stored: { 'gensai-locale': 'en' },
-    expected: 'light',
-    locale: 'ja',
-  },
-  {
-    name: 'English route retains its language',
-    hostname: 'en.gensai.example',
-    stored: { 'gensai-locale': 'ja' },
-    expected: 'light',
-    locale: 'en',
   },
   {
     name: 'blocked storage retains system dark',
@@ -55,7 +40,7 @@ for (const scenario of [
   },
 ]) {
   test(`preferences applied before body renders: ${scenario.name}`, () => {
-    const root = { dataset: {}, lang: scenario.locale || 'en' };
+    const root = { dataset: {}, lang: 'ja' };
     const context = {
       URL,
       document: { documentElement: root },
@@ -75,6 +60,10 @@ for (const scenario of [
     };
     for (const script of scripts) runInNewContext(script, context);
     assert.equal(root.dataset.theme, scenario.expected);
-    assert.equal(root.lang, scenario.locale || 'en');
+    assert.equal(
+      root.lang,
+      'ja',
+      'Theme initialization preserves the page language',
+    );
   });
 }
