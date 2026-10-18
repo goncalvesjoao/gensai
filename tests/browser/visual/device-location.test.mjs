@@ -25,6 +25,9 @@ for (const japanese of [false, true]) {
             options,
           ) => window.locationRequests.push({ success, failure, options });
         });
+        await page.addInitScript(() =>
+          localStorage.setItem('gensai-theme', 'light'),
+        );
         await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
         await page.locator('canvas').waitFor();
         const button = page.getByRole('button', {

@@ -12,6 +12,9 @@ for (const japanese of [false, true]) {
         const page = await browser.newPage({
           viewport: { width, height: 844 },
         });
+        await page.addInitScript(() =>
+          localStorage.setItem('gensai-theme', 'light'),
+        );
         await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
         const opener = page.getByRole('button', {
           name: japanese ? '災害メニューを開く' : 'Open hazard menu',

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import { localeUrl } from '../lib/locale.mjs';
-import { Moon, Sun, Languages } from 'lucide-react';
+import { Moon, Sun, SunMoon, Languages } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Tooltip,
@@ -25,14 +25,16 @@ const locales = [
 const translations = {
   en: {
     preferences: 'Display preferences',
-    light: 'Switch to light theme',
-    dark: 'Switch to dark theme',
+    light: 'Theme: Light. Switch to dark theme',
+    dark: 'Theme: Dark. Switch to system theme',
+    system: 'Theme: System. Switch to light theme',
     locale: 'Choose language',
   },
   ja: {
     preferences: '表示設定',
-    light: 'ライトテーマに切り替える',
-    dark: 'ダークテーマに切り替える',
+    light: 'テーマ：ライト。ダークテーマに切り替える',
+    dark: 'テーマ：ダーク。システム設定に切り替える',
+    system: 'テーマ：システム。ライトテーマに切り替える',
     locale: '言語を選択',
   },
 };
@@ -58,22 +60,36 @@ function savePreference(key, value) {
 
 export default function PreferenceControls({ locale = 'en' }) {
   const [preferences, setPreferences] = useState(null);
-  const theme = preferences?.theme || 'light';
+  const theme = preferences?.theme || 'system';
   const labels = translations[locale];
 
   useEffect(() => {
     // The layout resolves preferences before first paint; don't resolve them twice.
     const root = document.documentElement;
     setPreferences({
-      theme: root.dataset.theme === 'dark' ? 'dark' : 'light',
+      theme: root.dataset.themeMode || 'system',
       locale: root.lang === 'ja' ? 'ja' : 'en',
     });
   }, []);
 
   useEffect(() => {
     if (!preferences) return;
-    document.documentElement.dataset.theme = preferences.theme;
-    document.documentElement.lang = preferences.locale;
+    const root = document.documentElement;
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    function applyTheme() {
+      root.dataset.themeMode = preferences.theme;
+      root.dataset.theme =
+        preferences.theme === 'system'
+          ? media.matches
+            ? 'dark'
+            : 'light'
+          : preferences.theme;
+    }
+    applyTheme();
+    root.lang = preferences.locale;
+    if (preferences.theme !== 'system') return;
+    media.addEventListener('change', applyTheme);
+    return () => media.removeEventListener('change', applyTheme);
   }, [preferences]);
 
   function selectLocale(locale) {
@@ -82,12 +98,13 @@ export default function PreferenceControls({ locale = 'en' }) {
   }
 
   function toggleTheme() {
-    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    const nextTheme = { light: 'dark', dark: 'system', system: 'light' }[theme];
     setPreferences({ theme: nextTheme, locale });
     savePreference('gensai-theme', nextTheme);
   }
 
-  const themeLabel = theme === 'dark' ? labels.light : labels.dark;
+  const themeLabel = labels[theme];
+  const ThemeIcon = { light: Sun, dark: Moon, system: SunMoon }[theme];
   return (
     <TooltipProvider>
       <div
@@ -106,11 +123,7 @@ export default function PreferenceControls({ locale = 'en' }) {
             disabled={!preferences}
             onClick={toggleTheme}
           >
-            {theme === 'dark' ? (
-              <Moon size={20} aria-hidden="true" />
-            ) : (
-              <Sun size={20} aria-hidden="true" />
-            )}
+            <ThemeIcon size={20} aria-hidden="true" />
           </Button>
         </ControlTooltip>
         <DropdownMenu>

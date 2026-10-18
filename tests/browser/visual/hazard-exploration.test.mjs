@@ -110,6 +110,7 @@ for (const japanese of [false, true]) {
           await page.locator('#theme-toggle').click();
           assert.equal(await opener.getAttribute('aria-expanded'), 'true');
           await page.locator('#theme-toggle').click();
+          if (theme === 'dark') await page.locator('#theme-toggle').click();
           await page
             .getByText(
               japanese

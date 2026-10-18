@@ -27,6 +27,9 @@ for (const japanese of [false, true])
             },
           }),
         );
+        await page.addInitScript(() =>
+          localStorage.setItem('gensai-theme', 'light'),
+        );
         await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
         const search = page.getByRole('searchbox');
         for (const theme of ['light', 'dark']) {

@@ -19,16 +19,21 @@ test('preferences retain localized public URLs and visible controls at phone and
             `${base}${locale === 'ja' ? '/ja' : '/'}?view=hazards#map`,
           );
           const themeButton = page.locator('#theme-toggle');
-          await themeButton.click();
-          assert.equal(
-            await page.locator('html').getAttribute('data-theme'),
-            theme === 'dark' ? 'light' : 'dark',
-          );
-          await themeButton.click();
-          assert.equal(
-            await page.locator('html').getAttribute('data-theme'),
-            theme,
-          );
+          // System is the default; cycle to each appearance without assuming two modes.
+          for (const expected of [theme === 'dark' ? 'light' : 'dark', theme]) {
+            for (let step = 0; step < 3; step++) {
+              if (
+                (await page.locator('html').getAttribute('data-theme')) ===
+                expected
+              )
+                break;
+              await themeButton.click();
+            }
+            assert.equal(
+              await page.locator('html').getAttribute('data-theme'),
+              expected,
+            );
+          }
           const search = await page.getByRole('searchbox').boundingBox();
           const preferences = await page
             .locator('#locale-toggle')

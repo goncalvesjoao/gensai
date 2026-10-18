@@ -21,6 +21,9 @@ for (const japanese of [false, true])
           navigator.geolocation.getCurrentPosition = () =>
             window.locationRequests++;
         });
+        await page.addInitScript(() =>
+          localStorage.setItem('gensai-theme', 'light'),
+        );
         await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
         const status = page.getByRole('status');
         const selectedLabel = japanese ? '選択した場所' : 'Selected location';
@@ -82,24 +85,30 @@ for (const japanese of [false, true])
           await page.screenshot({
             path: `${process.env.SCREENSHOT_DIR}/${japanese ? 'ja' : 'en'}-${mobile ? 'phone' : 'computer'}-dark.png`,
           });
-        const markerBox = await page
-          .locator('.maplibregl-marker')
-          .boundingBox();
-        const canvasBox = await canvas.boundingBox();
-        assert.ok(
-          Math.abs(
-            markerBox.x +
-              markerBox.width / 2 -
-              (canvasBox.x + canvasBox.width / 2),
-          ) < 2,
-        );
-        assert.ok(
-          Math.abs(
-            markerBox.y +
-              markerBox.height -
-              (canvasBox.y + canvasBox.height / 2),
-          ) < 12,
-        );
+        // Resize delivery is asynchronous; compare both rectangles in the same frame.
+        await page.waitForFunction(() => {
+          const markerBox = document
+            .querySelector('.maplibregl-marker')
+            .getBoundingClientRect();
+          const canvas = document.querySelector('canvas');
+          const canvasBox = canvas.getBoundingClientRect();
+          return (
+            Math.abs(
+              canvasBox.width -
+                canvas.parentElement.getBoundingClientRect().width,
+            ) < 1 &&
+            Math.abs(
+              markerBox.x +
+                markerBox.width / 2 -
+                (canvasBox.x + canvasBox.width / 2),
+            ) < 2 &&
+            Math.abs(
+              markerBox.y +
+                markerBox.height -
+                (canvasBox.y + canvasBox.height / 2),
+            ) < 12
+          );
+        });
         const statusBox = await status.boundingBox();
         assert.ok(statusBox.width > 0 && statusBox.height > 0);
         assert.ok(
