@@ -13,30 +13,40 @@ const scripts = [...head.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)]
   .map(([, , script]) => script);
 
 for (const scenario of [
-  { name: 'system dark', systemDark: true, stored: {}, expected: 'dark' },
+  {
+    name: 'system dark',
+    systemDark: true,
+    stored: {},
+    expected: 'dark',
+    expectedMode: 'system',
+  },
   {
     name: 'saved light overrides system dark',
     systemDark: true,
     stored: { 'gensai-theme': 'light' },
     expected: 'light',
+    expectedMode: 'light',
   },
   {
     name: 'saved dark overrides system light',
     systemDark: false,
     stored: { 'gensai-theme': 'dark' },
     expected: 'dark',
+    expectedMode: 'dark',
   },
   {
     name: 'blocked storage retains system dark',
     systemDark: true,
     blocked: true,
     expected: 'dark',
+    expectedMode: 'system',
   },
   {
     name: 'invalid preference falls back to system',
     systemDark: true,
     stored: { 'gensai-theme': 'invalid' },
     expected: 'dark',
+    expectedMode: 'system',
   },
 ]) {
   test(`preferences applied before body renders: ${scenario.name}`, () => {
@@ -60,12 +70,7 @@ for (const scenario of [
     };
     for (const script of scripts) runInNewContext(script, context);
     assert.equal(root.dataset.theme, scenario.expected);
-    assert.equal(
-      root.dataset.themeMode,
-      ['light', 'dark'].includes(scenario.stored?.['gensai-theme'])
-        ? scenario.stored['gensai-theme']
-        : 'system',
-    );
+    assert.equal(root.dataset.themeMode, scenario.expectedMode);
     assert.equal(
       root.lang,
       'ja',
