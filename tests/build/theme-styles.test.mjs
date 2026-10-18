@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { test } from 'vitest';
 
 test('primary-strong utilities retain the runtime theme variable', () => {
-  const directory = new URL('../dist/_astro/', import.meta.url);
+  const directory = new URL('../../dist/_astro/', import.meta.url);
   const css = readdirSync(directory)
     .filter((file) => file.endsWith('.css'))
     .map((file) => readFileSync(new URL(file, directory), 'utf8'))

@@ -264,7 +264,10 @@ for (const status of [404, 500])
           : 'Tile request failed';
       const source = page.locator('[data-hazard-source="tsunami"]');
       await source.filter({ hasText: explanation }).waitFor();
-      await page.waitForTimeout(800);
+      await page.waitForFunction(() => {
+        const map = window.__gensaiMapInstance;
+        return map.isStyleLoaded() && map.areTilesLoaded() && !map.isMoving();
+      });
       const before = requests;
       hold = true;
       const canvas = await page.locator('canvas').boundingBox();
@@ -272,15 +275,32 @@ for (const status of [404, 500])
         canvas.x + canvas.width / 2,
         canvas.y + canvas.height / 2,
       );
+      await page.evaluate(() => {
+        const map = window.__gensaiMapInstance;
+        window.panFinished = new Promise((resolve) =>
+          map.once('moveend', resolve),
+        );
+        window.panStart = map.getCenter().toArray();
+      });
       await page.mouse.down();
       await page.mouse.move(
         canvas.x + canvas.width / 2 + 8,
         canvas.y + canvas.height / 2,
         { steps: 4 },
       );
-      await page.waitForTimeout(400);
+      await page.waitForFunction(() => window.__gensaiMapInstance.isMoving());
       await page.mouse.up();
-      await page.waitForTimeout(600);
+      await page.evaluate(async () => {
+        await window.panFinished;
+        await new Promise(requestAnimationFrame);
+      });
+      assert.notDeepEqual(
+        await page.evaluate(() =>
+          window.__gensaiMapInstance.getCenter().toArray(),
+        ),
+        await page.evaluate(() => window.panStart),
+        'the drag must move the map before checking cached failures',
+      );
       // A 500 can trigger a new parent-tile retry on pan. Hold that response
       // so it cannot hide loss of the existing failed viewport tile.
       if (status === 404)

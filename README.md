@@ -152,8 +152,9 @@ shim is needed.
 | `npm run build`           | Create a production build.                                          |
 | `npm run preview`         | Preview the production build locally after running `npm run build`. |
 | `npm test`                | Run React, built-output and browser integration checks.             |
-| `npm run test:fast`       | Build once and run all Vitest checks.                               |
+| `npm run test:fast`       | Run source and component checks without building.                   |
 | `npm run test:browser`    | Build and run browser integration checks with managed preview.      |
+| `npm run test:build`      | Build once and verify generated output with Vitest.                 |
 | `npm run test:react`      | Run React behavior checks without a build or browser.               |
 | `npm run test:visual`     | Build and run focused browser layout checks.                        |
 | `npm run test:all`        | Run the default suite and every visual check.                       |
@@ -210,8 +211,8 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `components.json`: shadcn/ReUI registry setup.
 - `tsconfig.json`: Astro configuration and `@/*` source alias for registry installs.
 - `astro.config.mjs`: Astro, React, Tailwind Vite plugin, and server configuration.
-- `tests/map-worker.test.mjs`: production worker request regression test.
-- `tests/map-routing.test.mjs`: static welcome link and redirect checks.
+- `tests/build/map-worker.test.mjs`: production worker request regression test.
+- `tests/build/map-routing.test.mjs`: static welcome link and redirect checks.
 - `tests/react/`: simulated-DOM address and device behavior checks.
 - `tests/browser/`: map interaction, focus, rendering and hosting checks.
 - `tests/browser/visual/`: focused language, theme and viewport layout checks.
@@ -219,8 +220,8 @@ but fail in production. See [MapLibre's Vite setup](https://maplibre.org/maplibr
 - `scripts/test-browser.mjs`: local preview and browser execution.
 - `docs/test-coverage.md`: assertion coverage and browser-matrix reductions.
 - `tests/locale.test.mjs`: route language and locale navigation checks.
-- `tests/preferences.test.mjs`: pre-paint theme checks.
-- `tests/theme-styles.test.mjs`: runtime theme-token regression checks.
+- `tests/build/preferences.test.mjs`: pre-paint theme checks.
+- `tests/build/theme-styles.test.mjs`: runtime theme-token regression checks.
 
 ## License
 

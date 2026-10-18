@@ -4,7 +4,11 @@ export default defineConfig({
   oxc: { jsx: { runtime: 'automatic' } },
   test: {
     environment: 'node',
-    include: ['tests/*.test.mjs', 'tests/react/*.test.jsx'],
+    include: [
+      'tests/*.test.mjs',
+      'tests/react/*.test.jsx',
+      'tests/build/*.test.mjs',
+    ],
     restoreMocks: true,
   },
 });

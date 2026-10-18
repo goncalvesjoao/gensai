@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { test } from 'vitest';
-import { startPreview } from '../scripts/preview.mjs';
+import { startPreview } from '../../scripts/preview.mjs';
 
 test('production map worker and its static imports are served as JavaScript', async () => {
   // Exercise the emitted URL, not the source import: plain ?url works in dev.
-  const assets = new URL('../dist/_astro/', import.meta.url);
+  const assets = new URL('../../dist/_astro/', import.meta.url);
   const files = await readdir(assets);
   const mapChunk = files.find((file) => /^MapView\..*\.js$/.test(file));
   assert.ok(mapChunk, 'Build the site before running this test');

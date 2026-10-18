@@ -4,7 +4,7 @@
   "description": "Gensai is a practical guide for disaster preparedness in Japan.",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test:fast && node scripts/test-browser.mjs",
+    "test": "npm run test:fast && npm run test:build && node scripts/test-browser.mjs",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "node scripts/preview.mjs",
@@ -12,14 +12,15 @@
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
-    "test:fast": "npm run build && vitest run",
+    "test:fast": "vitest run --exclude 'tests/build/**'",
     "test:browser": "npm run build && node scripts/test-browser.mjs",
     "test:production": "node --test tests/browser/production-access.test.mjs",
     "test:live": "npm run build && node scripts/test-browser.mjs --live",
     "test:setup": "playwright install chromium",
     "test:react": "vitest run tests/react",
     "test:visual": "npm run build && node scripts/test-browser.mjs --visual",
-    "test:all": "npm test && node scripts/test-browser.mjs --visual"
+    "test:all": "npm test && node scripts/test-browser.mjs --visual",
+    "test:build": "npm run build && vitest run tests/build"
   },
   "repository": {
     "type": "git",

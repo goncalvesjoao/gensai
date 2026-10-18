@@ -246,87 +246,47 @@ test('capped suggestions remain explicit choices from an overseas device and loc
   }
 });
 
-test('new searches and selection attempts supersede older provider and boundary responses', async () => {
+// Real map events and a delayed emitted module cannot be verified in jsdom.
+test('map selections cancel pending searches and searches cancel pending boundary selections', async () => {
   const browser = await browserSession();
+  let release = () => {};
   try {
     const page = await browser.newPage();
-    const requests = [];
-    await page.route('https://photon.komoot.io/api/**', (route) =>
-      requests.push(route),
-    );
-    await page.addInitScript(() => {
-      window.locationRequests = [];
-      navigator.geolocation.getCurrentPosition = (success) =>
-        window.locationRequests.push(success);
+    let receive;
+    let requested = new Promise((resolve) => {
+      receive = resolve;
     });
+    await page.route('https://photon.komoot.io/api/**', (route) =>
+      receive(route),
+    );
     await page.goto(base);
-    await page.locator('canvas').waitFor();
     const search = page.getByRole('searchbox');
     const selection = page.locator('.map-selection [role=status]');
     const feedback = page.locator('#address-search-feedback');
-    async function submit(q) {
-      const count = requests.length;
-      await search.fill(q);
-      await search.press('Enter');
-      await page.waitForFunction(() =>
-        document
-          .querySelector('#address-search-feedback')
-          .textContent.includes('Searching'),
-      );
-      while (requests.length === count) await page.waitForTimeout(10);
-    }
-    async function respond(route, name, lng = 139.6917, lat = 35.6895) {
-      await route
-        .fulfill({
-          json: {
-            type: 'FeatureCollection',
-            features: [match(name, lng, lat)],
-          },
-        })
-        .catch(() => {});
-    }
-    await submit('old');
-    await submit('new');
-    await respond(requests[1], 'Latest', 122.998, 24.467);
-    await selection.filter({ hasText: 'Latest' }).waitFor();
-    await respond(requests[0], 'Obsolete');
-    assert.match(await selection.textContent(), /Latest/);
-    await submit('superseded by device start');
-    await page
-      .getByRole('button', { name: 'Use my location', exact: true })
-      .click();
-    await respond(requests[2], 'Obsolete');
-    await page.evaluate(() =>
-      window.locationRequests.at(-1)({
-        coords: { latitude: 26.2124, longitude: 127.6809 },
-      }),
-    );
-    await selection.filter({ hasText: '26.21240, 127.68090' }).waitFor();
-    await submit('superseded by map');
+    await search.fill('superseded by map');
+    await search.press('Enter');
+    const obsolete = await requested;
     await page.locator('canvas').focus();
     await page.keyboard.press('Enter');
-    await respond(requests[3], 'Obsolete');
+    await obsolete
+      .fulfill({
+        json: { type: 'FeatureCollection', features: [match('Obsolete')] },
+      })
+      .catch(() => {});
     await selection.filter({ hasNotText: 'Checking' }).waitFor();
     assert.doesNotMatch(await selection.textContent(), /Obsolete/);
     assert.equal(await feedback.textContent(), '');
-    // A search start also invalidates a still-pending device callback.
-    await page
-      .getByRole('button', { name: 'Use my location', exact: true })
-      .click();
-    await submit('search beats device');
-    await page.evaluate(() =>
-      window.locationRequests.at(-1)({
-        coords: { latitude: 35.6895, longitude: 139.6917 },
-      }),
-    );
-    await respond(requests[4], 'Search wins', 122.998, 24.467);
-    await selection.filter({ hasText: 'Search wins' }).waitFor();
+
     await page.reload();
-    let release;
     const gate = new Promise((resolve) => {
       release = resolve;
     });
+    let boundaryRequested;
+    const download = new Promise((resolve) => {
+      boundaryRequested = resolve;
+    });
     await page.route('**/japan-boundary*.js', async (route) => {
+      boundaryRequested();
       await gate;
       await route.continue();
     });
@@ -338,16 +298,25 @@ test('new searches and selection attempts supersede older provider and boundary 
     await page
       .getByRole('button', { name: 'Select coordinates', exact: true })
       .click();
+    await download;
     await selection.filter({ hasText: 'Checking' }).waitFor();
-    await submit('new intent while boundary pending');
+    requested = new Promise((resolve) => {
+      receive = resolve;
+    });
+    await search.fill('new intent while boundary pending');
+    await search.press('Enter');
+    const latest = await requested;
+    const loaded = page.waitForResponse((response) =>
+      /\/japan-boundary[^/]*\.js/.test(response.url()),
+    );
     release();
-    await requests
-      .at(-1)
-      .fulfill({ json: { type: 'FeatureCollection', features: [] } });
+    await (await loaded).finished();
+    await latest.fulfill({ json: { type: 'FeatureCollection', features: [] } });
     await feedback.filter({ hasText: 'No supported Japan results' }).waitFor();
     assert.equal(await selection.textContent(), '');
     assert.equal(await page.locator('.maplibregl-marker').count(), 0);
   } finally {
+    release();
     await browser.close();
   }
 });

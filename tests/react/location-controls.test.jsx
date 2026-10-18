@@ -320,6 +320,68 @@ test('a newer query cancels the older response and selection attempts cancel lat
   expect(selected).toHaveLength(0);
 });
 
+test.each(['new search', 'device activation'])(
+  '%s supersedes a pending search even when its response arrives late',
+  async (intent) => {
+    let release;
+    const fetch = provider([match('Latest', 122.998, 24.467)]);
+    fetch.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+    render(<AddressSearch />);
+    submit('old');
+    const signal = fetch.mock.calls[0][1].signal;
+    if (intent === 'new search') {
+      submit('new');
+      await waitFor(() => expect(selected).toHaveLength(1));
+    } else {
+      fireEvent.click(screen.getByRole('button', { name: 'Use my location' }));
+      await act(async () =>
+        requests[0].success({
+          coords: { latitude: 26.2124, longitude: 127.6809 },
+        }),
+      );
+    }
+    expect(signal.aborted).toBe(true);
+    await act(async () =>
+      release({
+        ok: true,
+        json: async () => ({
+          type: 'FeatureCollection',
+          features: [match('Obsolete')],
+        }),
+      }),
+    );
+    expect(selected).toHaveLength(1);
+    expect(selected[0].location).toEqual(
+      intent === 'new search'
+        ? { lat: 24.467, lng: 122.998 }
+        : { lat: 26.2124, lng: 127.6809 },
+    );
+  },
+);
+
+test('submitting a search cancels a pending device callback', async () => {
+  const fetch = provider([match('Search wins', 122.998, 24.467)]);
+  render(<AddressSearch />);
+  const device = screen.getByRole('button', { name: 'Use my location' });
+  fireEvent.click(device);
+  submit('new search');
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(device.getAttribute('aria-busy')).toBe('false');
+  await act(async () =>
+    requests[0].success({
+      coords: { latitude: 35.6895, longitude: 139.6917 },
+    }),
+  );
+  await waitFor(() => expect(selected).toHaveLength(1));
+  expect(selected[0].location).toEqual({ lat: 24.467, lng: 122.998 });
+  expect(selected[0].label).toBe('Selected location: Search wins');
+});
+
 test('composing Enter does not submit an unfinished Japanese input', () => {
   const fetch = provider();
   render(<AddressSearch locale="ja" />);
