@@ -61,6 +61,12 @@ for (const scenario of [
     for (const script of scripts) runInNewContext(script, context);
     assert.equal(root.dataset.theme, scenario.expected);
     assert.equal(
+      root.dataset.themeMode,
+      ['light', 'dark'].includes(scenario.stored?.['gensai-theme'])
+        ? scenario.stored['gensai-theme']
+        : 'system',
+    );
+    assert.equal(
       root.lang,
       'ja',
       'Theme initialization preserves the page language',

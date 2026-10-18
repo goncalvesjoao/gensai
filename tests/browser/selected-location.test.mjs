@@ -21,6 +21,9 @@ test('delayed boundary loading keeps the latest selection and explains load fail
       await gate;
       await route.continue();
     });
+    await page.addInitScript(() =>
+      localStorage.setItem('gensai-theme', 'light'),
+    );
     await page.goto(base);
     await page
       .getByText('Choose or correct coordinates', { exact: true })

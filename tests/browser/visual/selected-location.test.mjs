@@ -21,6 +21,9 @@ for (const japanese of [false, true])
           navigator.geolocation.getCurrentPosition = () =>
             window.locationRequests++;
         });
+        await page.addInitScript(() =>
+          localStorage.setItem('gensai-theme', 'light'),
+        );
         await page.goto(`${base}/${japanese ? 'ja/' : ''}`);
         const status = page.getByRole('status');
         const selectedLabel = japanese ? '選択した場所' : 'Selected location';
