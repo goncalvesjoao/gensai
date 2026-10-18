@@ -14,3 +14,9 @@ read `docs/agents/triage-labels.md`.
 
 Use a single-context layout. Before exploring the codebase,
 read `docs/agents/domain.md`.
+
+### Ship-it identity
+
+Before Ship-it GitHub access or Git writes/network operations, including delegated
+workers, resumed runs, and scheduled ticks, read and follow the identity policy
+in `docs/agents/issue-tracker.md`.
